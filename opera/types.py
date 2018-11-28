@@ -3,15 +3,66 @@ from __future__ import print_function, unicode_literals
 from opera import ansible
 
 
+def get_indent(n):
+    return "  " * n
+
 class MissingImplementation(Exception):
     pass
 
 
-def Pass(x):
-    """
-    Dummy "class" that can be used for types that do not need wrapping.
-    """
-    return x
+class BadType(Exception):
+    pass
+
+
+class Pass(object):
+    # TODO(@tadeboro): Remove when we have enough classes implemented.
+    def __init__(self, data):
+        self._data = data
+
+    def __str__(self):
+        return str(self._data)
+
+
+class String(object):
+    def __init__(self, data):
+        if not isinstance(data, str):
+            raise BadType("String constructor takes string as input data")
+        self._data = data
+
+    def __str__(self):
+        return self._data
+
+
+class Function(object):
+    VALID_NAMES = (
+        "concat",
+        "get_artifact",
+        "get_attribute",
+        "get_input",
+        "get_nodes_of_type",
+        "get_operation_output",
+        "get_property",
+        "join",
+        "token",
+    )
+
+    def __init__(self, data):
+        if not isinstance(data, dict):
+            raise BadType("Function constructor takes dict as input data")
+        if len(data) != 1:
+            raise BadType("Function constructor takes single member dict")
+
+        (name, args), = data.items()
+        if name not in self.VALID_NAMES:
+            raise BadType("Invalid function name: " + name)
+        if not isinstance(args, list):
+            raise BadType("Function arguments should be specified as array")
+
+        self._name = name
+        self._args = args
+
+    def __str__(self):
+        return "{}({})".format(self._name, ", ".join(self._args))
 
 
 class BaseEntity(object):
@@ -27,10 +78,10 @@ class BaseEntity(object):
             value = item.dump(level + 1)
             separator = "\n"
         except AttributeError:
-            value = item  # pass-through for native types
+            value = str(item)  # pass-through for native types
             separator = " "
 
-        return "{}{}:{}{}".format("  " * level, name, separator, value)
+        return "{}{}:{}{}".format(get_indent(level), name, separator, value)
 
 
 class Entity(BaseEntity):
@@ -44,9 +95,17 @@ class Entity(BaseEntity):
             )
 
     def parse_attrs(self, data):
-        for attr, cls in self.ATTRS.items():
-            if attr in data:
-                setattr(self, attr, cls(data[attr]))
+        for attr, classes in self.ATTRS.items():
+            if attr not in data:
+                continue
+            for cls in classes:
+                try:
+                    setattr(self, attr, cls(data[attr]))
+                    break
+                except BadType:
+                    pass
+            else:
+                raise BadType("Cannot parse {}".format(data))
 
         wanted = set(self.ATTRS.keys())
         supplied = set(data.keys())
@@ -78,14 +137,13 @@ class EntityCollection(Entity):
     def parse_attrs(self, data):
         missing, extra = super(EntityCollection, self).parse_attrs(data)
         for attr in extra:
-            print((attr, data[attr]))
             setattr(self, attr, self.ITEM_CLASS(data[attr]))
         return missing, set()
 
 
 class Interface(Entity):
     ATTRS = dict(
-        create=Pass,
+        create=(Pass,),
     )
 
 
@@ -96,8 +154,8 @@ class InterfaceCollection(EntityCollection):
 
 class NodeTemplate(Entity):
     ATTRS = dict(
-        interfaces=InterfaceCollection,
-        type=Pass,
+        interfaces=(InterfaceCollection,),
+        type=(Pass,),
     )
 
     def deploy(self):
@@ -116,7 +174,7 @@ class NodeTemplateCollection(EntityCollection):
 
 class TopologyTemplate(Entity):
     ATTRS = dict(
-        node_templates=NodeTemplateCollection,
+        node_templates=(NodeTemplateCollection,),
     )
 
     def deploy(self):
@@ -125,8 +183,8 @@ class TopologyTemplate(Entity):
 
 class ServiceTemplate(Entity):
     ATTRS = dict(
-        topology_template=TopologyTemplate,
-        tosca_definitions_version=Pass,
+        topology_template=(TopologyTemplate,),
+        tosca_definitions_version=(Pass,),
     )
 
     def deploy(self):
