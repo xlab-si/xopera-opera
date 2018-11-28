@@ -43,38 +43,44 @@ class Entity(BaseEntity):
                 "{} did not override ATTRS".format(cls_name)
             )
 
-    def __init__(self, data):
-        self.check_override()
+    def parse_attrs(self, data):
         for attr, cls in self.ATTRS.items():
             if attr in data:
                 setattr(self, attr, cls(data[attr]))
 
+        wanted = set(self.ATTRS.keys())
+        supplied = set(data.keys())
+        missing = wanted - supplied
+        extra = supplied - wanted
+        return missing, extra
+
+    def __init__(self, data):
+        self.check_override()
+        self.parse_attrs(data)
+
     def dump(self, level):
         return "\n".join(
-            self.dump_item(attr, getattr(self, attr), level)
-            for attr in self.ATTRS if hasattr(self, attr)
+            self.dump_item(k, v, level) for k, v in vars(self).items()
         )
 
 
-class EntityCollection(BaseEntity):
+class EntityCollection(Entity):
     ITEM_CLASS = None  # This should be overridden in derived classes
 
     def check_override(self):
+        super(EntityCollection, self).check_override()
         if self.ITEM_CLASS is None:
             cls_name = self.__class__.__name__
             raise MissingImplementation(
                 "{} did not override ITEM_CLASS".format(cls_name)
             )
 
-    def __init__(self, data):
-        self.check_override()
-        for k, v in data.items():
-            setattr(self, k, self.ITEM_CLASS(v))
-
-    def dump(self, level):
-        return "\n".join(
-            self.dump_item(k, v, level) for k, v in vars(self).items()
-        )
+    def parse_attrs(self, data):
+        missing, extra = super(EntityCollection, self).parse_attrs(data)
+        for attr in extra:
+            print((attr, data[attr]))
+            setattr(self, attr, self.ITEM_CLASS(data[attr]))
+        return missing, set()
 
 
 class Interface(Entity):
@@ -84,6 +90,7 @@ class Interface(Entity):
 
 
 class InterfaceCollection(EntityCollection):
+    ATTRS = {}
     ITEM_CLASS = Interface
 
 
@@ -98,6 +105,7 @@ class NodeTemplate(Entity):
 
 
 class NodeTemplateCollection(EntityCollection):
+    ATTRS = {}
     ITEM_CLASS = NodeTemplate
 
     def deploy(self):
