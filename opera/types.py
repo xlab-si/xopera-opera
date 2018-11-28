@@ -38,7 +38,10 @@ class Entity(BaseEntity):
 
     def check_override(self):
         if self.ATTRS is None:
-            raise MissingImplementation("Class did not override ATTRS")
+            cls_name = self.__class__.__name__
+            raise MissingImplementation(
+                "{} did not override ATTRS".format(cls_name)
+            )
 
     def __init__(self, data):
         self.check_override()
@@ -58,7 +61,10 @@ class EntityCollection(BaseEntity):
 
     def check_override(self):
         if self.ITEM_CLASS is None:
-            raise MissingImplementation("Class did not override ITEM_CLASS")
+            cls_name = self.__class__.__name__
+            raise MissingImplementation(
+                "{} did not override ITEM_CLASS".format(cls_name)
+            )
 
     def __init__(self, data):
         self.check_override()
