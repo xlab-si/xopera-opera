@@ -1,0 +1,29 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+node_types:
+  xlab.nodes.VM.OpenStack:
+    derived_from: tosca.nodes.Compute
+    properties:
+      flavor:
+        type: string
+        description: OpenStack flavor id (flavor names are not accepted)
+    attributes:
+      id:
+        type: string
+        description: OpenStack id of the VM
+    interfaces:
+      Standard:
+        type: tosca.interfaces.node.lifecycle.Standard
+        create:
+          inputs:
+            flavor:
+              default: { get_property: [ SELF, flavor ] }
+            x:
+              default: y
+          implementation:
+            primary: playbooks/os_server.yml
+
+topology_template:
+  node_templates:
+    db_server:
+      type: xlab.nodes.VM.OpenStack

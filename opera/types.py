@@ -181,8 +181,115 @@ class TopologyTemplate(Entity):
         self.node_templates.deploy()
 
 
+class ArtifactDefinition(Entity):
+    pass
+
+
+class ArtifactDefinitionCollection(EntityCollection):
+    ATTRS = {}
+    ITEM_CLASS = ArtifactDefinition
+
+
+class AttributeDefinition(Entity):
+    ATTRS = dict(
+        default=(Pass,),
+        description=(Pass,),
+        type=(Pass,),
+    )
+
+
+class AttributeDefinitionCollection(EntityCollection):
+    ATTRS = {}
+    ITEM_CLASS = AttributeDefinition
+
+
+class CapabilityDefinition(Entity):
+    pass
+
+
+class CapabilityDefinitionCollection(EntityCollection):
+    ATTRS = {}
+    ITEM_CLASS = CapabilityDefinition
+
+
+class OperationImplementationDefinition(Entity):
+    ATTRS = dict(
+        primary=(Pass,),
+    )
+
+
+class ParameterDefinition(Entity):
+    ATTRS = dict(
+        default=(Function, String),
+    )
+
+
+class ParameterDefinitionCollection(EntityCollection):
+    ATTRS = {}
+    ITEM_CLASS = ParameterDefinition
+
+
+class OperationDefinition(Entity):
+    ATTRS = dict(
+        inputs=(ParameterDefinitionCollection,),
+        implementation=(OperationImplementationDefinition,),
+    )
+
+
+class InterfaceDefinition(EntityCollection):
+    ATTRS = dict(
+        type=(Pass,),
+    )
+    ITEM_CLASS = OperationDefinition
+
+
+class InterfaceDefinitionCollection(EntityCollection):
+    ATTRS = {}
+    ITEM_CLASS = InterfaceDefinition
+
+
+class PropertyDefinition(Entity):
+    ATTRS = dict(
+        default=(Pass,),
+        description=(Pass,),
+        type=(Pass,),
+    )
+
+
+class PropertyDefinitionCollection(EntityCollection):
+    ATTRS = {}
+    ITEM_CLASS = PropertyDefinition
+
+
+class RequirementDefinition(Entity):
+    pass
+
+
+class RequirementDefinitionCollection(EntityCollection):
+    ATTRS = {}
+    ITEM_CLASS = RequirementDefinition
+
+
+class NodeType(Entity):
+    ATTRS = dict(
+        artifacts=(ArtifactDefinitionCollection,),
+        attributes=(AttributeDefinitionCollection,),
+        capabilities=(CapabilityDefinitionCollection,),
+        derived_from=(Pass,),
+        interfaces=(InterfaceDefinitionCollection,),
+        properties=(PropertyDefinitionCollection,),
+        requirements=(RequirementDefinitionCollection,),
+    )
+
+
+class NodeTypeCollection(EntityCollection):
+    ATTRS = {}
+    ITEM_CLASS = NodeType
+
+
 class ServiceTemplate(Entity):
     ATTRS = dict(
+        node_types=(NodeTypeCollection,),
         topology_template=(TopologyTemplate,),
         tosca_definitions_version=(Pass,),
     )
