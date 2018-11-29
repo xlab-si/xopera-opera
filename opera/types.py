@@ -140,6 +140,17 @@ class EntityCollection(Entity):
             setattr(self, attr, self.ITEM_CLASS(data[attr]))
         return missing, set()
 
+class OrderedEntityCollection(EntityCollection):
+    ATTRS = {}  # Ordered collections cannot have any attributes
+
+    def parse_attrs(self, data):
+        self._order = []
+        for item in data:
+            (attr, value), = item.items()
+            setattr(self, attr, self.ITEM_CLASS(value))
+            self._order.append(attr)
+        return set(), set()
+
 
 class Interface(Entity):
     ATTRS = dict(
@@ -265,8 +276,7 @@ class RequirementDefinition(Entity):
     pass
 
 
-class RequirementDefinitionCollection(EntityCollection):
-    ATTRS = {}
+class RequirementDefinitionCollection(OrderedEntityCollection):
     ITEM_CLASS = RequirementDefinition
 
 
