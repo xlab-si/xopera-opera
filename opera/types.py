@@ -1,5 +1,7 @@
 from __future__ import print_function, unicode_literals
 
+import collections
+
 from opera import ansible
 
 
@@ -87,6 +89,17 @@ class BaseEntity(object):
 class Entity(BaseEntity):
     ATTRS = None  # This should be overridden in derived classes
 
+    def __init__(self, data):
+        self.attrs = collections.OrderedDict()
+        self.check_override()
+        self.parse_attrs(data)
+
+    def __getattr__(self, attr):
+        try:
+            return self.attrs[attr]
+        except KeyError:
+            raise AttributeError
+
     def check_override(self):
         if self.ATTRS is None:
             cls_name = self.__class__.__name__
@@ -100,7 +113,7 @@ class Entity(BaseEntity):
                 continue
             for cls in classes:
                 try:
-                    setattr(self, attr, cls(data[attr]))
+                    self.attrs[attr] = cls(data[attr])
                     break
                 except BadType:
                     pass
@@ -113,13 +126,9 @@ class Entity(BaseEntity):
         extra = supplied - wanted
         return missing, extra
 
-    def __init__(self, data):
-        self.check_override()
-        self.parse_attrs(data)
-
     def dump(self, level):
         return "\n".join(
-            self.dump_item(k, v, level) for k, v in vars(self).items()
+            self.dump_item(k, v, level) for k, v in self.attrs.items()
         )
 
 
@@ -137,18 +146,16 @@ class EntityCollection(Entity):
     def parse_attrs(self, data):
         missing, extra = super(EntityCollection, self).parse_attrs(data)
         for attr in extra:
-            setattr(self, attr, self.ITEM_CLASS(data[attr]))
+            self.attrs[attr] = self.ITEM_CLASS(data[attr])
         return missing, set()
 
 class OrderedEntityCollection(EntityCollection):
     ATTRS = {}  # Ordered collections cannot have any attributes
 
     def parse_attrs(self, data):
-        self._order = []
         for item in data:
             (attr, value), = item.items()
-            setattr(self, attr, self.ITEM_CLASS(value))
-            self._order.append(attr)
+            self.attrs[attr] = self.ITEM_CLASS(value)
         return set(), set()
 
 
