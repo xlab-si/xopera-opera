@@ -1,6 +1,7 @@
 from __future__ import print_function, unicode_literals
 
 import argparse
+import pkg_resources
 import sys
 
 import yaml
@@ -40,6 +41,12 @@ def create_deploy_parser(subparsers):
                         help="service template yaml file")
 
 
+def load_standard_library():
+    return yaml.safe_load(
+        pkg_resources.resource_stream(__name__, "types.yaml"),
+    )
+
+
 def main():
     parser = create_parser()
     args = parser.parse_args()
@@ -47,5 +54,8 @@ def main():
     service_template = types.ServiceTemplate(yaml.safe_load(args.template))
     print((service_template))
     service_template.deploy()
+
+    test = types.ServiceTemplate(load_standard_library())
+    print(test)
 
     return 0

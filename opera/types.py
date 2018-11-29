@@ -215,7 +215,9 @@ class AttributeDefinitionCollection(EntityCollection):
 
 
 class CapabilityDefinition(Entity):
-    pass
+    ATTRS = dict(
+        type=(String,),
+    )
 
 
 class CapabilityDefinitionCollection(EntityCollection):
@@ -273,7 +275,9 @@ class PropertyDefinitionCollection(EntityCollection):
 
 
 class RequirementDefinition(Entity):
-    pass
+    ATTRS = dict(
+        capabilitiy=(String,),
+    )
 
 
 class RequirementDefinitionCollection(OrderedEntityCollection):
