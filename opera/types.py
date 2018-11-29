@@ -169,27 +169,16 @@ class NodeTemplate(Entity):
         type=(Pass,),
     )
 
-    def deploy(self):
-        ansible.run(self.interfaces.Standard.create)
-
 
 class NodeTemplateCollection(EntityCollection):
     ATTRS = {}
     ITEM_CLASS = NodeTemplate
-
-    def deploy(self):
-        # TODO(@tadeboro): Build graph here
-        for v in vars(self).values():
-            v.deploy()
 
 
 class TopologyTemplate(Entity):
     ATTRS = dict(
         node_templates=(NodeTemplateCollection,),
     )
-
-    def deploy(self):
-        self.node_templates.deploy()
 
 
 class ArtifactDefinition(Entity):
@@ -307,6 +296,3 @@ class ServiceTemplate(Entity):
         topology_template=(TopologyTemplate,),
         tosca_definitions_version=(Pass,),
     )
-
-    def deploy(self):
-        self.topology_template.deploy()

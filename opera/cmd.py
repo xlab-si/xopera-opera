@@ -53,7 +53,6 @@ def main():
 
     service_template = types.ServiceTemplate(yaml.safe_load(args.template))
     print((service_template))
-    service_template.deploy()
 
     test = types.ServiceTemplate(load_standard_library())
     print(test)
