@@ -57,4 +57,7 @@ def main():
     test = types.ServiceTemplate(load_standard_library())
     print(test)
 
+    test.merge(service_template)
+    print(test)
+
     return 0

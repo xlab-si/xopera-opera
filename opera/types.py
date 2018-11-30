@@ -16,6 +16,10 @@ class BadType(Exception):
     pass
 
 
+class MergeError(Exception):
+    pass
+
+
 class Pass(object):
     # TODO(@tadeboro): Remove when we have enough classes implemented.
     def __init__(self, data):
@@ -33,6 +37,12 @@ class String(object):
 
     def __str__(self):
         return self._data
+
+    def __eq__(self, other):
+        return self._data == other._data
+
+    def __ne__(self, other):
+        self._data != other._data
 
 
 class Function(object):
@@ -148,6 +158,7 @@ class EntityCollection(Entity):
         for attr in extra:
             self.attrs[attr] = self.ITEM_CLASS(data[attr])
         return missing, set()
+
 
 class OrderedEntityCollection(EntityCollection):
     ATTRS = {}  # Ordered collections cannot have any attributes
@@ -296,10 +307,38 @@ class NodeTypeCollection(EntityCollection):
     ATTRS = {}
     ITEM_CLASS = NodeType
 
+    def merge(self, other):
+        duplicates = set(self.attrs.keys()) & set(other.attrs.keys())
+        if len(duplicates) > 0:
+            raise MergeError("Duplicated types: {}".format(duplicates))
+        self.attrs.update(other.attrs)
+
 
 class ServiceTemplate(Entity):
     ATTRS = dict(
         node_types=(NodeTypeCollection,),
         topology_template=(TopologyTemplate,),
-        tosca_definitions_version=(Pass,),
+        tosca_definitions_version=(String,),
     )
+
+    def is_compatible_with(self, other):
+        key = "tosca_definitions_version"
+        return self.attrs[key] == other.attrs[key]
+
+    @property
+    def merge_keys(self):
+        skip = (
+            "tosca_definitions_version",
+        )
+        return (k for k in self.ATTRS if k not in skip)
+
+    def merge(self, other):
+        if not self.is_compatible_with(other):
+            raise MergeError("Incompatible ServiceTemplate versions")
+
+        for key in self.merge_keys:
+            if key in other.attrs:
+                if key in self.attrs:
+                    self.attrs[key].merge(other.attrs[key])
+                elif key in other.attrs:
+                    self.attrs[key] = other.attrs[key]
