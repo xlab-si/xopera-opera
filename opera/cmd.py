@@ -55,6 +55,10 @@ def main():
     service_template.merge(types.ServiceTemplate.from_data(
         yaml.safe_load(args.template)
     ))
-    print(service_template)
+    service_template.resolve()
+    instances = service_template.instantiate(None)
+
+    for i in instances:
+        i.deploy()
 
     return 0

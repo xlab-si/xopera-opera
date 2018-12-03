@@ -21,7 +21,7 @@ node_types:
             x:
               default: y
           implementation:
-            primary: playbooks/os_server.yml
+            primary: examples/playbooks/os_server.yml
 
 topology_template:
   node_templates:

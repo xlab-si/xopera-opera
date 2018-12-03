@@ -5,6 +5,7 @@ import yaml
 
 def run(playbook):
     print("Running ansible {}".format(playbook))
+    return dict(id="abc123", xx=123)
     # make temporary folder
     # copy playbook there
     # copy artifacts

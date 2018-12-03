@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 import collections
 import sys
 
-from opera import ansible
+from opera import instances
 
 
 def get_indent(n):
@@ -248,6 +248,11 @@ class NodeTemplate(Entity):
         type=(NodeTypeReference,),
     )
 
+    def instantiate(self, name, inputs):
+        instance = instances.NodeInstance.from_template(name, self, inputs)
+        instance.save()  # TODO(@tadeboro): path for persisting
+        return instance
+
 
 class NodeTemplateCollection(EntityCollection):
     ATTRS = {}
@@ -295,7 +300,7 @@ class CapabilityDefinitionCollection(EntityCollection):
 
 class OperationImplementationDefinition(Entity):
     ATTRS = dict(
-        primary=(Pass,),
+        primary=(String,),
     )
 
 
@@ -357,7 +362,7 @@ class NodeType(Entity):
         artifacts=(ArtifactDefinitionCollection,),
         attributes=(AttributeDefinitionCollection,),
         capabilities=(CapabilityDefinitionCollection,),
-        derived_from=(Pass,),
+        derived_from=(NodeTypeReference,),
         interfaces=(InterfaceDefinitionCollection,),
         properties=(PropertyDefinitionCollection,),
         requirements=(RequirementDefinitionCollection,),
@@ -403,3 +408,9 @@ class ServiceTemplate(Entity):
     def resolve(self):
         for k in self.RECURSE_ON:
             self[k].resolve(self)
+
+    def instantiate(self, inputs):
+        instances = []
+        for name, item in self["topology_template"]["node_templates"].items():
+            instances.append(item.instantiate(name, inputs))
+        return instances
