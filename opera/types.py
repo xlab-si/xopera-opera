@@ -350,23 +350,20 @@ class ServiceTemplate(Entity):
         topology_template=(TopologyTemplate,),
         tosca_definitions_version=(String,),
     )
+    RECURSE_ON = (
+        "node_types",
+        "topology_template",
+    )
 
     def is_compatible_with(self, other):
         key = "tosca_definitions_version"
         return self[key] == other[key]
 
-    @property
-    def merge_keys(self):
-        skip = (
-            "tosca_definitions_version",
-        )
-        return (k for k in self if k not in skip)
-
     def merge(self, other):
         if not self.is_compatible_with(other):
             raise MergeError("Incompatible ServiceTemplate versions")
 
-        for key in other.merge_keys:
+        for key in self.RECURSE_ON:
             if key in self:
                 self[key].merge(other[key])
             else:
