@@ -40,6 +40,9 @@ class Pass(object):
     def __str__(self):
         return str(self._data)
 
+    def resolve(self, _unused):
+        pass
+
 
 class String(object):
     @classmethod
@@ -59,6 +62,26 @@ class String(object):
 
     def __ne__(self, other):
         self._data != other._data
+
+    def resolve(self, _service_template):
+        pass
+
+
+class Reference(String):
+    SECTION = None
+
+    def resolve(self, service_template):
+        if self.SECTION is None:
+            raise MissingImplementation(
+                "{} did not override SECTION".format(cls.__name__)
+            )
+
+        # TODO(@tadeboro): Add target validation error messages
+        self.target = service_template[self.SECTION][self._data]
+
+
+class NodeTypeReference(Reference):
+    SECTION = "node_types"
 
 
 class Function(object):
@@ -95,6 +118,10 @@ class Function(object):
 
     def __str__(self):
         return "{}({})".format(self._name, ", ".join(self._args))
+
+    def resolve(self, service_template):
+        # TODO(@tadeboro): resolve arguments here
+        pass
 
 
 class BaseEntity(collections.OrderedDict):
@@ -167,6 +194,10 @@ class Entity(BaseEntity):
 
         raise BadType("Cannot parse {}".format(data))
 
+    def resolve(self, service_template):
+        for k in self:
+            self[k].resolve(service_template)
+
 
 class EntityCollection(Entity):
     ITEM_CLASS = None  # This should be overridden in derived classes
@@ -214,7 +245,7 @@ class InterfaceCollection(EntityCollection):
 class NodeTemplate(Entity):
     ATTRS = dict(
         interfaces=(InterfaceCollection,),
-        type=(Pass,),
+        type=(NodeTypeReference,),
     )
 
 
@@ -368,3 +399,7 @@ class ServiceTemplate(Entity):
                 self[key].merge(other[key])
             else:
                 self[key] = other[key]
+
+    def resolve(self):
+        for k in self.RECURSE_ON:
+            self[k].resolve(self)
