@@ -1,6 +1,7 @@
 from __future__ import print_function, unicode_literals
 
 import collections
+import sys
 
 from opera import ansible
 
@@ -10,6 +11,12 @@ def get_indent(n):
 
 class MissingImplementation(Exception):
     pass
+
+
+class UnknownAttribute(Exception):
+    def __init__(self, name):
+        super(UnknownAttribute, self).__init__(name)
+        self.name = name
 
 
 class BadType(Exception):
@@ -22,6 +29,11 @@ class MergeError(Exception):
 
 class Pass(object):
     # TODO(@tadeboro): Remove when we have enough classes implemented.
+
+    @classmethod
+    def from_data(cls, data):
+        return cls(data)
+
     def __init__(self, data):
         self._data = data
 
@@ -30,9 +42,13 @@ class Pass(object):
 
 
 class String(object):
-    def __init__(self, data):
+    @classmethod
+    def from_data(cls, data):
         if not isinstance(data, str):
-            raise BadType("String constructor takes string as input data")
+            raise BadType("String parser takes string as input data")
+        return cls(data)
+
+    def __init__(self, data):
         self._data = data
 
     def __str__(self):
@@ -58,18 +74,22 @@ class Function(object):
         "token",
     )
 
-    def __init__(self, data):
+    @classmethod
+    def from_data(cls, data):
         if not isinstance(data, dict):
             raise BadType("Function constructor takes dict as input data")
         if len(data) != 1:
             raise BadType("Function constructor takes single member dict")
 
         (name, args), = data.items()
-        if name not in self.VALID_NAMES:
+        if name not in cls.VALID_NAMES:
             raise BadType("Invalid function name: " + name)
         if not isinstance(args, list):
             raise BadType("Function arguments should be specified as array")
 
+        return cls(name, args)
+
+    def __init__(self, name, args):
         self._name = name
         self._args = args
 
@@ -77,13 +97,7 @@ class Function(object):
         return "{}({})".format(self._name, ", ".join(self._args))
 
 
-class BaseEntity(object):
-    def __repr__(self):
-        return "{}[{}]".format(type(self).__name__, vars(self))
-
-    def __str__(self):
-        return self.dump(0)
-
+class BaseEntity(collections.OrderedDict):
     @staticmethod
     def dump_item(name, item, level):
         try:
@@ -95,79 +109,95 @@ class BaseEntity(object):
 
         return "{}{}:{}{}".format(get_indent(level), name, separator, value)
 
+    @classmethod
+    def from_data(cls, data):
+        cls.check_override()
+        # TODO(@tadeboro): Add validation here
+        return cls(cls.parse(data))
+
+    @classmethod
+    def parse(cls, data):
+        data = cls.normalize_data(data)
+        parsed_data = {}
+        for k, v in data.items():
+            try:
+                parsed_data[k] = cls.parse_attr(k, v)
+            except UnknownAttribute as e:
+                # TODO(@tadeboro): remove this when parser supports decent
+                # amount of TOSCA standard
+                print(
+                    "WARNING: Skipping attribute '{}'".format(e.name),
+                    file=sys.stderr,
+                )
+        return parsed_data
+
+    @classmethod
+    def normalize_data(cls, data):
+        # By default, no normalization is needed
+        return data
+
+    def __str__(self):
+        return self.dump(0)
+
+    def dump(self, level):
+        return "\n".join(self.dump_item(k, v, level) for k, v in self.items())
+
 
 class Entity(BaseEntity):
     ATTRS = None  # This should be overridden in derived classes
 
-    def __init__(self, data):
-        self.attrs = collections.OrderedDict()
-        self.check_override()
-        self.parse_attrs(data)
-
-    def __getattr__(self, attr):
-        try:
-            return self.attrs[attr]
-        except KeyError:
-            raise AttributeError
-
-    def check_override(self):
-        if self.ATTRS is None:
-            cls_name = self.__class__.__name__
+    @classmethod
+    def check_override(cls):
+        if cls.ATTRS is None:
             raise MissingImplementation(
-                "{} did not override ATTRS".format(cls_name)
+                "{} did not override ATTRS".format(cls.__name__)
             )
 
-    def parse_attrs(self, data):
-        for attr, classes in self.ATTRS.items():
-            if attr not in data:
-                continue
-            for cls in classes:
-                try:
-                    self.attrs[attr] = cls(data[attr])
-                    break
-                except BadType:
-                    pass
-            else:
-                raise BadType("Cannot parse {}".format(data))
+    @classmethod
+    def parse_attr(cls, name, data):
+        classes = cls.ATTRS.get(name)
+        if classes is None:
+            raise UnknownAttribute(name)
 
-        wanted = set(self.ATTRS.keys())
-        supplied = set(data.keys())
-        missing = wanted - supplied
-        extra = supplied - wanted
-        return missing, extra
+        for c in classes:
+            try:
+                return c.from_data(data)
+            except BadType:
+                pass
 
-    def dump(self, level):
-        return "\n".join(
-            self.dump_item(k, v, level) for k, v in self.attrs.items()
-        )
+        raise BadType("Cannot parse {}".format(data))
 
 
 class EntityCollection(Entity):
     ITEM_CLASS = None  # This should be overridden in derived classes
 
-    def check_override(self):
-        super(EntityCollection, self).check_override()
-        if self.ITEM_CLASS is None:
-            cls_name = self.__class__.__name__
+    @classmethod
+    def check_override(cls):
+        super(EntityCollection, cls).check_override()
+        if cls.ITEM_CLASS is None:
             raise MissingImplementation(
-                "{} did not override ITEM_CLASS".format(cls_name)
+                "{} did not override ITEM_CLASS".format(cls.__name__)
             )
 
-    def parse_attrs(self, data):
-        missing, extra = super(EntityCollection, self).parse_attrs(data)
-        for attr in extra:
-            self.attrs[attr] = self.ITEM_CLASS(data[attr])
-        return missing, set()
+    @classmethod
+    def parse_attr(cls, name, data):
+        try:
+            return super(EntityCollection, cls).parse_attr(name, data)
+        except UnknownAttribute as e:
+            return cls.ITEM_CLASS.from_data(data)
 
 
 class OrderedEntityCollection(EntityCollection):
-    ATTRS = {}  # Ordered collections cannot have any attributes
+    ATTRS = {}  # Ordered collections have no etra fields
 
-    def parse_attrs(self, data):
+    @classmethod
+    def normalize_data(cls, data):
+        # Convert list of single-entry dicts into ordered dict
+        result = collections.OrderedDict()
         for item in data:
-            (attr, value), = item.items()
-            self.attrs[attr] = self.ITEM_CLASS(value)
-        return set(), set()
+            (k, v), = item.items()
+            result[k] = v
+        return result
 
 
 class Interface(Entity):
@@ -308,10 +338,10 @@ class NodeTypeCollection(EntityCollection):
     ITEM_CLASS = NodeType
 
     def merge(self, other):
-        duplicates = set(self.attrs.keys()) & set(other.attrs.keys())
+        duplicates = set(self.keys()) & set(other.keys())
         if len(duplicates) > 0:
             raise MergeError("Duplicated types: {}".format(duplicates))
-        self.attrs.update(other.attrs)
+        self.update(other)
 
 
 class ServiceTemplate(Entity):
@@ -323,22 +353,21 @@ class ServiceTemplate(Entity):
 
     def is_compatible_with(self, other):
         key = "tosca_definitions_version"
-        return self.attrs[key] == other.attrs[key]
+        return self[key] == other[key]
 
     @property
     def merge_keys(self):
         skip = (
             "tosca_definitions_version",
         )
-        return (k for k in self.ATTRS if k not in skip)
+        return (k for k in self if k not in skip)
 
     def merge(self, other):
         if not self.is_compatible_with(other):
             raise MergeError("Incompatible ServiceTemplate versions")
 
-        for key in self.merge_keys:
-            if key in other.attrs:
-                if key in self.attrs:
-                    self.attrs[key].merge(other.attrs[key])
-                elif key in other.attrs:
-                    self.attrs[key] = other.attrs[key]
+        for key in other.merge_keys:
+            if key in self:
+                self[key].merge(other[key])
+            else:
+                self[key] = other[key]

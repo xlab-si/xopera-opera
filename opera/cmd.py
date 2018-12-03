@@ -51,13 +51,10 @@ def main():
     parser = create_parser()
     args = parser.parse_args()
 
-    service_template = types.ServiceTemplate(yaml.safe_load(args.template))
-    print((service_template))
-
-    test = types.ServiceTemplate(load_standard_library())
-    print(test)
-
-    test.merge(service_template)
-    print(test)
+    service_template = types.ServiceTemplate.from_data(load_standard_library())
+    service_template.merge(types.ServiceTemplate.from_data(
+        yaml.safe_load(args.template)
+    ))
+    print(service_template)
 
     return 0
