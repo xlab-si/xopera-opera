@@ -1,1 +1,2 @@
 pyyaml >= 3.10  # MIT
+-e git+https://github.com/ansible/ansible.git@devel#egg=ansible  # GPLv3

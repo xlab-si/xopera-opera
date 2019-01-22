@@ -128,8 +128,20 @@ class NodeInstance(Instance):
             )
             if playbook is None:
                 continue
-            attributes = ansible.run(playbook)
+            success, attributes = ansible.run(
+                str(playbook), self["attributes"]
+            )
             for k, v in attributes.items():
                 if k in self["attributes"]:
                     self["attributes"][k]["value"] = v
             self.save()
+
+    def undeploy(self):
+        self.load()
+        for s in self.UNDEPLOY_STEPS:
+            playbook = self.dig(
+                "interfaces", "Standard", s, "implementation", "primary"
+            )
+            if playbook is None:
+                continue
+            ansible.run(str(playbook), self["attributes"])

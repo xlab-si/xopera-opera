@@ -82,7 +82,7 @@ class Reference(String):
     def resolve(self, service_template):
         if self.SECTION is None:
             raise MissingImplementation(
-                "{} did not override SECTION".format(cls.__name__)
+                "{} did not override SECTION".format(self.__class__.__name__)
             )
 
         # TODO(@tadeboro): Add target validation error messages
