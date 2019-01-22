@@ -51,9 +51,11 @@ def main():
     parser = create_parser()
     args = parser.parse_args()
 
-    service_template = types.ServiceTemplate.from_data(load_standard_library())
+    service_template = types.ServiceTemplate.from_data(
+        load_standard_library(), []
+    )
     service_template.merge(types.ServiceTemplate.from_data(
-        yaml.safe_load(args.template)
+        yaml.safe_load(args.template), []
     ))
     service_template.resolve()
     instances = service_template.instantiate(None)

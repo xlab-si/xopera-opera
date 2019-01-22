@@ -9,14 +9,19 @@ from opera import instances
 def get_indent(n):
     return "  " * n
 
+
+def format_path(path):
+    return "/{}".format("/".join(path))
+
+
 class MissingImplementation(Exception):
     pass
 
 
 class UnknownAttribute(Exception):
-    def __init__(self, name):
-        super(UnknownAttribute, self).__init__(name)
-        self.name = name
+    def __init__(self, path):
+        super(UnknownAttribute, self).__init__(format_path(path))
+        self.path = path
 
 
 class BadType(Exception):
@@ -31,11 +36,13 @@ class Pass(object):
     # TODO(@tadeboro): Remove when we have enough classes implemented.
 
     @classmethod
-    def from_data(cls, data):
-        return cls(data)
+    def from_data(cls, data, path):
+        print("Parsing {}".format(format_path(path)))
+        return cls(data, path)
 
-    def __init__(self, data):
+    def __init__(self, data, path):
         self._data = data
+        self._path = path
 
     def __str__(self):
         return str(self._data)
@@ -46,13 +53,15 @@ class Pass(object):
 
 class String(object):
     @classmethod
-    def from_data(cls, data):
+    def from_data(cls, data, path):
+        print("Parsing {}".format(format_path(path)))
         if not isinstance(data, str):
             raise BadType("String parser takes string as input data")
-        return cls(data)
+        return cls(data, path)
 
-    def __init__(self, data):
+    def __init__(self, data, path):
         self._data = data
+        self._path = path
 
     def __str__(self):
         return self._data
@@ -98,7 +107,8 @@ class Function(object):
     )
 
     @classmethod
-    def from_data(cls, data):
+    def from_data(cls, data, path):
+        print("Parsing {}".format(format_path(path)))
         if not isinstance(data, dict):
             raise BadType("Function constructor takes dict as input data")
         if len(data) != 1:
@@ -110,11 +120,12 @@ class Function(object):
         if not isinstance(args, list):
             raise BadType("Function arguments should be specified as array")
 
-        return cls(name, args)
+        return cls(name, args, path)
 
-    def __init__(self, name, args):
+    def __init__(self, name, args, path):
         self._name = name
         self._args = args
+        self._path = path
 
     def __str__(self):
         return "{}({})".format(self._name, ", ".join(self._args))
@@ -137,26 +148,20 @@ class BaseEntity(collections.OrderedDict):
         return "{}{}:{}{}".format(get_indent(level), name, separator, value)
 
     @classmethod
-    def from_data(cls, data):
+    def from_data(cls, data, path):
         cls.check_override()
         # TODO(@tadeboro): Add validation here
-        return cls(cls.parse(data))
+        data = cls.normalize_data(data)
+        if not isinstance(data, dict):
+            raise BadType("Entity constructor takes dict as input data")
+        instance = cls(cls.parse(data, path))
+        instance._path = path
+        return instance
 
     @classmethod
-    def parse(cls, data):
-        data = cls.normalize_data(data)
-        parsed_data = {}
-        for k, v in data.items():
-            try:
-                parsed_data[k] = cls.parse_attr(k, v)
-            except UnknownAttribute as e:
-                # TODO(@tadeboro): remove this when parser supports decent
-                # amount of TOSCA standard
-                print(
-                    "WARNING: Skipping attribute '{}'".format(e.name),
-                    file=sys.stderr,
-                )
-        return parsed_data
+    def parse(cls, data, path):
+        print("Parsing {}".format(format_path(path)))
+        return {k: cls.parse_attr(k, v, path + [k]) for k, v in data.items()}
 
     @classmethod
     def normalize_data(cls, data):
@@ -181,18 +186,18 @@ class Entity(BaseEntity):
             )
 
     @classmethod
-    def parse_attr(cls, name, data):
+    def parse_attr(cls, name, data, path):
         classes = cls.ATTRS.get(name)
         if classes is None:
-            raise UnknownAttribute(name)
+            raise UnknownAttribute(path)
 
         for c in classes:
             try:
-                return c.from_data(data)
+                return c.from_data(data, path)
             except BadType:
                 pass
 
-        raise BadType("Cannot parse {}".format(data))
+        raise BadType("Cannot parse {}".format(format_path(path)))
 
     def resolve(self, service_template):
         for k in self:
@@ -211,11 +216,11 @@ class EntityCollection(Entity):
             )
 
     @classmethod
-    def parse_attr(cls, name, data):
+    def parse_attr(cls, name, data, path):
         try:
-            return super(EntityCollection, cls).parse_attr(name, data)
-        except UnknownAttribute as e:
-            return cls.ITEM_CLASS.from_data(data)
+            return super(EntityCollection, cls).parse_attr(name, data, path)
+        except UnknownAttribute:
+            return cls.ITEM_CLASS.from_data(data, path)
 
 
 class OrderedEntityCollection(EntityCollection):
