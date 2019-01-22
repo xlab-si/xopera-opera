@@ -224,7 +224,7 @@ class EntityCollection(Entity):
 
 
 class OrderedEntityCollection(EntityCollection):
-    ATTRS = {}  # Ordered collections have no etra fields
+    ATTRS = {}  # Ordered collections have no extra fields
 
     @classmethod
     def normalize_data(cls, data):
@@ -238,7 +238,9 @@ class OrderedEntityCollection(EntityCollection):
 
 class Interface(Entity):
     ATTRS = dict(
+        inputs=(Pass,),
         create=(Pass,),
+        delete=(Pass,),
     )
 
 
@@ -251,6 +253,9 @@ class NodeTemplate(Entity):
     ATTRS = dict(
         interfaces=(InterfaceCollection,),
         type=(NodeTypeReference,),
+
+        properties=(Pass,),
+        requirements=(Pass,),
     )
 
     def instantiate(self, name, inputs):
@@ -281,9 +286,11 @@ class ArtifactDefinitionCollection(EntityCollection):
 
 class AttributeDefinition(Entity):
     ATTRS = dict(
+        description=(String,),
+
         default=(Pass,),
-        description=(Pass,),
-        type=(Pass,),
+        type=(String,),
+        entry_schema=(Pass,),
     )
 
 
@@ -295,6 +302,7 @@ class AttributeDefinitionCollection(EntityCollection):
 class CapabilityDefinition(Entity):
     ATTRS = dict(
         type=(String,),
+        valid_source_types=(Pass,),
     )
 
 
@@ -323,7 +331,7 @@ class ParameterDefinitionCollection(EntityCollection):
 class OperationDefinition(Entity):
     ATTRS = dict(
         inputs=(ParameterDefinitionCollection,),
-        implementation=(OperationImplementationDefinition,),
+        implementation=(OperationImplementationDefinition, String),
     )
 
 
@@ -354,7 +362,11 @@ class PropertyDefinitionCollection(EntityCollection):
 
 class RequirementDefinition(Entity):
     ATTRS = dict(
-        capabilitiy=(String,),
+        capability=(String,),
+
+        node=(Pass,),
+        relationship=(Pass,),
+        occurrences=(Pass,),
     )
 
 
@@ -371,6 +383,8 @@ class NodeType(Entity):
         interfaces=(InterfaceDefinitionCollection,),
         properties=(PropertyDefinitionCollection,),
         requirements=(RequirementDefinitionCollection,),
+
+        description=(Pass,),
     )
 
 
@@ -385,9 +399,23 @@ class NodeTypeCollection(EntityCollection):
         self.update(other)
 
 
+class RelationshipType(Entity):
+    ATTRS = dict(
+        derived_from=(String,),
+        valid_target_types=(Pass,),
+        interfaces=(Pass,),
+    )
+
+
+class RelationshipTypeCollection(EntityCollection):
+    ATTRS = {}
+    ITEM_CLASS = RelationshipType
+
+
 class ServiceTemplate(Entity):
     ATTRS = dict(
         node_types=(NodeTypeCollection,),
+        relationship_types=(RelationshipTypeCollection,),
         topology_template=(TopologyTemplate,),
         tosca_definitions_version=(String,),
     )
