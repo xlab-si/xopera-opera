@@ -52,15 +52,19 @@ def main():
     args = parser.parse_args()
 
     service_template = types.ServiceTemplate.from_data(
-        load_standard_library(), []
+        "OPERA_ROOT", load_standard_library(), [],
     )
     service_template.merge(types.ServiceTemplate.from_data(
-        yaml.safe_load(args.template), []
+        "OPERA_ROOT", yaml.safe_load(args.template), []
     ))
-    service_template.resolve()
-    instances = service_template.instantiate(None)
 
-    for i in instances:
-        i.deploy()
+    service_template.resolve()
+    # print(service_template)
+
+    instances = service_template.instantiate()
+    # print(instances)
+    # print(instances.ordered_instance_ids)
+
+    instances.deploy()
 
     return 0

@@ -45,6 +45,9 @@ def _run_in(dest_dir, cmd, env):
 
 
 def run(playbook, vars):
+    print("|| Ansible deploying {} with {}".format(playbook, vars))
+    return 0, {}
+
     with tempfile.TemporaryDirectory() as dir_path:
         playbook = _save_artifact_into(dir_path, playbook, suffix=".yaml")
         inventory = _save_content_into(

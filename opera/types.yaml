@@ -84,3 +84,25 @@ node_types:
         type: tosca.capabilities.Scalable
       binding:
         type: tosca.capabilities.network.Bindable
+
+  tosca.nodes.SoftwareComponent:
+    derived_from: tosca.nodes.Root
+    description: >
+      The TOSCA SoftwareComponent node represents a generic software component
+      that can be managed and run by a TOSCA Compute Node Type.
+    properties:
+      component_version:
+        type: version
+        description: The optional software component’s version.
+        required: false
+      admin_credential:
+        type: tosca.datatypes.Credential
+        description: >
+          The optional credential that can be used to authenticate to the
+          software component.
+        required: false
+    requirements:
+      - host:
+          capability: tosca.capabilities.Container
+          node: tosca.nodes.Compute
+          relationship: tosca.relationships.HostedOn
