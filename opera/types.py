@@ -570,6 +570,10 @@ class ServiceTemplate(Entity):
         "topology_template",
     )
 
+    @classmethod
+    def from_data(cls, data):
+        return super().from_data("ROOT", data, [])
+
     def is_compatible_with(self, oth):
         return self.tosca_definitions_version == oth.tosca_definitions_version
 
