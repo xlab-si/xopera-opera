@@ -70,12 +70,41 @@ class Instance(object):
     def get_property(self, *path):
         return self.template.get_property(*path)
 
-    def get_attribute(self, path):
-        if path[0] not in ("SELF", "SOURCE", "TARGET"):
+    def get_requirement_attribute(self, name, *path):
+        # TODO(@tadeboro): Add attribute fetch from required instances when we
+        # know how to handle multiple instances safely.
+        return None
+
+    def get_attribute(self, reference, name, *path):
+        if reference not in ("SELF", "SOURCE", "TARGET", "HOST"):
             raise Exception(
                 "Accessing non-local stuff bad. Fix your service template."
             )
-        return None
+
+        # TODO(@tadeboro): Add support for nested attribute values once we
+        # have data type support.
+        if name in self.attributes:
+            return self.attributes[name]
+
+        attr = self.template.get_attribute(reference, name, *path)
+        if attr:
+            return attr
+        return self.get_requirement_attribute(name, *path)
+
+    def get_host(self, indirect=False):
+        if self.template.is_a("tosca.nodes.Compute"):
+            if indirect:
+                # TODO(@tadeboro): Think about this a bit more. Feels too
+                # restrictive at the moment.
+                return self.attributes.get("public_address")
+            return "localhost"
+
+        req_name = self.template.get_hosted_on_requirement_name()
+        if len(self.requirements[req_name]) != 1:
+            raise Exception(
+                "{} cannot be hosted on more than one node".format(self.name)
+            )
+        return next(iter(self.requirements[req_name])).get_host(indirect=True)
 
 
 class InstanceModel(object):

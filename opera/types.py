@@ -477,6 +477,29 @@ class NodeTemplate(Entity):
         else:
             return self.get_requirement_property(name, *path)
 
+    def get_attribute(self, reference, name, *path):
+        if reference not in ("SELF", "SOURCE", "TARGET", "HOST"):
+            raise Exception(
+                "Accessing non-local stuff bad. Fix your service template."
+            )
+
+        # TODO(@tadeboro): Generalize attr access when we have support for
+        # data types.
+        attr = (
+            self.dig("attributes", name) or
+            # self.type.get_attribute(name, *path) or
+            self.dig("capabilities", "attributes", name)
+        )
+        if attr:
+            return attr.eval(self)
+        return None
+
+    def is_a(self, type):
+        return self.type.is_a(type)
+
+    def get_hosted_on_requirement_name(self):
+        return self.type.get_hosted_on_requirement_name()
+
 
 class NodeTemplateCollection(Entity):
     ITEM_CLASS = NodeTemplate
@@ -539,6 +562,29 @@ class NodeType(Entity):
         op_impl = self.dig("interfaces", interface, name, "implementation")
         inputs.update(self.get_operation_inputs(interface, name))
         return op_impl or implementation, inputs
+
+    def is_a(self, type):
+        return (
+            self.name == type or
+            (self.dig("derived_from") and self.derived_from.is_a(type))
+        )
+
+    def get_hosted_on_requirement_name(self):
+        requirements = self.dig("requirements")
+        if requirements:
+            for name, req in requirements.items():
+                # TODO(@tadeboro): Remove next uglyness when we add support
+                # for relationship types into parser.
+                if (
+                        req.dig("relationship") and
+                        req.relationship.data == "tosca.relationships.HostedOn"
+                ):
+                    return name
+
+        return (
+            self.dig("derived_from") and
+            self.derived_from.get_hosted_on_requirement_name()
+        )
 
 
 class NodeTypeCollection(Entity):
