@@ -20,17 +20,21 @@ def add_parser(subparsers):
 
 
 def deploy(args):
+    print("Loading service template ...")
     service_template = types.ServiceTemplate.from_data(stdlib.load())
     service_template.merge(
         types.ServiceTemplate.from_data(yaml.safe_load(args.csar))
     )
 
+    print("Resolving service template links ...")
     service_template.resolve()
-    # print(service_template)
 
+    print("Creating instance model ...")
     instances = service_template.instantiate()
-    # print(instances)
-    # print(instances.ordered_instance_ids)
 
+    print("Deploying instance model ...")
     instances.deploy()
+
+    print("Done.")
+
     return 0

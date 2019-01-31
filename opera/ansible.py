@@ -80,14 +80,15 @@ def run(host, playbook, vars):
             ANSIBLE_STDOUT_CALLBACK="json",
         )
         code, out, err = _run_in(dir_path, cmd, env)
-        with open(out) as fd:
-            for l in fd:
-                print(l.strip())
-        print("------------")
-        with open(err) as fd:
-            for l in fd:
-                print(l.strip())
-        print("============")
+        if code != 0:
+            with open(out) as fd:
+                for l in fd:
+                    print(l.rstrip())
+            print("------------")
+            with open(err) as fd:
+                for l in fd:
+                    print(l.rstrip())
+            print("============")
         with open(out) as fd:
             attributes = json.load(fd)["global_custom_stats"]
         # TODO(@tadeboro): Do something sensible on error

@@ -32,7 +32,7 @@ class MergeError(Exception):
 class Base(object):
     @classmethod
     def from_data(cls, name, data, path):
-        print("Parsing {}".format(format_path(path)))
+        # print("Parsing {}".format(format_path(path)))
         cls.validate(data)
         return cls.parse(name, cls.normalize(data), path)
 
@@ -117,7 +117,7 @@ class Reference(String):
                 "{} did not override SECTION_PATH".format(type(self).__name__)
             )
 
-        print("Resolving {} in {}".format(self.data, self.SECTION_PATH))
+        # print("Resolving {} in {}".format(self.data, self.SECTION_PATH))
         target = service_template.dig(*self.SECTION_PATH, self.data)
         if target is None:
             raise Exception("Invalid reference /{}".format(
@@ -201,7 +201,7 @@ class Value(Base):
             try:
                 return klass.from_data(name, data, path)
             except BadType as e:
-                print(e)
+                # print(e)
                 pass
         raise Exception("Should not be here: Pass should always parse")
 

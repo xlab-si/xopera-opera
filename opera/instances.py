@@ -51,6 +51,7 @@ class Instance(object):
             self.set_state(end_state)
 
     def deploy(self):
+        print("  Processing {} ...".format(self.id))
         self.execute_workflow(dict(
             create=("creating", "created"),
             configure=("configuring", "configured"),
