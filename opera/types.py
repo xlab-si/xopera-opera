@@ -241,8 +241,15 @@ class Entity(Base):
     def __getitem__(self, key):
         return self.data[key]
 
-    def __setitem__(self, key, value):
-        self.data[key] = value
+    def items(self):
+        # Iterate over items that are not specified as attributes
+        for k, v in self.data.items():
+            if k not in self.ATTRS:
+                yield k, v
+
+    def values(self):
+        for _, v in self.items():
+            yield v
 
     def dump(self, level):
         indent = get_indent(level)
