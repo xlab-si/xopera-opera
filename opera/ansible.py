@@ -5,6 +5,8 @@ import subprocess
 import sys
 import tempfile
 
+import yaml
+
 
 def _save_artifact_into(dest_dir, artifact, suffix=None):
     dest = tempfile.NamedTemporaryFile(
@@ -32,7 +34,6 @@ def _run_in(dest_dir, cmd, env):
     fstderr = tempfile.NamedTemporaryFile(
         dir=dest_dir, delete=False, suffix=".stderr",
     )
-    print(cmd)
     result = subprocess.run(
         cmd, cwd=dest_dir, stdout=fstdout, stderr=fstderr,
         env=dict(os.environ, **env),
@@ -42,21 +43,38 @@ def _run_in(dest_dir, cmd, env):
     return result.returncode, fstdout.name, fstderr.name
 
 
-def run(playbook, vars):
-    print("|| Ansible deploying {} with {}".format(playbook, vars))
-    return 0, {}
+def _get_inventory(host):
+    inventory = dict(all=dict(hosts=dict(opera=dict(ansible_host=host))))
+    inventory = dict(ansible_host=host)
 
+    if host == "localhost":
+        inventory["ansible_connection"] = "local"
+        inventory["ansible_python_interpreter"] = sys.executable
+    else:
+        inventory["ansible_user"] = os.environ.get("OPERA_SSH_USER", "centos")
+
+    return yaml.safe_dump(dict(all=dict(hosts=dict(opera=inventory))))
+
+
+def run(host, playbook, vars):
     with tempfile.TemporaryDirectory() as dir_path:
         playbook = _save_artifact_into(dir_path, playbook, suffix=".yaml")
-        inventory = _save_content_into(
-            dir_path, "localhost ansible_connection=local ansible_python_interpreter={}".format(sys.executable)
+        inventory = _save_content_into(dir_path, _get_inventory(host))
+        vars_file = _save_content_into(
+            dir_path, yaml.safe_dump(vars), suffix=".yaml",
         )
+
         with open("{}/ansible.cfg".format(dir_path), "w") as fd:
             fd.write("[defaults]\n")
             fd.write("retry_files_enabled = False\n")
 
         # copy secondary artifacts
-        cmd = ["ansible-playbook", "-i", inventory, playbook]
+        cmd = [
+            "ansible-playbook",
+            "-i", inventory,
+            "-e", "@" + vars_file,
+            playbook
+        ]
         env = dict(
             ANSIBLE_SHOW_CUSTOM_STATS="1",
             ANSIBLE_STDOUT_CALLBACK="json",

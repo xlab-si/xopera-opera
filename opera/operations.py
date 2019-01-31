@@ -15,6 +15,6 @@ class Operation(object):
             k: v.eval(self.instance) for k, v in self.inputs.items()
         }
         status, attrs = ansible.run(
-            self.implementation.primary.data, evaled_inputs,
+            host, self.implementation.primary.data, evaled_inputs,
         )
         return status == 0, attrs
