@@ -16,6 +16,9 @@ node_types:
       network:
         type: string
         description: OpenStack network id (network names are not accepted)
+      key_name:
+        type: string
+        description: OpenStack SSH key name that should be placed on the VM
     attributes:
       id:
         type: string
@@ -25,10 +28,11 @@ node_types:
         type: tosca.interfaces.node.lifecycle.Standard
         create:
           inputs:
-            name:    { default: { get_property: [ SELF, name    ] } }
-            image:   { default: { get_property: [ SELF, image   ] } }
-            flavor:  { default: { get_property: [ SELF, flavor  ] } }
-            network: { default: { get_property: [ SELF, network ] } }
+            vm_name:  { default: { get_property: [ SELF, name     ] } }
+            image:    { default: { get_property: [ SELF, image    ] } }
+            flavor:   { default: { get_property: [ SELF, flavor   ] } }
+            network:  { default: { get_property: [ SELF, network  ] } }
+            key_name: { default: { get_property: [ SELF, key_name ] } }
           implementation: playbooks/vm/create.yml
         delete:
           inputs:
@@ -83,6 +87,7 @@ topology_template:
         image: 9ea4856a-32b2-4553-b408-cfa4cb1bb40b
         flavor: d3046a41-245a-4042-862e-59568e81f8fa
         network: 753940e0-c2a7-4c9d-992e-4d5bd71f85aa
+        key_name: tadej_borovsak
 
     nginx:
       type: my.nodes.Nginx
