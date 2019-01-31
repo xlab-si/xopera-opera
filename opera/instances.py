@@ -13,6 +13,9 @@ class Instance(object):
             state="initial",  # TODO(@tadeboro): replace with enum
         )
 
+        # Graph fields
+        self.requirements = {}
+
     @property
     def id(self):
         return self.attributes["tosca_id"]
@@ -91,7 +94,10 @@ class InstanceModel(object):
         for id, instance in self.nodes.items():
             reqs = instance.template.dig("requirements")
             if reqs:
-                for node in reqs.data.values():
+                for kind, node in reqs.items():
+                    instance.requirements[kind] = {
+                        self.nodes[i] for i in self.name_ids_lut[node.name]
+                    }
                     self.edges[id].update(self.name_ids_lut[node.name])
 
     def deploy(self):
