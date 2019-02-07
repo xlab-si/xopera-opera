@@ -96,7 +96,7 @@ class Instance(object):
             if indirect:
                 # TODO(@tadeboro): Think about this a bit more. Feels too
                 # restrictive at the moment.
-                return self.attributes.get("public_address")
+                return self.get_attribute("SELF", "public_address")
             return "localhost"
 
         req_name = self.template.get_hosted_on_requirement_name()
