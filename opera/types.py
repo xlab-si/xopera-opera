@@ -226,7 +226,7 @@ class Entity(Base):
     def parse_attr(cls, name, data, path):
         klass = cls.ATTRS.get(name, cls.ITEM_CLASS)
         if klass is None:
-            raise UnknownAttribute(path)
+            raise UnknownAttribute(path + [name])
         return klass.from_data(name, data, path + [name])
 
     def __str__(self):
