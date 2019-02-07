@@ -633,10 +633,11 @@ class ServiceTemplate(Entity):
             raise MergeError("Incompatible ServiceTemplate versions")
 
         for key in self.MERGE_FIELDS:
-            if key in self.data:
-                self.data[key].merge(other.data[key])
-            else:
-                self.data[key] = other.data[key]
+            if key in other.data:
+                if key in self.data:
+                    self.data[key].merge(other.data[key])
+                else:
+                    self.data[key] = other.data[key]
 
     def resolve(self):
         return super().resolve(self)
