@@ -308,6 +308,11 @@ class PropertyAssignmentCollection(Entity):
     ITEM_CLASS = Value
 
 
+class AttributeAssignmentCollection(Entity):
+    # TODO(@tadeboro): properly handle dict assignment.
+    ITEM_CLASS = Value
+
+
 class ArtifactDefinition(Entity):
     pass
 
@@ -431,6 +436,7 @@ class NodeTemplate(Entity):
     ATTRS = dict(
         interfaces=InterfaceCollection,
         properties=PropertyAssignmentCollection,
+        attributes=AttributeAssignmentCollection,
         requirements=RequirementCollection,
         type=NodeTypeReference,
     )
