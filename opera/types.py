@@ -417,6 +417,9 @@ class Interface(Entity):
 
 
 class InterfaceCollection(Entity):
+    ATTRS = dict(
+        inputs=PropertyAssignmentCollection,
+    )
     ITEM_CLASS = Interface
 
 
