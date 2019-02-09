@@ -284,10 +284,14 @@ class OrderedEntity(Entity):
 
 class PropertyDefinition(Entity):
     ATTRS = dict(
-        description=String,
-        required=Bool,
+        constraints=Pass,
         default=Value,
-
+        description=String,
+        entry_schema=Pass,
+        external_schema=Pass,
+        metadata=Pass,
+        required=Bool,
+        status=Pass,
         type=Pass,
     )
 
@@ -300,7 +304,7 @@ class Requirement(Entity):
     pass
 
 
-class RequirementCollection(OrderedEntity):
+class RequirementAssignmentCollection(OrderedEntity):
     ITEM_CLASS = NodeTemplateReference
 
 
@@ -314,7 +318,13 @@ class AttributeAssignmentCollection(Entity):
 
 
 class ArtifactDefinition(Entity):
-    pass
+    ATTRS = dict(
+        deploy_path=Pass,
+        description=String,
+        path=Pass,
+        repository=Pass,
+        type=Pass,
+    )
 
 
 class ArtifactDefinitionCollection(Entity):
@@ -323,11 +333,11 @@ class ArtifactDefinitionCollection(Entity):
 
 class AttributeDefinition(Entity):
     ATTRS = dict(
+        default=Value,
         description=String,
-
-        default=Pass,
-        type=String,
         entry_schema=Pass,
+        status=Pass,
+        type=Pass,
     )
 
 
@@ -337,7 +347,11 @@ class AttributeDefinitionCollection(Entity):
 
 class CapabilityDefinition(Entity):
     ATTRS = dict(
-        type=String,
+        attributes=AttributeDefinitionCollection,
+        description=String,
+        occurences=Pass,
+        properties=PropertyDefinitionCollection,
+        type=Pass,
         valid_source_types=Pass,
     )
 
@@ -348,7 +362,10 @@ class CapabilityDefinitionCollection(Entity):
 
 class OperationImplementationDefinition(Entity):
     ATTRS = dict(
-        primary=String,
+        dependencies=Pass,
+        operation_host=Pass,
+        primary=Pass,
+        timeout=Pass,
     )
 
     @classmethod
@@ -363,9 +380,22 @@ class OperationImplementationDefinition(Entity):
         return data
 
 
+class OperationImplementationAssignment(OperationImplementationDefinition):
+    pass  # This class is introduced because semantics are different
+
+
 class ParameterDefinition(Entity):
     ATTRS = dict(
+        constraints=Pass,
         default=Value,
+        description=String,
+        entry_schema=Pass,
+        external_schema=Pass,
+        metadata=Pass,
+        required=Bool,
+        status=Pass,
+        type=Pass,
+        value=Value,
     )
 
 
@@ -375,8 +405,9 @@ class ParameterDefinitionCollection(Entity):
 
 class OperationDefinition(Entity):
     ATTRS = dict(
-        inputs=ParameterDefinitionCollection,
+        description=String,
         implementation=OperationImplementationDefinition,
+        inputs=PropertyDefinitionCollection,
     )
 
     @classmethod
@@ -391,16 +422,17 @@ class OperationDefinition(Entity):
         return data
 
 
-class Operation(Entity):
+class OperationAssignment(Entity):
     ATTRS = dict(
+        description=String,
+        implementation=OperationImplementationAssignment,
         inputs=PropertyAssignmentCollection,
-        implementation=OperationImplementationDefinition,
     )
 
     @classmethod
     def validate(cls, data):
         if not isinstance(data, (str, dict)):
-            raise BadType("Operation cannot parse")
+            raise BadType("OperationAssignment cannot parse")
 
     @classmethod
     def normalize(cls, data):
@@ -409,24 +441,21 @@ class Operation(Entity):
         return data
 
 
-class Interface(Entity):
+class InterfaceAssignment(Entity):
     ATTRS = dict(
         inputs=PropertyAssignmentCollection,
     )
-    ITEM_CLASS = Operation
+    ITEM_CLASS = OperationAssignment
 
 
-class InterfaceCollection(Entity):
-    ATTRS = dict(
-        inputs=PropertyAssignmentCollection,
-    )
-    ITEM_CLASS = Interface
+class InterfaceAssignmentCollection(Entity):
+    ITEM_CLASS = InterfaceAssignment
 
 
 class InterfaceDefinition(Entity):
     ATTRS = dict(
-        type=Pass,
         inputs=PropertyDefinitionCollection,
+        type=Pass,
     )
     ITEM_CLASS = OperationDefinition
 
@@ -437,10 +466,17 @@ class InterfaceDefinitionCollection(Entity):
 
 class NodeTemplate(Entity):
     ATTRS = dict(
-        interfaces=InterfaceCollection,
-        properties=PropertyAssignmentCollection,
+        artifacts=Pass,
         attributes=AttributeAssignmentCollection,
-        requirements=RequirementCollection,
+        capabilities=Pass,
+        copy=Pass,
+        description=String,
+        directives=Pass,
+        interfaces=InterfaceAssignmentCollection,
+        metadata=Pass,
+        node_filter=Pass,
+        properties=PropertyAssignmentCollection,
+        requirements=RequirementAssignmentCollection,
         type=NodeTypeReference,
     )
 
@@ -516,17 +552,24 @@ class NodeTemplateCollection(Entity):
 
 class TopologyTemplate(Entity):
     ATTRS = dict(
+        description=String,
+        groups=Pass,
+        inputs=ParameterDefinitionCollection,
         node_templates=NodeTemplateCollection,
+        outputs=Pass,
+        policies=Pass,
+        relationship_templates=Pass,
+        substitution_mappings=Pass,
+        workflows=Pass,
     )
 
 
 class RequirementDefinition(Entity):
     ATTRS = dict(
-        capability=String,
-
+        capability=Pass,
         node=Pass,
-        relationship=Pass,
         occurrences=Pass,
+        relationship=Pass,
     )
 
 
@@ -539,12 +582,13 @@ class NodeType(Entity):
         artifacts=ArtifactDefinitionCollection,
         attributes=AttributeDefinitionCollection,
         capabilities=CapabilityDefinitionCollection,
-        derived_from=NodeTypeReference,
+        derived_from=NodeTypeReference,  # TypeEntity
+        description=Pass,  # TypeEntity
         interfaces=InterfaceDefinitionCollection,
+        metadata=Pass,  # TypeEntity
         properties=PropertyDefinitionCollection,
         requirements=RequirementDefinitionCollection,
-
-        description=Pass,
+        version=Pass,  # TypeEntity
     )
 
     def get_operation_inputs(self, interface, name):
@@ -608,9 +652,14 @@ class NodeTypeCollection(Entity):
 
 class RelationshipType(Entity):
     ATTRS = dict(
-        derived_from=String,
+        attributes=AttributeDefinitionCollection,
+        derived_from=Pass,
+        description=String,
+        interfaces=InterfaceDefinitionCollection,
+        metadata=Pass,
+        properties=PropertyDefinitionCollection,
         valid_target_types=Pass,
-        interfaces=Pass,
+        version=Pass,
     )
 
 
@@ -620,10 +669,22 @@ class RelationshipTypeCollection(Entity):
 
 class ServiceTemplate(Entity):
     ATTRS = dict(
+        artifact_types=Pass,
+        capability_types=Pass,
+        data_types=Pass,
+        description=String,
+        dsl_definitions=Pass,
+        group_types=Pass,
+        imports=Pass,
+        interface_types=Pass,
+        metadata=Pass,
+        namespace=Pass,
         node_types=NodeTypeCollection,
+        policy_types=Pass,
         relationship_types=RelationshipTypeCollection,
+        repositories=Pass,
         topology_template=TopologyTemplate,
-        tosca_definitions_version=String,
+        tosca_definitions_version=Pass,
     )
     MERGE_FIELDS = (
         "node_types",
