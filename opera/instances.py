@@ -71,9 +71,12 @@ class Instance(object):
         return self.template.get_property(*path)
 
     def get_requirement_attribute(self, name, *path):
-        # TODO(@tadeboro): Add attribute fetch from required instances when we
-        # know how to handle multiple instances safely.
-        return None
+        if name not in self.requirements:
+            return None
+        if len(self.requirements[name]) != 1:
+            raise Exception("Cannot get attribute from multiple instances.")
+        linked_instance = next(iter(self.requirements[name]))
+        return linked_instance.get_attribute("SELF", *path)
 
     def get_attribute(self, reference, name, *path):
         if reference not in ("SELF", "SOURCE", "TARGET", "HOST"):
