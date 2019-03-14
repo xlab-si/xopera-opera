@@ -1,1 +1,4 @@
-from opera.commands import deploy
+from opera.commands import (
+    deploy,
+    undeploy,
+)

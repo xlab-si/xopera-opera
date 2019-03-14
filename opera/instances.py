@@ -62,6 +62,7 @@ class Instance(object):
         ))
 
     def undeploy(self):
+        print("  Processing {} ...".format(self.id))
         self.execute_workflow(dict(
             stop=("stopping", "configured"),
             delete=("deleting", "initial"),
@@ -116,6 +117,10 @@ class InstanceModel(object):
         self.nodes = {}
         self.edges = collections.defaultdict(set)
         self.name_ids_lut = collections.defaultdict(set)
+
+    def load(self):
+        for i in self.nodes.values():
+            i.load()
 
     def add(self, instances):
         for i in instances:
