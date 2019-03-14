@@ -44,8 +44,10 @@ def _run_in(dest_dir, cmd, env):
 
 
 def _get_inventory(host):
-    inventory = dict(all=dict(hosts=dict(opera=dict(ansible_host=host))))
-    inventory = dict(ansible_host=host)
+    inventory = dict(
+        ansible_host=host,
+        ansible_ssh_common_args="-o StrictHostKeyChecking=no",
+    )
 
     if host == "localhost":
         inventory["ansible_connection"] = "local"
