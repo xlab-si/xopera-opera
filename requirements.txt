@@ -1,2 +1,4 @@
 pyyaml >= 3.10  # MIT
--e git+https://github.com/ansible/ansible.git@devel#egg=ansible  # GPLv3
+# Add ansible back in when 2.8 is released (and remove it from dev
+# dependencies in Pipfile)
+# ansible  # GPLv3

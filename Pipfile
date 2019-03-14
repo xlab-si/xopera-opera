@@ -1,0 +1,11 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+openstacksdk = "*"
+ansible = {editable = true,git = "https://github.com/ansible/ansible.git",ref = "devel"}
+
+[packages]
+opera = {editable = true,path = "."}
