@@ -1,9 +1,8 @@
 import argparse
-import pkg_resources
 
 import yaml
 
-from opera import stdlib, types
+from opera import csar, stdlib, types
 
 
 def add_parser(subparsers):
@@ -20,6 +19,8 @@ def add_parser(subparsers):
 
 
 def deploy(args):
+    csar.save(args.name, args.csar.name)
+
     print("Loading service template ...")
     service_template = types.ServiceTemplate.from_data(stdlib.load())
     service_template.merge(
