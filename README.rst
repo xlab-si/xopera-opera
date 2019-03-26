@@ -55,7 +55,7 @@ Log into OpenStack and download rc file content form the ``Access & Security``
 At the start of each session (e.g., when we open a new command line console),
 source the ``openstack.rc`` file::
 
-  (venv) xOpera $ ./openstack.rc
+  (venv) xOpera $ . ./openstack.rc
 
 We need to supply our OpenStack password when prompted. To test credentils that
 we just entered, we can run::
@@ -66,7 +66,7 @@ If this produced something reasonable on the output, credentials are valid and
 we can deploy our first TOSCA service template. If the command failed, we can
 set our password again by running::
 
-  (venv) xOpera $ ./openstack.rc
+  (venv) xOpera $ . ./openstack.rc
 
 Before we can use ``opera``, we must import ssh key into our OpenStack under
 ``Access & Security`` -> ``Key Pairs`` -> ``Import Key Pair``. We must make sure
