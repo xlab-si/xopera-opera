@@ -7,80 +7,57 @@ The initial compliance is with the `TOSCA Simple Profile YAML v1.2`_.
 .. _OASIS TOSCA: https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=tosca
 .. _TOSCA Simple Profile YAML v1.2: https://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.2/os/TOSCA-Simple-Profile-YAML-v1.2-os.html
 
+
+Quickstart
+----------
+
+The simplest way to test ``opera`` is to install it into virtual environment::
+
+  $ mkdir ~/opera && cd ~/opera
+  $ python3 -m venv .venv && . .venv/bin/activate
+  (.venv) $ pip install opera
+
+To test if everything is working as expected, we can now try to deploy a
+hello-world service::
+
+  (.venv) $ curl -L \
+        https://github.com/xlab-si/xopera-examples/archive/master.tar.gz \
+    | tar -xzf -
+  (.venv) $ cd xopera-examples-master/01-hello-world
+  (.venv) $ opera deploy hello service.yaml
+
+If nothing went wrong, new empty file has been created at
+``/tmp/playing-opera/hello/hello.txt``.
+
+
 Prerequisites
 -------------
 
-``opera`` works in Python 3, preferably in a virtual environment. In a typical
-modern Linux environment, we should already be set. In Ubuntu, however, we might
-need to run the following commands:
-
-::
+``opera`` requires python 3 and a virtual environment. In a typical modern
+Linux environment, we should already be set. In Ubuntu, however, we might need
+to run the following commands::
 
   $ sudo apt update
   $ sudo apt install -y python3-venv python3-wheel python-wheel-common
 
-Installation
-------------
-
-Initiate an environment for the `opera` orchestrator and for exploring the
-orchestration. E.g.::
-
-  $ mkdir xOpera
-  $ cd xOpera
-
-Obtain the latest version of the opera orchestrator::
-
-  xOpera $ git clone https://github.com/xlab-si/xopera-opera.git
-
-Start the Python 3 virtual environment::
-
-  xOpera $ python3 -m venv venv
-  xOpera $ . venv/bin/activate
-  (venv) xOpera $ pip install wheel
-  (venv) xOpera $ pip install -e git+https://github.com/ansible/ansible.git@devel#egg=ansible
-  (venv) xOpera $ pip install -e xopera-opera
 
 OpenStack client setup
 ----------------------
 
-The service template in the ``examples/`` folder require the OpenStack client
-to be installed and the environment properly configured. To install the
-client, issue the following commands in our active virtual environment::
+Because using OpenStack modules from Ansible playbooks is quite common, we can
+install ``opera`` with all required OpenStack libraries by running::
 
-  (venv) xOpera $ pip install openstacksdk python-openstackclient
+  (.venv) $ pip install -U opera[openstack]
 
-Log into OpenStack and download rc file content form the ``Access & Security``
--> ``API Access`` page and place it into ``openstack.rc`` file.
+Before we can actually use the OpenStack functionality, we also need to obtain
+the OpenStack credentials. If we log into OpenStack and navigate to the
+``Access & Security`` -> ``API Access`` page, we can download the rc file with
+all required information.
 
 At the start of each session (e.g., when we open a new command line console),
-source the ``openstack.rc`` file::
+we must source the rc file by running::
 
-  (venv) xOpera $ . ./openstack.rc
+  (venv) $ . openstack.rc
 
-We need to supply our OpenStack password when prompted. To test credentils that
-we just entered, we can run::
-
-  (venv) xOpera $ openstack image list
-
-If this produced something reasonable on the output, credentials are valid and
-we can deploy our first TOSCA service template. If the command failed, we can
-set our password again by running::
-
-  (venv) xOpera $ . ./openstack.rc
-
-Before we can use ``opera``, we must import ssh key into our OpenStack under
-``Access & Security`` -> ``Key Pairs`` -> ``Import Key Pair``. We must make sure
-we use the correct name as instructed in the message.
-
-Using opera
------------
-
-To see the usage of the ``opera`` tool, call the tool without parameters::
-
-  (venv) xOpera $ opera
-  (venv) xOpera $ opera deploy
-
-Use the blueprint in the ``examples/`` to test the orchestrator::
-
-  (venv) xOpera $ cd xopera-opera/examples
-  (venv) examples $ opera deploy example-deployment service.yaml
+After we enter the password, we are ready to start using the OpenStack modules
+in playbooks that implement life cycle operations.
