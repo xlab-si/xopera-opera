@@ -696,6 +696,13 @@ class ServiceTemplate(Entity):
         return super().from_data("ROOT", data, [])
 
     def is_compatible_with(self, oth):
+        comps = ["tosca_simple_yaml_1_" + str(i) for i in range(3)]
+        versions = (
+            self.tosca_definitions_version.data,
+            oth.tosca_definitions_version.data,
+        )
+        if all(v in comps for v in versions):
+            return True
         return self.tosca_definitions_version == oth.tosca_definitions_version
 
     def merge(self, other):
