@@ -3,7 +3,7 @@
   gather_facts: no
 
   tasks:
-    - name: Create VM
+    - name: Delete VM
       os_server:
         state: absent
         name: "{{ id }}"

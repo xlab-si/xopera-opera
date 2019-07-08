@@ -16,6 +16,9 @@ node_types:
       network:
         type: string
         description: OpenStack network id (network names are not accepted)
+      security_groups:
+        type: string
+        description: OpenStack names of the security groups to which the instance should be added.Comma separated string.
       key_name:
         type: string
         description: OpenStack SSH key name that should be placed on the VM
@@ -32,6 +35,7 @@ node_types:
             image:    { default: { get_property: [ SELF, image    ] } }
             flavor:   { default: { get_property: [ SELF, flavor   ] } }
             network:  { default: { get_property: [ SELF, network  ] } }
+            security_groups:  { default: { get_property: [ SELF, security_groups  ] } }
             key_name: { default: { get_property: [ SELF, key_name ] } }
           implementation: playbooks/vm/create.yml
         delete:
@@ -87,6 +91,7 @@ topology_template:
         image: 9ea4856a-32b2-4553-b408-cfa4cb1bb40b
         flavor: d3046a41-245a-4042-862e-59568e81f8fa
         network: 753940e0-c2a7-4c9d-992e-4d5bd71f85aa
+        security_groups: default
         key_name: tadej_borovsak
 
     nginx:

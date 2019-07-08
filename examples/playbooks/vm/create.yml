@@ -10,6 +10,7 @@
         key_name: "{{ key_name }}"
         flavor: "{{ flavor }}"
         network: "{{ network }}"
+        security_groups: "{{ security_groups }}"
       register: server_info
 
     - name: Set attributes
