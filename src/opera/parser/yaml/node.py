@@ -2,9 +2,9 @@ from opera.parser.utils.location import Location
 
 
 class Node:
-    def __init__(self, value, stream_name, line, column):
+    def __init__(self, value, loc=None):
         self.value = value
-        self.loc = Location(stream_name, line, column)
+        self.loc = loc or Location("", 0, 0)
 
     def _dump_header(self):
         return "{}({})".format(type(self.value).__name__, self.loc)
