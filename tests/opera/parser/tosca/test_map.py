@@ -64,6 +64,20 @@ class TestMapWrapperBare:
         assert MapWrapper({"a": Base("b", None)}, None).bare == {"a": "b"}
 
 
+class TestMapWrapperMerge:
+    def test_merge(self):
+        map = MapWrapper({"a": 0}, None)
+        map.merge(MapWrapper({"b": 1}, None))
+
+        assert map.data == dict(a=0, b=1)
+
+    def test_duplicated_key(self):
+        with pytest.raises(ParseError, match="twice"):
+            MapWrapper({"twice": 0}, None).merge(
+                MapWrapper({"twice": 1}, None),
+            )
+
+
 class TestMapParse:
     @pytest.mark.parametrize("data", [1, 3.4, "", "a", (), []])
     def test_non_dict_data_is_invalid(self, data):

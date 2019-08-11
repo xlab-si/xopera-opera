@@ -33,6 +33,15 @@ class MapWrapper(Base):
     def bare(self):
         return {k: v.bare for k, v in self.data.items()}
 
+    def merge(self, other):
+        duplicates = set(self.keys()) & set(other.keys())
+        if duplicates:
+            self.abort(
+                "Duplicate keys '{}' found in {} and {}".format(
+                    ", ".join(duplicates), self.loc, other.loc,
+                ), self.loc,
+            )
+        self.data.update(other.data)
 
 
 class Map:

@@ -56,3 +56,67 @@ class TestParse:
             tosca_definitions_version: tosca_simple_yaml_1_3
             """
         ))
+
+
+class TestMerge:
+    def test_valid_section_merge(self, yaml_ast):
+        template = ServiceTemplate.parse(yaml_ast(
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            node_types:
+              type_a:
+                derived_from: a
+            """
+        ))
+        template.merge(ServiceTemplate.parse(yaml_ast(
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            node_types:
+              type_b:
+                derived_from: b
+            """
+        )))
+
+        assert template.node_types.bare == {
+            "type_a": {"derived_from": "a"},
+            "type_b": {"derived_from": "b"},
+        }
+
+    def test_valid_merge(self, yaml_ast):
+        template = ServiceTemplate.parse(yaml_ast(
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            data_types:
+              type_a:
+                derived_from: a
+            """
+        ))
+        template.merge(ServiceTemplate.parse(yaml_ast(
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            node_types:
+              type_a:
+                derived_from: a
+            """
+        )))
+
+        assert template.node_types.bare == {"type_a": {"derived_from": "a"}}
+        assert template.data_types.bare == {"type_a": {"derived_from": "a"}}
+
+    def test_duplicates(self, yaml_ast):
+        with pytest.raises(ParseError, match="type_a"):
+            ServiceTemplate.parse(yaml_ast(
+                """
+                tosca_definitions_version: tosca_simple_yaml_1_3
+                node_types:
+                  type_a:
+                    derived_from: a
+                """
+            )).merge(ServiceTemplate.parse(yaml_ast(
+                """
+                tosca_definitions_version: tosca_simple_yaml_1_3
+                node_types:
+                  type_a:
+                    derived_from: b
+                """
+            )))

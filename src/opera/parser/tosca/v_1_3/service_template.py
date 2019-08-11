@@ -53,3 +53,33 @@ class ServiceTemplate(Entity):
             for k, v in yaml_node.value.items()
             if k.value != "dsl_definitions"
         }, yaml_node.loc)
+
+    def merge(self, other):
+        if self.tosca_definitions_version != other.tosca_definitions_version:
+            self.abort(
+                "Incompatible TOSCA definitions: {} and {}".format(
+                    self.tosca_definitions_version,
+                    other.tosca_definitions_version
+                ), other.loc,
+            )
+
+        # TODO(@tadeboro): Should we merge the topology templates or should we
+        # be doing substitution mapping instead?
+        for key in (
+                "repositories",
+                "artifact_types",
+                "data_types",
+                "capability_types",
+                "interface_types",
+                "relationship_types",
+                "node_types",
+                "group_types",
+                "policy_types",
+                "topology_template",
+        ):
+            if key not in other.data:
+                continue
+            if key in self.data:
+                self.data[key].merge(other.data[key])
+            else:
+                self.data[key] = other.data[key]
