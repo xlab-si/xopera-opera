@@ -1,12 +1,49 @@
-version: 2
-jobs:
-  build:
-    docker:
-      - image: circleci/python:3.5.7
-        environment:
-          PIPENV_VENV_IN_PROJECT: true
+version: "2.1"
+
+commands:
+  run_tests:
+    description: Run test suite
     steps:
       - checkout
       - run: sudo pip install pipenv
       - run: make init
       - run: make test
+
+executors:
+  python35:
+    docker:
+      - image: circleci/python:3.5.7
+    environment:
+      PIPENV_VENV_IN_PROJECT: true
+  python36:
+    docker:
+      - image: circleci/python:3.6.9
+    environment:
+      PIPENV_VENV_IN_PROJECT: true
+  python37:
+    docker:
+      - image: circleci/python:3.7.4
+    environment:
+      PIPENV_VENV_IN_PROJECT: true
+
+jobs:
+  test35:
+    executor: python35
+    steps:
+      - run_tests
+  test36:
+    executor: python36
+    steps:
+      - run_tests
+  test37:
+    executor: python37
+    steps:
+      - run_tests
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test35
+      - test36
+      - test37
