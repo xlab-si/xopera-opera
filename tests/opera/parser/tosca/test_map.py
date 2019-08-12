@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 import pytest
 
 from opera.error import ParseError
@@ -112,3 +114,21 @@ class TestOrderedMapParse:
         data = [(k, v.data) for k, v in obj.data.items()]
 
         assert data == [("a", "b"), ("c", "d")]
+
+
+class TestMapWrapperVisit:
+    def test_empty_visit(self):
+        MapWrapper({}, None).visit("called", "with", keyword="args")
+
+    def test_visit(self):
+        obj1 = Base(None, None)
+        obj1.called = Mock()
+        obj2 = Base(None, None)
+        obj2.not_called = Mock()
+
+        MapWrapper({"a": obj1, "b": obj2}, None).visit(
+            "called", "with", keyword="args",
+        )
+
+        obj1.called.assert_called_once_with("with", keyword="args")
+        obj2.not_called.assert_not_called()

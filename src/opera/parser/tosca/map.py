@@ -43,6 +43,12 @@ class MapWrapper(Base):
             )
         self.data.update(other.data)
 
+    def visit(self, method, *args, **kwargs):
+        self.data = collections.OrderedDict(
+            (k, v.visit(method, *args, **kwargs)) for k, v in self.items()
+        )
+        return super().visit(method, *args, **kwargs)
+
 
 class Map:
     def __init__(self, value_class):

@@ -35,3 +35,8 @@ class Base:
 
     def __str__(self):
         return str(self.bare)
+
+    def visit(self, method, *args, **kwargs):
+        if hasattr(self, method):
+            getattr(self, method)(*args, **kwargs)
+        return self

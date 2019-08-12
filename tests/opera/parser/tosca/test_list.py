@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 import pytest
 
 from opera.error import ParseError
@@ -65,3 +67,19 @@ class TestBare:
         obj = ListWrapper([Base("a", None), Base("b", None)], None)
 
         assert obj.bare == ["a", "b"]
+
+
+class TestListWrapperVisit:
+    def test_empty_visit(self):
+        ListWrapper([], None).visit("called", "with", keyword="args")
+
+    def test_non_empty_visit(self):
+        obj1 = Base(None, None)
+        obj1.called = Mock()
+        obj2 = Base(None, None)
+        obj2.not_called = Mock()
+
+        ListWrapper([obj1, obj2], None).visit("called", "with", keyword="args")
+
+        obj1.called.assert_called_once_with("with", keyword="args")
+        obj2.not_called.assert_not_called()

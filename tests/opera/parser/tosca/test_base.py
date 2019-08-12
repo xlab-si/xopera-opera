@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 import pytest
 
 from opera.error import ParseError
@@ -66,3 +68,21 @@ class TestStr:
     @pytest.mark.parametrize("data", [1, 2.3, True, "abc", {}, []])
     def test_str(self, data):
         assert str(data) == str(Base(data, Location("s", 4, 5)))
+
+
+class TestVisit:
+    def test_nop_visit(self):
+        obj = Base(None, None)
+        obj.not_called = Mock()
+
+        obj.visit("missing_method")
+
+        obj.not_called.assert_not_called()
+
+    def test_visit(self):
+        obj = Base(None, None)
+        obj.called = Mock()
+
+        obj.visit("called", "with", keyword="args")
+
+        obj.called.assert_called_once_with("with", keyword="args")
