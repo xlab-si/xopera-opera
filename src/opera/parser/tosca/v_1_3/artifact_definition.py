@@ -2,6 +2,7 @@ from opera.parser.yaml.node import Node
 
 from ..entity import Entity
 from ..map import Map
+from ..path import Path
 from ..reference import Reference
 from ..string import String
 from ..version import Version
@@ -12,7 +13,7 @@ from ..void import Void
 class ArtifactDefinition(Entity):
     ATTRS = dict(
         type=Reference("artifact_types"),
-        file=String,
+        file=Path,
         repository=Reference("repositories"),
         description=String,
         deploy_path=String,
