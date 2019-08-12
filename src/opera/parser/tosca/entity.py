@@ -1,11 +1,10 @@
-from .base import Base
-from .map import Map
+from .map import Map, MapWrapper
 from .reference import Reference
 from .string import String
 from .version import Version
 
 
-class Entity(Base):
+class Entity(MapWrapper):
     ATTRS = {}  # This must be overridden in derived classes
     REQUIRED = set()  # This can be overriden in derived classes
 
@@ -55,29 +54,6 @@ class Entity(Base):
             return self.data[key]
         except KeyError:
             raise AttributeError(key)
-
-    def __getitem__(self, key):
-        return self.data[key]
-
-    def __iter__(self):
-        return iter(self.data)
-
-    def dig(self, key, *subpath):
-        if key not in self.data:
-            return None
-        if not subpath:
-            return self.data[key]
-        return self.data[key].dig(*subpath)
-
-    def items(self):
-        return self.data.items()
-
-    def values(self):
-        return self.data.values()
-
-    @property
-    def bare(self):
-        return {k: v.bare for k, v in self.data.items()}
 
 
 class TypeEntity(Entity):
