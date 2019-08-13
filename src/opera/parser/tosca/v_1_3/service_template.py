@@ -1,5 +1,6 @@
 import pathlib
 
+from opera.parser import yaml
 from opera.parser.yaml.node import Node
 
 from ..entity import Entity
@@ -53,6 +54,25 @@ class ServiceTemplate(Entity):
             for k, v in yaml_node.value.items()
             if k.value != "dsl_definitions"
         }, yaml_node.loc)
+
+    @classmethod
+    def parse(cls, yaml_node, base_path, csar_path):
+        service = super().parse(yaml_node)
+        service.visit("canonicalize_paths", csar_path)
+        service.merge_imports(base_path)
+        return service
+
+    def merge_imports(self, base_path):
+        for import_def in self.data.get("imports", []):
+            import_path = import_def.file.data
+            with (base_path / import_path).open() as fd:
+                yaml_data = yaml.load(fd, str(import_path))
+            self.merge(ServiceTemplate.parse(
+                yaml_data, base_path, import_path.parent,
+            ))
+        # We do not need imports anymore, since they are preprocessor
+        # construct and would only clutter the AST.
+        self.data.pop("imports", None)
 
     def merge(self, other):
         if self.tosca_definitions_version != other.tosca_definitions_version:
