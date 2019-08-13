@@ -48,14 +48,14 @@ class TestParse:
             policy_types: {}
             topology_template: {}
             """
-        ))
+        ), None, None)
 
     def test_minimal(self, yaml_ast):
         ServiceTemplate.parse(yaml_ast(
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             """
-        ))
+        ), None, None)
 
 
 class TestMerge:
@@ -67,7 +67,7 @@ class TestMerge:
               type_a:
                 derived_from: a
             """
-        ))
+        ), None, None)
         template.merge(ServiceTemplate.parse(yaml_ast(
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
@@ -75,7 +75,7 @@ class TestMerge:
               type_b:
                 derived_from: b
             """
-        )))
+        ), None, None))
 
         assert template.node_types.bare == {
             "type_a": {"derived_from": "a"},
@@ -90,7 +90,7 @@ class TestMerge:
               type_a:
                 derived_from: a
             """
-        ))
+        ), None, None)
         template.merge(ServiceTemplate.parse(yaml_ast(
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
@@ -98,7 +98,7 @@ class TestMerge:
               type_a:
                 derived_from: a
             """
-        )))
+        ), None, None))
 
         assert template.node_types.bare == {"type_a": {"derived_from": "a"}}
         assert template.data_types.bare == {"type_a": {"derived_from": "a"}}
@@ -112,11 +112,11 @@ class TestMerge:
                   type_a:
                     derived_from: a
                 """
-            )).merge(ServiceTemplate.parse(yaml_ast(
+            ), None, None).merge(ServiceTemplate.parse(yaml_ast(
                 """
                 tosca_definitions_version: tosca_simple_yaml_1_3
                 node_types:
                   type_a:
                     derived_from: b
                 """
-            )))
+            ), None, None))
