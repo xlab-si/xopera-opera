@@ -38,5 +38,5 @@ class Base:
 
     def visit(self, method, *args, **kwargs):
         if hasattr(self, method):
-            getattr(self, method)(*args, **kwargs)
+            return getattr(self, method)(*args, **kwargs)
         return self

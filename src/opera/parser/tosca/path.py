@@ -36,3 +36,4 @@ class Path(String):
                 pos += 1
 
         self.data = pathlib.PurePath(*parts)
+        return self
