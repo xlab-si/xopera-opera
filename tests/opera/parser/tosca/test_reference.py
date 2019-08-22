@@ -1,7 +1,89 @@
 import pytest
 
-from opera.parser.tosca.reference import Reference
+from opera.error import ParseError
+from opera.parser.tosca.reference import (
+    DataTypeReference, DataTypeReferenceWrapper, Reference, ReferenceWrapper,
+)
+from opera.parser.tosca.type import Type
+from opera.parser.tosca.v_1_3.service_template import ServiceTemplate
 from opera.parser.yaml.node import Node
+
+
+class TestReferenceWrapperResolveReference:
+    def test_valid_type_reference(self, yaml_ast):
+        service = ServiceTemplate.parse(yaml_ast(
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            node_types:
+              my.Type:
+                derived_from: tosca.nodes.Root
+            """
+        ), None, None)
+        ref = ReferenceWrapper("my.Type", None)
+        ref.section_path = ("node_types",)
+
+        assert service.node_types["my.Type"] == ref.resolve_reference(service)
+
+    def test_valid_template_reference(self, yaml_ast):
+        service = ServiceTemplate.parse(yaml_ast(
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            topology_template:
+              node_templates:
+                my_node:
+                  type: tosca.nodes.Root
+            """
+        ), None, None)
+        ref = ReferenceWrapper("my_node", None)
+        ref.section_path = ("topology_template", "node_templates")
+
+        target = service.topology_template.node_templates["my_node"]
+        assert target == ref.resolve_reference(service)
+
+    def test_invalid_reference(self, yaml_ast):
+        service = ServiceTemplate.parse(yaml_ast(
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            node_types:
+              my.Type:
+                derived_from: tosca.nodes.Root
+            """
+        ), None, None)
+        ref = ReferenceWrapper("INVALID", None)
+        ref.section_path = ("node_types",)
+
+        with pytest.raises(ParseError):
+            ref.resolve_reference(service)
+
+
+class TestDataTypeReferenceWrapperResolveReference:
+    @pytest.mark.parametrize("typ", [
+        "string", "integer", "float", "boolean", "null",
+        "timestamp", "version", "range", "list", "map", "scalar-unit.size",
+        "scalar-unit.time", "scalar-unit.frequency", "scalar-unit.bitrate",
+    ])
+    def test_valid_internal_data_type_reference(self, typ):
+        ref = DataTypeReferenceWrapper(typ, None)
+        ref.section_path = ("data_types",)
+
+        result = ref.resolve_reference(None)
+
+        assert isinstance(result, Type)
+        assert typ == result.data
+
+    def test_valid_user_data_type_reference(self, yaml_ast):
+        service = ServiceTemplate.parse(yaml_ast(
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            data_types:
+              my.Type:
+                derived_from: float
+            """
+        ), None, None)
+        ref = DataTypeReferenceWrapper("my.Type", None)
+        ref.section_path = ("data_types",)
+
+        assert service.data_types["my.Type"] == ref.resolve_reference(service)
 
 
 class TestReferenceInit:
