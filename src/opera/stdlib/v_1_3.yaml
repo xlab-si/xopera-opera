@@ -3,7 +3,7 @@ tosca_definitions_version: tosca_simple_yaml_1_3
 
 artifact_types:
   tosca.artifacts.Root:
-    derived_from: None
+    derived_from: tosca.entity.Root
     description: >
       The TOSCA Artifact Type all other TOSCA Artifact Types derive from
 
@@ -44,7 +44,7 @@ artifact_types:
 
 capability_types:
   tosca.capabilities.Root:
-    derived_from: None
+    derived_from: tosca.entity.Root
     description: >
       The TOSCA root Capability Type all other TOSCA Capability Types
       derive from
@@ -208,7 +208,7 @@ capability_types:
 
 data_types:
   tosca.datatypes.Root:
-    derived_from: None
+    derived_from: tosca.entity.Root
     description: >
       The TOSCA root Data Type all other TOSCA base Data Types derive from
 
@@ -303,7 +303,7 @@ data_types:
   
 group_types:
   tosca.groups.Root:
-    derived_from: None
+    derived_from: tosca.entity.Root
     description: The TOSCA Group Type all other TOSCA Group Types derive from.
     # FIXME: Next section is copied from the normative types section, but the
     # bloody thing does not conform to the TOSCA grammar. Determine what
@@ -591,7 +591,7 @@ node_types:
 
 policy_types:
   tosca.policies.Root:
-    derived_from: None
+    derived_from: tosca.entity.Root
     description: >
       The TOSCA Policy Type all other TOSCA Policy Types derive from.
 
@@ -622,7 +622,7 @@ policy_types:
 
 relationship_types:
   tosca.relationships.Root:
-    derived_from: None
+    derived_from: tosca.entity.Root
     description: >
       The TOSCA root Relationship Type all other TOSCA base Relationship Types
       derive from
