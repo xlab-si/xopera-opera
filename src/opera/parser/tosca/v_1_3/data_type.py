@@ -3,7 +3,7 @@ from opera.parser.yaml.node import Node
 from ..entity import TypeEntity
 from ..list import List
 from ..map import Map
-from ..reference import Reference
+from ..reference import DataTypeReference
 from ..string import String
 
 from .constraint_clause import ConstraintClause
@@ -11,7 +11,7 @@ from .property_definition import PropertyDefinition
 
 
 class DataType(TypeEntity):
-    REFERENCE = Reference("data_types")
+    REFERENCE = DataTypeReference("data_types")
     ATTRS = dict(
         constraints=List(ConstraintClause),
         properties=Map(PropertyDefinition),

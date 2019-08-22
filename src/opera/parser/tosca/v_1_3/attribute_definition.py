@@ -1,5 +1,5 @@
 from ..entity import Entity
-from ..reference import Reference
+from ..reference import DataTypeReference
 from ..string import String
 from ..void import Void
 
@@ -9,7 +9,7 @@ from .status import Status
 
 class AttributeDefinition(Entity):
     ATTRS = dict(
-        type=Reference("data_types"),
+        type=DataTypeReference("data_types"),
         description=String,
         default=Void,
         status=Status,
