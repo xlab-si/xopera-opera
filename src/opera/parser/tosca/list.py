@@ -22,8 +22,10 @@ class ListWrapper(Base):
         return [v.bare for v in self.data]
 
     def visit(self, method, *args, **kwargs):
-        self.data = [v.visit(method, *args, **kwargs) for v in self]
-        return super().visit(method, *args, **kwargs)
+        return type(self)(
+            [v.visit(method, *args, **kwargs) for v in self],
+            self.loc,
+        )
 
 
 class List:
