@@ -12,19 +12,27 @@ class TestBuild:
         assert isinstance(Path.build(Node("/")).data, pathlib.PurePath)
 
 
-class TestCanonicalizePaths:
-    @pytest.mark.parametrize("input,parent,output", [
-        ("/absolute/path", "base/path", "/absolute/path"),
-        ("/absolute/path", ".", "/absolute/path"),
-        ("rel/path", "base/path", "base/path/rel/path"),
-        ("rel/path", ".", "rel/path"),
-        ("rel/path", "..", "../rel/path"),
-        ("rel/path", "../..", "../../rel/path"),
-        ("../rel/path", "component", "rel/path"),
-        ("../../rel/path", "component", "../rel/path"),
+class TestPrefixPath:
+    @pytest.mark.parametrize("input,prefix", [
+        ("/a/b", "c"), ("/a", "b"), ("/a", "../.."), ("/c", "."),
     ])
-    def test_canonicalization(self, input, parent, output):
+    def test_prefix_absolute_path(self, input, prefix):
         path = Path(pathlib.PurePath(input), None)
-        path.canonicalize_paths(pathlib.PurePath(parent))
+        path.prefix_path(pathlib.PurePath(prefix))
+
+        assert str(path.data) == input
+
+    @pytest.mark.parametrize("input,prefix,output", [
+        ("a", "b", "b/a"),
+        ("a", "..", "../a"),
+        ("a", ".", "a"),
+        ("a/b", "c", "c/a/b"),
+        ("a/b", "..", "../a/b"),
+        ("a/b", "c/d", "c/d/a/b"),
+        ("a", "c/d/", "c/d/a"),
+    ])
+    def test_prefix_relative_path(self, input, prefix, output):
+        path = Path(pathlib.PurePath(input), None)
+        path.prefix_path(pathlib.PurePath(prefix))
 
         assert str(path.data) == output

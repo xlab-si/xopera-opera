@@ -58,7 +58,7 @@ class ServiceTemplate(Entity):
     @classmethod
     def parse(cls, yaml_node, base_path, csar_path):
         service = super().parse(yaml_node)
-        service.visit("canonicalize_paths", csar_path)
+        service.visit("prefix_path", csar_path)
         service.merge_imports(base_path)
         return service
 
