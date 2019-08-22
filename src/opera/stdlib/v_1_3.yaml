@@ -104,7 +104,7 @@ capability_types:
         required: false
         default: tcp
       port:
-        type: PortDef
+        type: tosca.datatypes.network.PortDef
         required: false
       secure:
         type: boolean
@@ -132,7 +132,7 @@ capability_types:
         constraints:
           - min_length: 1
         entry_schema:
-          type: PortSpec
+          type: tosca.datatypes.network.PortSpec
     attributes:
       ip_address:
         type: string
@@ -289,7 +289,7 @@ data_types:
         constraints:
           - valid_values: [ udp, tcp, igmp ]
       target:
-        type: PortDef
+        type: tosca.datatypes.network.PortDef
         required: false
       target_range:
         type: range
@@ -297,7 +297,7 @@ data_types:
         constraints:
           - in_range: [ 1, 65535 ]
       source:
-        type: PortDef
+        type: tosca.datatypes.network.PortDef
         required: false
 
   
