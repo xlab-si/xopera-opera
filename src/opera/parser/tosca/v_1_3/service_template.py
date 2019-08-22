@@ -64,11 +64,11 @@ class ServiceTemplate(Entity):
 
     def merge_imports(self, base_path):
         for import_def in self.data.get("imports", []):
-            import_path = import_def.file.data
-            with (base_path / import_path).open() as fd:
-                yaml_data = yaml.load(fd, str(import_path))
+            csar_path = import_def.file.resolve_path(base_path).data
+            with (base_path / csar_path).open() as fd:
+                yaml_data = yaml.load(fd, str(csar_path))
             self.merge(ServiceTemplate.parse(
-                yaml_data, base_path, import_path.parent,
+                yaml_data, base_path, csar_path.parent,
             ))
         # We do not need imports anymore, since they are preprocessor
         # construct and would only clutter the AST.
