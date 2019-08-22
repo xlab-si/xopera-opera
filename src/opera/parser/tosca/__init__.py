@@ -25,6 +25,7 @@ def load(base_path, template_name):
     stdlib_yaml = stdlib.load(tosca_version)
     service = parser.parse(stdlib_yaml, base_path, PurePath("STDLIB"))
     service.merge(parser.parse(input_yaml, base_path, PurePath()))
+    service.visit("resolve_reference", service)
 
     return service
 
