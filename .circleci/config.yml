@@ -10,11 +10,6 @@ commands:
       - run: make test
 
 executors:
-  python35:
-    docker:
-      - image: circleci/python:3.5.7
-    environment:
-      PIPENV_VENV_IN_PROJECT: true
   python36:
     docker:
       - image: circleci/python:3.6.9
@@ -27,10 +22,6 @@ executors:
       PIPENV_VENV_IN_PROJECT: true
 
 jobs:
-  test35:
-    executor: python35
-    steps:
-      - run_tests
   test36:
     executor: python36
     steps:
@@ -44,6 +35,5 @@ workflows:
   version: 2
   test:
     jobs:
-      - test35
       - test36
       - test37
