@@ -12,7 +12,7 @@ class TestIsValidInternalType:
         assert Type.is_valid_internal_type(typ) is False
 
     @pytest.mark.parametrize("typ", [
-        "tosca.entity.Root", "string", "integer", "float", "boolean", "null",
+        "string", "integer", "float", "boolean", "null",
         "timestamp", "version", "range", "list", "map", "scalar-unit.size",
         "scalar-unit.time", "scalar-unit.frequency", "scalar-unit.bitrate",
     ])
