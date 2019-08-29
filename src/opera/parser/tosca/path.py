@@ -11,7 +11,6 @@ class Path(String):
     def prefix_path(self, parent_path):
         if not self.data.is_absolute():
             self.data = parent_path / self.data
-        return self
 
     def resolve_path(self, base_path):
         # Absolute path is relative to the CSAR root folder, so we need to
@@ -20,9 +19,8 @@ class Path(String):
             path = self.data.relative_to(self.data.root)
         else:
             path = self.data
-        path = self._compact_path(path)
-        self._validate_path(base_path, path)
-        return type(self)(path, self.loc)
+        self.data = self._compact_path(path)
+        self._validate_path(base_path)
 
     @staticmethod
     def _compact_path(path):
@@ -49,25 +47,20 @@ class Path(String):
 
         return pathlib.PurePath(*parts)
 
-    def _validate_path(self, base_path, path):
-        abs_path = base_path / path
-
+    def _validate_path(self, base_path):
         # Abstract checks
-        if str(path) == ".":
-            self.abort(
-                "Path {} points to the CSAR root.".format(str(path)), self.loc,
-            )
-        if path.parts[0] == "..":
-            self.abort(
-                "Path {} points outside the CSAR.".format(str(path)), self.loc,
-            )
+        if str(self.data) == ".":
+            self.abort("Path points to the CSAR root.", self.loc)
+        if self.data.parts[0] == "..":
+            self.abort("Path points outside the CSAR.", self.loc)
 
         # Concrete checks
+        abs_path = base_path / self.data
         if not abs_path.exists():
-            self.abort("Path {} does not exists.".format(str(path)))
+            self.abort("Path does not exists.", self.loc)
         # We test for symlinks separately since is_dir() and is_file() return
         # True on symlinks and this is not what we want.
         if abs_path.is_symlink():
-            self.abort("Path {} is a symlink.".format(str(path)))
+            self.abort("Path is a symlink.", self.loc)
         if not abs_path.is_dir() and not abs_path.is_file():
-            self.abort("Path {} is not file or folder.".format(str(path)))
+            self.abort("Path is not file or folder.", self.loc)

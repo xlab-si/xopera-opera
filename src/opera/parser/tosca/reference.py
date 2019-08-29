@@ -12,15 +12,15 @@ class ReferenceWrapper(String):
 
         # Special case for root types that should have no parent
         if self.data == "tosca.entity.Root":
-            return Type(self.data, self.loc)
+            return None
 
         target = service_template.dig(*self.section_path, self.data)
-        if target:
-            return target
+        if not target:
+            self.abort("Invalid reference {}".format(
+                "/".join(self.section_path + (self.data,)),
+            ), self.loc)
 
-        self.abort("Invalid reference {}".format(
-            "/".join(self.section_path + (self.data,)),
-        ), self.loc)
+        return target
 
 
 class DataTypeReferenceWrapper(ReferenceWrapper):
