@@ -25,7 +25,7 @@ class NodeTemplate(Entity):
         directives=List(String),
         properties=Map(Void),
         attributes=Map(Void),
-        requirements=OrderedMap(RequirementAssignment),
+        requirements=List(Map(RequirementAssignment)),
         capabilities=Map(CapabilityAssignment),
         interfaces=Map(InterfaceDefinitionForTemplate),
         artifacts=Map(ArtifactDefinition),
