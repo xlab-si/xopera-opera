@@ -1,0 +1,440 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+namespace: https://xlab.si/TOSCA/1.2
+
+metadata:
+  template-name: sample
+  template-author: XLAB d.o.o.
+  template-version: "1.1"
+
+description: Simple template for testing parser.
+
+dsl_definitions:
+  - &shared
+    often: used
+    data: is placed here
+
+repositories:
+  mini_repo:
+    url: mini_repo_url
+
+  maxi_repo:
+    description: Repo description
+    url: maxi_repo_url
+    credential:
+      token_type: password
+      token: secret_password
+      user: username
+
+  tiny_repo: tiny_repo_url
+
+imports:
+  - files/a.yaml
+
+artifact_types:
+  my_artifact_type:
+    derived_from: tosca.artifacts.File
+    description: My artifact type description
+    metadata:
+      author: me
+    version: 1.2.3.alpha-4
+    mime_type: application/ansible-playbook
+    file_ext: [ yaml, yml ]
+    properties:
+      my_artifact_property:
+        type: float
+        description: Hello my property
+        required: true
+        default: 1.23
+        status: deprecated
+        constraints:
+          - greater_than: 1
+          - less_or_equal: 2
+        metadata:
+          more: metadata
+
+data_types:
+  my_data_type:
+    derived_from: tosca.datatypes.Root
+    description: My data type description
+    metadata:
+      author: me
+    version: 1.2.3.alpha-5
+    constraints:
+      - in_range: [ 5, 9 ]
+    properties:
+      my_data_property:
+        type: float
+        description: Hello my property
+        required: true
+        default: 1.23
+        status: supported
+        metadata:
+          more: metadata
+
+  my_rootless_data_type:
+    properties:
+      my_rootless_data_property:
+        type: string
+
+
+capability_types:
+  my_capability_type:
+    derived_from: tosca.capabilities.Root
+    version: 1.2.3.beta-7
+    description: Capability type description
+    metadata:
+      some: metadata
+    properties:
+      my_capability_property:
+        type: integer
+    attributes:
+      my_capability_attribute:
+        type: string
+        description: My attribute description
+        default: default value
+        status: experimental
+      my_capability_attribute_2:
+        type: list
+        description: My attribute description
+        default: [1, 2, 3]
+        status: experimental
+        entry_schema:
+          type: integer
+          description: My list entry schema
+          constraints:
+            - greater_or_equal: 0
+            - less_than: 9
+    valid_source_types:
+      - my_node_type
+
+
+interface_types:
+  my_interface_type:
+    derived_from: tosca.capabilities.Root
+    version: 1.2.3.beta-7
+    metadata:
+      some: metadata
+    description: Capability type description
+    inputs:
+      my_operation_input:
+        type: float
+        description: Hello my property
+        required: true
+        default: 1.23
+        status: deprecated
+        metadata:
+          more: metadata
+    operations:
+      my_interface_operation:
+        description: My operation description
+        implementation:
+          primary:
+            type: tosca.artifacts.File
+            file: path/to/primary.yaml
+            repository: my_repo
+            description: my descrtiption
+            deploy_path: some/path
+            artifact_version: 1.2.3.go-4
+            checksum: abcdefghij
+            checksum_algorithm: SHA256
+            properties:
+              prop: value
+              another: prop
+          dependencies:
+            - type: tosca.artifacts.File
+              file: path/to/seconf.c
+            - path/to/third.sh
+          timeout: 10
+          operation_host: SELF
+        inputs:
+          input_1:
+            description: Hello my input
+            required: true
+            default: 1.23
+            status: deprecated
+            metadata:
+              more: metadata
+          input_2:
+            value: 1.23
+          input_3:
+            type: float
+        outputs:
+          output_1: [ SELF, attr, 0, key ]
+    notifications:
+      my_notification:
+        description: My notification description
+        implementation:
+          primary: some/artifact.yaml
+          dependencies:
+            - more/artifacts.txt
+        outputs:
+          output_2: [ SELF, some, thing, here ]
+
+
+relationship_types:
+  my_relationship_type:
+    derived_from: tosca.relationships.Root
+    version: 1.2.3.beta-7
+    metadata:
+      some: metadata
+    description: Relationship type description
+    properties:
+      my_relationship_property:
+        type: integer
+    attributes:
+      my_relationship_attribute:
+        type: string
+    valid_target_types:
+      - tosca.capabilities.Compute
+    interfaces:
+      my_custom_interface:
+        inputs:
+          my_operation_input:
+            type: float
+            description: Hello my property
+            required: true
+            default: 1.23
+            status: deprecated
+            metadata:
+              more: metadata
+        operations:
+          my_interface_operation:
+            description: My operation description
+            implementation:
+              primary:
+                type: tosca.artifacts.File
+                file: path/to/primary.yaml
+                repository: my_repo
+                description: my descrtiption
+                deploy_path: some/path
+                artifact_version: 1.2.3.go-4
+                checksum: abcdefghij
+                checksum_algorithm: SHA256
+                properties:
+                  prop: value
+                  another: prop
+              dependencies:
+                - type: tosca.artifacts.File
+                  file: path/to/seconf.c
+                - path/to/third.sh
+              timeout: 10
+              operation_host: SELF
+            inputs:
+              input_1:
+                description: Hello my input
+                required: true
+                default: 1.23
+                status: deprecated
+                metadata:
+                  more: metadata
+              input_2:
+                value: 1.23
+              input_3:
+                type: float
+            outputs:
+              output_1: [ SELF, attr, 0, key ]
+        notifications:
+          my_notification:
+            description: My notification description
+            implementation:
+              primary: some/artifact.yaml
+              dependencies:
+                - more/artifacts.txt
+            outputs:
+              output_2: [ SELF, some, thing, here ]
+
+
+node_types:
+  my_node_type:
+    derived_from: tosca.nodes.Root
+    version: 1.2.3.beta-8
+    metadata:
+      some: metadata
+    description: Node type description
+    attributes:
+      my_relationship_attribute:
+        type: string
+    properties:
+      my_relationship_property:
+        type: integer
+    requirements:
+      - my_requirement: cap_name
+      - another_requirement:
+          capability: some_cap_name
+          node: some_node_type
+          occurrences: [ 2, UNBOUNDED ]
+          relationship: relationship_type_name
+      - yet_another_requirement:
+          capability: some_cap_name
+          node: some_node_type
+          occurrences: [ 2, UNBOUNDED ]
+    capabilities:
+      my_cap:
+        type: my_cap_type
+        description: my cap type
+        properties:
+          my_prop:
+            type: int
+        attributes:
+          my_attr:
+            type: float
+        valid_source_types:
+          - source_cap_1
+          - source_cap_2
+        occurrences: [ 1, 6 ]
+    interfaces:
+      my_bad_interface:
+        inputs:
+          my_input:
+            type: string
+        operations:
+          my_op: artifact/file
+        notifications:
+          my_notification:
+            description: My notification description
+            implementation:
+              primary: some/artifact.yaml
+    artifacts:
+      my_artifact: path/to/artifact
+
+
+group_types:
+  my_group_type:
+    derived_from: tosca.groups.Root
+    version: 1.2.3.beta-81
+    metadata:
+      some: metadata
+    description: Group type description
+    attributes:
+      my_group_attribute:
+        type: string
+    properties:
+      my_group_property:
+        type: integer
+    members:
+      - node_type_1
+      - node_type_2
+
+
+policy_types:
+  my_policy_type:
+    derived_from: tosca.policies.Root
+    version: 1.2.3.beta-54
+    metadata:
+      some: metadata
+    description: Policy type description
+    properties:
+      my_policy_property:
+        type: integer
+
+
+topology_template:
+  description: Some description
+  inputs:
+    my_input:
+      value: my value
+  outputs:
+    my_output:
+      value: heh
+
+  node_templates:
+    my_node_template:
+      type: my_node_type
+      description: template_description
+      metadata:
+        some: metadata
+      directives:
+        - some
+        - directives
+      properties:
+        prop1: val1
+        prop2: val2
+      attributes:
+        attr: val
+        atr2:
+          description: desc
+          value: val
+      requirements:
+        - req1: node_template_name1
+        - req2:
+            capability: my_cap
+            node: my_node
+            relationship: my_relationship
+            node_filter:
+              properties:
+                - my_property_filter: { greater_than: 1 }
+              capabilities:
+                - my_cap 1
+                - my_cap 2
+            occurrences: [1, 4]
+      capabilities:
+        my_cap:
+          properties:
+            cap_prop: 1
+          attributes:
+            cap_attr: 1.3
+          occurrences: [ 1, 7 ]
+      interfaces:
+        my_bad_interface:
+          inputs:
+            my_input:
+              type: string
+          operations:
+            my_op: artifact/file
+          notifications:
+            my_notification:
+              description: My notification description
+              implementation:
+                primary: some/artifact.yaml
+      artifacts:
+        my_artifact: path/to/artifact
+      node_filter:
+        properties:
+          - my_property_filter: { greater_than: 1 }
+        capabilities:
+          - my_cap 1
+          - my_cap 2
+      copy: my_referenced_node
+  relationship_templates:
+    my_relationship_template:
+      type: my_relationship_type
+      description: My description
+      metadata:
+        go: away
+      properties:
+        prop: value
+      attributes:
+        attr: value
+      interfaces:
+        my_bad_interface:
+          inputs:
+            my_input:
+              type: string
+          operations:
+            my_op: artifact/file
+          notifications:
+            my_notification:
+              description: My notification description
+              implementation:
+                primary: some/artifact.yaml
+      copy: my_referenced_relationship
+  groups:
+    my_group_template:
+      type: my_group_type
+      description: desc
+      metadata:
+        yet: another one
+      properties:
+        prop: val
+      members:
+        - node 1
+        - node 2
+  policies:
+    my_policy_template:
+      type: my_policy_template
+      description: my desc for policy
+      metadata:
+        i give: up
+      properties:
+        prop: val
