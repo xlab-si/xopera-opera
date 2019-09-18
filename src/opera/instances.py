@@ -128,22 +128,22 @@ class InstanceModel(object):
             self.name_ids_lut[i.name].add(i.id)
 
     def link(self):
-        for id, instance in self.nodes.items():
+        for instance_id, instance in self.nodes.items():
             reqs = instance.template.dig("requirements")
             if reqs:
                 for kind, node in reqs.items():
                     instance.requirements[kind] = {
                         self.nodes[i] for i in self.name_ids_lut[node.name]
                     }
-                    self.edges[id].update(self.name_ids_lut[node.name])
+                    self.edges[instance_id].update(self.name_ids_lut[node.name])
 
     def deploy(self):
-        for id in self.ordered_instance_ids:
-            self.nodes[id].deploy()
+        for instance_id in self.ordered_instance_ids:
+            self.nodes[instance_id].deploy()
 
     def undeploy(self):
-        for id in reversed(self.ordered_instance_ids):
-            self.nodes[id].undeploy()
+        for instance_id in reversed(self.ordered_instance_ids):
+            self.nodes[instance_id].undeploy()
 
     @property
     def ordered_instance_ids(self):
@@ -151,20 +151,20 @@ class InstanceModel(object):
         marks = collections.defaultdict(lambda: 0)
         ordered_ids = []
 
-        def visit(id):
-            if marks[id] == 2:
+        def visit(instance_id):
+            if marks[instance_id] == 2:
                 return
-            if marks[id] == 1:
+            if marks[instance_id] == 1:
                 raise Exception("Template has a cycle")
-            marks[id] = 1
-            for requirement in self.edges[id]:
+            marks[instance_id] = 1
+            for requirement in self.edges[instance_id]:
                 visit(requirement)
-            marks[id] = 2
-            ordered_ids.append(id)
+            marks[instance_id] = 2
+            ordered_ids.append(instance_id)
 
-        for id in self.nodes:
-            if marks[id] == 0:
-                visit(id)
+        for node_id in self.nodes:
+            if marks[node_id] == 0:
+                visit(node_id)
         return ordered_ids
 
     def __str__(self):

@@ -8,5 +8,5 @@ class PolicyType(TypeEntity):
     REFERENCE = Reference("policy_types")
     ATTRS = dict(
         properties=Map(PropertyDefinition),
-        # TODOD(@tadeboro): Add targets, triggers
+        # TODO(@tadeboro): Add targets, triggers
     )

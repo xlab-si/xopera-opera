@@ -43,7 +43,7 @@ VALID_TEST_CASES = [
              """),
         {"d": ["with", "strs", {"dct": 1, "of": 2, "nums": 3}, "list"]},
     ),
-    # FIXME(@tadeboro): This fails for some reasone. Need to dig through
+    # FIXME(@tadeboro): This fails for some reason. Need to dig through
     # pyyaml sources and find out why null constructor is not called in this
     # case.
     #  (
@@ -53,6 +53,6 @@ VALID_TEST_CASES = [
 
 
 class TestLoad:
-    @pytest.mark.parametrize("input,output", VALID_TEST_CASES)
-    def test_load_valid_yaml(self, input, output):
-        assert yaml.load(input, "test").bare == output
+    @pytest.mark.parametrize("input_yaml,output_object", VALID_TEST_CASES)
+    def test_load_valid_yaml(self, input_yaml, output_object):
+        assert yaml.load(input_yaml, "test").bare == output_object

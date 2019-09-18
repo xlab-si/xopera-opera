@@ -70,6 +70,7 @@ class TestEntityGetattr:
 
     def test_get_invalid_attr(self):
         with pytest.raises(AttributeError):
+            # noinspection PyStatementEffect
             Entity(dict(a=2), None).b
 
 
@@ -79,6 +80,7 @@ class TestEntityGetitem:
 
     def test_get_invalid_item(self):
         with pytest.raises(KeyError):
+            # noinspection PyStatementEffect
             Entity(dict(a=2), None)["b"]
 
 

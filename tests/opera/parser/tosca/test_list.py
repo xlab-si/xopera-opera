@@ -29,10 +29,12 @@ class TestListWrapperGetitem:
 
     def test_getitem_invalid_index(self):
         with pytest.raises(IndexError):
+            # noinspection PyStatementEffect
             ListWrapper([], None)[1]
 
     def test_getitem_invalid_index_type(self):
         with pytest.raises(TypeError):
+            # noinspection PyStatementEffect
             ListWrapper([], None)["a"]
 
 

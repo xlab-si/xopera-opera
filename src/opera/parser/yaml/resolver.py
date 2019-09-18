@@ -24,10 +24,10 @@ class Resolver:
                     return tag
         return self.defaults[kind]
 
-    def descend_resolver(_self, _current_node, _current_index):
+    def descend_resolver(self, _current_node, _current_index):
         pass
 
-    def ascend_resolver(_self):
+    def ascend_resolver(self):
         pass
 
 

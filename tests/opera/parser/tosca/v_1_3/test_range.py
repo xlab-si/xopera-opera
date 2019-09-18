@@ -27,9 +27,9 @@ class TestValidate:
 
 
 class TestBuild:
-    @pytest.mark.parametrize("input,output", [
+    @pytest.mark.parametrize("input_string,output_range", [
         ("[1, 2]", (1, 2)), ("[-4, 5]", (-4, 5)),
         ("[0, UNBOUNDED]", (0, math.inf)),
     ])
-    def test_construction(self, input, output, yaml_ast):
-        assert Range.build(yaml_ast(input)).data == output
+    def test_construction(self, input_string, output_range, yaml_ast):
+        assert Range.build(yaml_ast(input_string)).data == output_range

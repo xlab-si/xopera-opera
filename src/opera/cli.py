@@ -15,9 +15,9 @@ class ArgParser(argparse.ArgumentParser):
         self.print_help()
         sys.exit(2)
 
-    def add_subparsers(self):
+    def add_subparsers(self, **kwargs):
         # Workaround for http://bugs.python.org/issue9253
-        subparsers = super(ArgParser, self).add_subparsers()
+        subparsers = super(ArgParser, self).add_subparsers(**kwargs)
         subparsers.required = True
         subparsers.dest = "command"
         return subparsers

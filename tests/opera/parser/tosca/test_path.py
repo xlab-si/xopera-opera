@@ -22,7 +22,7 @@ class TestPrefixPath:
 
         assert str(path.data) == input
 
-    @pytest.mark.parametrize("input,prefix,output", [
+    @pytest.mark.parametrize("input_string,prefix,output", [
         ("a", "b", "b/a"),
         ("a", "..", "../a"),
         ("a", ".", "a"),
@@ -31,8 +31,8 @@ class TestPrefixPath:
         ("a/b", "c/d", "c/d/a/b"),
         ("a", "c/d/", "c/d/a"),
     ])
-    def test_prefix_relative_path(self, input, prefix, output):
-        path = Path(pathlib.PurePath(input), None)
+    def test_prefix_relative_path(self, input_string, prefix, output):
+        path = Path(pathlib.PurePath(input_string), None)
         path.prefix_path(pathlib.PurePath(prefix))
 
         assert str(path.data) == output
