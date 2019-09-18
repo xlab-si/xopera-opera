@@ -1,3 +1,5 @@
+from opera.template.topology import Topology
+
 from ..entity import Entity
 from ..map import Map
 from ..string import String
@@ -20,3 +22,7 @@ class TopologyTemplate(Entity):
         outputs=Map(ParameterDefinition),
         # TODO(@tadeboro): substitution_mappings and workflows
     )
+
+    def get_template(self, service):
+        return Topology({
+            name: node.get_template

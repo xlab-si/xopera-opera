@@ -64,3 +64,7 @@ class Path(String):
             self.abort("Path is a symlink.", self.loc)
         if not abs_path.is_dir() and not abs_path.is_file():
             self.abort("Path is not file or folder.", self.loc)
+
+    @property
+    def bare(self):
+        return str(self.data)

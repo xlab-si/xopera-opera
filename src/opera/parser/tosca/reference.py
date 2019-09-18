@@ -10,6 +10,10 @@ class ReferenceWrapper(String):
     def resolve_reference(self, service_template):
         assert self.section_path, "Missing section path"
 
+        print("RESOLVING {}{} ({})".format(
+            self.section_path, self.data, self.loc,
+        ))
+
         # Special case for root types that should have no parent
         if self.data == "tosca.entity.Root":
             return None

@@ -22,6 +22,9 @@ class MapWrapper(Base):
     def items(self):
         return self.data.items()
 
+    def get(self, key, default=None):
+        return self.data.get(key, default)
+
     def dig(self, key, *subpath):
         if key not in self.data:
             return None

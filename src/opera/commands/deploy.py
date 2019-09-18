@@ -1,8 +1,9 @@
 import argparse
+from pathlib import Path, PurePath
 
-import yaml
-
-from opera import csar, stdlib, types
+from opera import csar, template
+from opera.error import ParseError
+from opera.parser import tosca
 
 
 def add_parser(subparsers):
@@ -20,22 +21,27 @@ def add_parser(subparsers):
 
 def deploy(args):
     csar.save(args.name, args.csar.name)
+    status = 0
 
     print("Loading service template ...")
-    service_template = types.ServiceTemplate.from_data(stdlib.load())
-    service_template.merge(
-        types.ServiceTemplate.from_data(yaml.safe_load(args.csar))
-    )
+    try:
+        ast = tosca.load(Path.cwd(), PurePath(args.csar.name))
+        print("=======================")
+        tmpl = template.build(ast)
+        print(tmpl)
+    except ParseError as e:
+        print("{}: {}".format(e.loc, e))
+        status = 1
 
-    print("Resolving service template links ...")
-    service_template.resolve()
+    #    print("Resolving service template links ...")
+    #    service_template.resolve()
 
-    print("Creating instance model ...")
-    instances = service_template.instantiate()
+    #    print("Creating instance model ...")
+    #    instances = service_template.instantiate()
 
-    print("Deploying instance model ...")
-    instances.deploy()
+    #    print("Deploying instance model ...")
+    #    instances.deploy()
 
     print("Done.")
 
-    return 0
+    return status

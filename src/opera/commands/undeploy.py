@@ -2,7 +2,7 @@ import argparse
 
 import yaml
 
-from opera import csar, stdlib, types
+from opera import csar
 
 
 def add_parser(subparsers):
@@ -16,24 +16,24 @@ def add_parser(subparsers):
 
 
 def undeploy(args):
-    template_name = csar.load(args.name)
+    ### template_name = csar.load(args.name)
 
-    print("Loading service template ...")
-    service_template = types.ServiceTemplate.from_data(stdlib.load())
-    with open(template_name) as fd:
-        service_template.merge(
-            types.ServiceTemplate.from_data(yaml.safe_load(fd))
-        )
+    ### print("Loading service template ...")
+    ### service_template = types.ServiceTemplate.from_data(stdlib.load())
+    ### with open(template_name) as fd:
+    ###     service_template.merge(
+    ###         types.ServiceTemplate.from_data(yaml.safe_load(fd))
+    ###     )
 
-    print("Resolving service template links ...")
-    service_template.resolve()
+    ### print("Resolving service template links ...")
+    ### service_template.resolve()
 
-    print("Loading instance model ...")
-    instances = service_template.instantiate()
-    instances.load()
+    ### print("Loading instance model ...")
+    ### instances = service_template.instantiate()
+    ### instances.load()
 
-    print("Undeploying instance model ...")
-    instances.undeploy()
+    ### print("Undeploying instance model ...")
+    ### instances.undeploy()
 
     print("Done.")
 

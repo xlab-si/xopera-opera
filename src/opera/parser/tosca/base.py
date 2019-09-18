@@ -4,7 +4,6 @@ from opera.error import ParseError
 class Base:
     @classmethod
     def parse(cls, yaml_node):
-        print("Parsing [{}] {}".format(cls.__name__, yaml_node.loc))
         yaml_node = cls.normalize(yaml_node)
         cls.validate(yaml_node)
         return cls.build(yaml_node)

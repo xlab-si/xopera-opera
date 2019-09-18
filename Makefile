@@ -5,4 +5,4 @@ test:
 	pipenv run pytest tests
 
 fix:
-	pipenv run pytest -x tests
+	pipenv run pytest -x -v tests

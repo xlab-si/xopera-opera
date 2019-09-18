@@ -20,7 +20,7 @@ def add_parser(subparsers):
 def validate(args):
     print("Validating service template ...")
     try:
-        tosca.load(Path.cwd(), PurePath(args.template.name))
+        print(tosca.load(Path.cwd(), PurePath(args.template.name)))
         print("Done.")
         return 0
     except ParseError as e:
