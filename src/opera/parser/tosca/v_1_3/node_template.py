@@ -1,15 +1,14 @@
-from ..entity import Entity
-from ..list import List
-from ..map import Map, OrderedMap
-from ..reference import Reference
-from ..string import String
-from ..void import Void
-
 from .artifact_definition import ArtifactDefinition
 from .capability_assignment import CapabilityAssignment
 from .interface_definition_for_template import InterfaceDefinitionForTemplate
 from .node_filter_definition import NodeFilterDefinition
 from .requirement_assignment import RequirementAssignment
+from ..entity import Entity
+from ..list import List
+from ..map import Map
+from ..reference import Reference
+from ..string import String
+from ..void import Void
 
 
 # NOTE: We deviate form the TOSCA standard in attribute assignment statement,

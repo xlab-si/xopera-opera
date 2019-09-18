@@ -1,9 +1,8 @@
 import pytest
 
-from opera.parser.yaml.node import Node
-
 from opera.error import ParseError
 from opera.parser.tosca.v_1_3.repository_definition import RepositoryDefinition
+from opera.parser.yaml.node import Node
 
 
 class TestNormalize:

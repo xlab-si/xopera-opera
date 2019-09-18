@@ -1,9 +1,7 @@
 from opera.parser.yaml.node import Node
-
+from .credential import Credential
 from ..entity import Entity
 from ..string import String
-
-from .credential import Credential
 
 
 class RepositoryDefinition(Entity):

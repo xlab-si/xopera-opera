@@ -1,10 +1,9 @@
+from .interface_definition_for_template import InterfaceDefinitionForTemplate
 from ..entity import Entity
 from ..map import Map
 from ..reference import Reference
 from ..string import String
 from ..void import Void
-
-from .interface_definition_for_template import InterfaceDefinitionForTemplate
 
 
 class RelationshipTemplate(Entity):

@@ -1,9 +1,9 @@
 from .constructor import Constructor
 from .resolver import Resolver
 
-
 try:
     from _yaml import CParser
+
 
     class Loader(CParser, Constructor, Resolver):
         def __init__(self, stream, stream_name):
@@ -17,6 +17,7 @@ except ImportError:
     from yaml.parser import Parser
     from yaml.reader import Reader
     from yaml.scanner import Scanner
+
 
     class Loader(Reader, Scanner, Parser, Composer, Constructor, Resolver):
         def __init__(self, stream, stream_name):

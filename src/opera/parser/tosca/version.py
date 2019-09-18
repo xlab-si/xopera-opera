@@ -2,7 +2,6 @@ import re
 
 from .string import String
 
-
 # TOSCA definition: <major>.<minor>[.<fix>[.<qualifier>[-<build]]]
 #   major: is a required integer value greater than or equal to 0 (zero)
 #   minor: is a required integer value greater than or equal to 0 (zero).

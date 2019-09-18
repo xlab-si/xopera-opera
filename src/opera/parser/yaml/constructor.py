@@ -1,7 +1,6 @@
 from yaml.constructor import BaseConstructor, ConstructorError
 
 from opera.parser.utils.location import Location
-
 from .node import Node
 
 

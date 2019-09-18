@@ -1,10 +1,9 @@
+from .schema_definition import SchemaDefinition
+from .status import Status
 from ..entity import Entity
 from ..reference import DataTypeReference
 from ..string import String
 from ..void import Void
-
-from .schema_definition import SchemaDefinition
-from .status import Status
 
 
 class AttributeDefinition(Entity):

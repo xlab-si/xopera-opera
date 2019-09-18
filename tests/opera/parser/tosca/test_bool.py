@@ -11,7 +11,7 @@ class TestValidate:
         Bool.validate(Node(data))
 
     @pytest.mark.parametrize(
-        "data", [4,  (), (1, 2, 3), [], ["a", "b"], {}],
+        "data", [4, (), (1, 2, 3), [], ["a", "b"], {}],
     )
     def test_with_non_bool_data(self, data):
         with pytest.raises(ParseError):

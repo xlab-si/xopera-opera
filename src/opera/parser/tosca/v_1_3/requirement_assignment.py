@@ -1,12 +1,9 @@
 from opera.parser.yaml.node import Node
-
+from .node_filter_definition import NodeFilterDefinition
+from .range import Range
 from ..entity import Entity
 from ..reference import Reference
 from ..string import String
-from ..void import Void
-
-from .node_filter_definition import NodeFilterDefinition
-from .range import Range
 
 
 class RequirementAssignment(Entity):

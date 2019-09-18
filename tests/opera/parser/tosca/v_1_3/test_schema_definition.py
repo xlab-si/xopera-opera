@@ -1,5 +1,3 @@
-import pytest
-
 from opera.parser.tosca.v_1_3.schema_definition import SchemaDefinition
 
 

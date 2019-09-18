@@ -1,10 +1,9 @@
-from pathlib import PurePath
 import importlib
+from pathlib import PurePath
 
 from opera import stdlib
 from opera.error import ParseError
 from opera.parser import yaml
-
 
 SUPPORTED_VERSIONS = dict(
     tosca_simple_yaml_1_3="v_1_3",

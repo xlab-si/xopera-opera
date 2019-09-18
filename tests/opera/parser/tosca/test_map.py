@@ -3,8 +3,8 @@ from unittest.mock import Mock
 import pytest
 
 from opera.error import ParseError
-from opera.parser.tosca.map import Map, MapWrapper, OrderedMap
 from opera.parser.tosca.base import Base
+from opera.parser.tosca.map import Map, MapWrapper, OrderedMap
 from opera.parser.yaml.node import Node
 
 
@@ -14,7 +14,7 @@ class TestMapWrapperGetitem:
 
     def test_test_non_string_key(self):
         with pytest.raises(KeyError):
-            assert MapWrapper({Base(1, None): "v" }, None)[1]
+            assert MapWrapper({Base(1, None): "v"}, None)[1]
 
 
 class TestMapWrapperIteration:
@@ -43,7 +43,7 @@ class TestMapWrapperItems:
 
 class TestMapWrapperDig:
     def test_single_level(self):
-        assert MapWrapper({"k": "v" }, None).dig("k") == "v"
+        assert MapWrapper({"k": "v"}, None).dig("k") == "v"
 
     def test_multi_level(self):
         obj = MapWrapper({

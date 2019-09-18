@@ -2,7 +2,6 @@ import math
 import textwrap
 
 import pytest
-from yaml.error import YAMLError
 
 from opera.parser import yaml
 

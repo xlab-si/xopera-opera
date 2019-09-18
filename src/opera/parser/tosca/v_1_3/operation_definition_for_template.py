@@ -1,14 +1,12 @@
 from opera.parser.yaml.node import Node
-
+from .operation_implementation_definition import (
+    OperationImplementationDefinition,
+)
 from ..entity import Entity
 from ..list import List
 from ..map import Map
 from ..string import String
 from ..void import Void
-
-from .operation_implementation_definition import (
-    OperationImplementationDefinition,
-)
 
 
 class OperationDefinitionForTemplate(Entity):

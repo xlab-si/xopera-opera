@@ -2,7 +2,7 @@ import pytest
 
 from opera.error import ParseError
 from opera.parser.tosca.reference import (
-    DataTypeReference, DataTypeReferenceWrapper, Reference, ReferenceWrapper,
+    DataTypeReferenceWrapper, Reference, ReferenceWrapper,
 )
 from opera.parser.tosca.type import Type
 from opera.parser.tosca.v_1_3.service_template import ServiceTemplate

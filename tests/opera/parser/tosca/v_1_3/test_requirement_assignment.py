@@ -7,7 +7,6 @@ from opera.parser.tosca.v_1_3.requirement_assignment import (
 from opera.parser.yaml.node import Node
 
 
-
 class TestNormalize:
     @pytest.mark.parametrize("data", [1, 2.3, True, (), []])
     def test_invalid_data(self, data):

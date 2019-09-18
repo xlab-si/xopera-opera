@@ -1,3 +1,6 @@
+from .constraint_clause import ConstraintClause
+from .schema_definition import SchemaDefinition
+from .status import Status
 from ..bool import Bool
 from ..entity import Entity
 from ..list import List
@@ -5,10 +8,6 @@ from ..map import Map
 from ..reference import DataTypeReference
 from ..string import String
 from ..void import Void
-
-from .constraint_clause import ConstraintClause
-from .schema_definition import SchemaDefinition
-from .status import Status
 
 
 class PropertyDefinition(Entity):

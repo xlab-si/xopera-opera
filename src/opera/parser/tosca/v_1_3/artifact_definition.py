@@ -9,7 +9,6 @@ from ..version import Version
 from ..void import Void
 
 
-
 class ArtifactDefinition(Entity):
     ATTRS = dict(
         type=Reference("artifact_types"),

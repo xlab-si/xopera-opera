@@ -2,7 +2,6 @@ import collections
 
 from opera.error import ParseError
 from opera.parser.yaml.node import Node
-
 from .base import Base
 
 

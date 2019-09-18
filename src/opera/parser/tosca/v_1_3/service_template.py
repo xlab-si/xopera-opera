@@ -1,13 +1,5 @@
-import pathlib
-
 from opera.parser import yaml
 from opera.parser.yaml.node import Node
-
-from ..entity import Entity
-from ..list import List
-from ..map import Map
-from ..string import String
-
 from .artifact_type import ArtifactType
 from .capability_type import CapabilityType
 from .data_type import DataType
@@ -20,6 +12,10 @@ from .relationship_type import RelationshipType
 from .repository_definition import RepositoryDefinition
 from .topology_template import TopologyTemplate
 from .tosca_definitions_version import ToscaDefinitionsVersion
+from ..entity import Entity
+from ..list import List
+from ..map import Map
+from ..string import String
 
 
 class ServiceTemplate(Entity):

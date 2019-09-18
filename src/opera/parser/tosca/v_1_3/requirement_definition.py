@@ -1,9 +1,7 @@
 from opera.parser.yaml.node import Node
-
+from .range import Range
 from ..entity import Entity
 from ..reference import Reference
-
-from .range import Range
 
 
 class RequirementDefinition(Entity):
