@@ -8,3 +8,6 @@ eggs/
 dist/
 
 venv/
+.venv/
+
+.idea/
