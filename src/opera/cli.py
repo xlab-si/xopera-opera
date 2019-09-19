@@ -1,6 +1,7 @@
 import argparse
 import inspect
 import sys
+from typing import NoReturn
 
 from opera import commands
 
@@ -10,7 +11,7 @@ class ArgParser(argparse.ArgumentParser):
     Argument parser that displays help on error
     """
 
-    def error(self, message):
+    def error(self, message: str) -> NoReturn:
         sys.stderr.write("error: {}\n".format(message))
         self.print_help()
         sys.exit(2)

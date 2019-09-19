@@ -1,5 +1,6 @@
 import re
 
+from opera.parser.yaml.node import Node
 from .string import String
 
 # TOSCA definition: <major>.<minor>[.<fix>[.<qualifier>[-<build]]]
@@ -12,7 +13,7 @@ from .string import String
 #              major_version, minor_version and fix_version numbers.
 #   build: is an optional integer value greater than or equal to 0 (zero) that
 #          can be used to further qualify different build versions of the code
-#          that has the same qualifer_string.
+#          that has the same qualifier_string.
 VERSION_RE = re.compile(
     r"""
     ^
@@ -35,7 +36,7 @@ VERSION_RE = re.compile(
 
 class Version(String):
     @classmethod
-    def validate(cls, yaml_node):
+    def validate(cls, yaml_node: Node):
         super().validate(yaml_node)
         if not VERSION_RE.match(yaml_node.value):
             cls.abort("Invalid version format.", yaml_node.loc)

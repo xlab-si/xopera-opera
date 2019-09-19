@@ -1,3 +1,4 @@
+import yaml
 from yaml.constructor import BaseConstructor, ConstructorError
 
 from opera.parser.utils.location import Location
@@ -5,11 +6,11 @@ from .node import Node
 
 
 class Constructor(BaseConstructor):
-    def __init__(self, stream_name):
+    def __init__(self, stream_name: str):
         super().__init__()
         self._stream_name = stream_name
 
-    def _pos(self, node):
+    def _pos(self, node: yaml.nodes.Node):
         # Convert 0-based indices to 1-based (text editor) marks
         return Location(
             self._stream_name,
@@ -17,15 +18,15 @@ class Constructor(BaseConstructor):
             node.start_mark.column + 1,
         )
 
-    def construct_yaml_null(self, node):
+    def construct_yaml_null(self, node: yaml.nodes.Node):
         self.construct_scalar(node)
         return Node(None, self._pos(node))
 
-    def construct_yaml_bool(self, node):
+    def construct_yaml_bool(self, node: yaml.nodes.Node):
         value = self.construct_scalar(node).lower()
         return Node(value == "true", self._pos(node))
 
-    def construct_yaml_int(self, node):
+    def construct_yaml_int(self, node: yaml.nodes.Node):
         value = self.construct_scalar(node)
         if value.startswith("0o"):
             base = 8
@@ -35,7 +36,7 @@ class Constructor(BaseConstructor):
             base = 10
         return Node(int(value, base=base), self._pos(node))
 
-    def construct_yaml_float(self, node):
+    def construct_yaml_float(self, node: yaml.nodes.Node):
         value = self.construct_scalar(node).lower()
         if value == ".nan":
             value = "nan"
@@ -43,20 +44,20 @@ class Constructor(BaseConstructor):
             value = value.replace(".", "")
         return Node(float(value), self._pos(node))
 
-    def construct_yaml_str(self, node):
+    def construct_yaml_str(self, node: yaml.nodes.Node):
         return Node(self.construct_scalar(node), self._pos(node))
 
-    def construct_yaml_seq(self, node):
+    def construct_yaml_seq(self, node: yaml.nodes.Node):
         data = Node([], self._pos(node))
         yield data
         data.value.extend(self.construct_sequence(node))
 
-    def construct_yaml_map(self, node):
+    def construct_yaml_map(self, node: yaml.nodes.Node):
         data = Node({}, self._pos(node))
         yield data
         data.value.update(self.construct_mapping(node))
 
-    def construct_undefined(self, node):
+    def construct_undefined(self, node: yaml.nodes.Node):
         raise ConstructorError(
             None, None,
             "could not determine a constructor for {}".format(node.tag),

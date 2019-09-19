@@ -1,15 +1,17 @@
+from typing import Optional
+
 from opera.parser.utils.location import Location
 
 
 class Node:
-    def __init__(self, value, loc=None):
+    def __init__(self, value, loc: Optional[Location] = None):
         self.value = value
-        self.loc = loc or Location("", 0, 0)
+        self.loc: Location = loc or Location("", 0, 0)
 
     def _dump_header(self):
         return "{}({})".format(type(self.value).__name__, self.loc)
 
-    def _dump_map(self, pad):
+    def _dump_map(self, pad: str):
         children = (
             "  {}{}: {}".format(pad, k.dump(pad + "  "), v.dump(pad + "  "))
             for k, v in self.value.items()
@@ -18,7 +20,7 @@ class Node:
             head=self._dump_header(), children=",\n".join(children), pad=pad,
         )
 
-    def _dump_seq(self, pad):
+    def _dump_seq(self, pad: str):
         children = (pad + "  " + v.dump(pad + "  ") for v in self.value)
         return "{head}[\n{children}\n{pad}]".format(
             head=self._dump_header(), children=",\n".join(children), pad=pad,

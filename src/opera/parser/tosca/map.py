@@ -35,7 +35,7 @@ class MapWrapper(Base):
     def bare(self):
         return {k: v.bare for k, v in self.data.items()}
 
-    def merge(self, other):
+    def merge(self, other: "MapWrapper") -> None:
         duplicates = set(self.keys()) & set(other.keys())
         if duplicates:
             self.abort(
@@ -54,13 +54,13 @@ class Map:
     def __init__(self, value_class):
         self.value_class = value_class
 
-    def parse(self, yaml_node):
+    def parse(self, yaml_node: Node):
         if not isinstance(yaml_node.value, dict):
             raise ParseError("Expected map.", yaml_node.loc)
 
         for k in yaml_node.value:
             if not isinstance(k.value, str):
-                cls.abort("Expected string key.", k.loc)
+                raise ParseError("Expected string key.", yaml_node.loc)
 
         return MapWrapper(collections.OrderedDict(
             (k.value, self.value_class.parse(v))
@@ -69,7 +69,7 @@ class Map:
 
 
 class OrderedMap(Map):
-    def parse(self, yaml_node):
+    def parse(self, yaml_node: Node):
         if not isinstance(yaml_node.value, list):
             raise ParseError(
                 "Expected list of single-key maps.", yaml_node.loc,

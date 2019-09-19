@@ -1,21 +1,23 @@
 import importlib
-from pathlib import PurePath
+from pathlib import PurePath, Path
 
 from opera import stdlib
 from opera.error import ParseError
 from opera.parser import yaml
+from opera.parser.tosca.v_1_3 import Parser
+from opera.parser.yaml.node import Node
 
 SUPPORTED_VERSIONS = dict(
     tosca_simple_yaml_1_3="v_1_3",
 )
 
 
-def load(base_path, template_name):
+def load(base_path: Path, template_name: str):
     with (base_path / template_name).open() as input_fd:
         input_yaml = yaml.load(input_fd, str(template_name))
     if not isinstance(input_yaml.value, dict):
         raise ParseError(
-            "Top level structure should be a map.", yaml_node.loc,
+            "Top level structure should be a map.", input_yaml.loc,
         )
 
     tosca_version = _get_tosca_version(input_yaml)
@@ -30,11 +32,12 @@ def load(base_path, template_name):
     return service
 
 
-def _get_parser(tosca_version):
+# TODO: differentiate parsers between versions
+def _get_parser(tosca_version: str) -> Parser:
     return importlib.import_module(".v_1_3", __name__).Parser
 
 
-def _get_tosca_version(input_yaml):
+def _get_tosca_version(input_yaml: Node):
     for k, v in input_yaml.value.items():
         if k.value == "tosca_definitions_version":
             try:

@@ -12,5 +12,5 @@ class Type(String):
     }
 
     @classmethod
-    def is_valid_internal_type(cls, typ):
+    def is_valid_internal_type(cls, typ: str):
         return typ in cls.INTERNAL_TYPES

@@ -1,9 +1,10 @@
+from opera.parser.yaml.node import Node
 from .string import String
 from .type import Type
 
 
 class ReferenceWrapper(String):
-    def __init__(self, data, loc):
+    def __init__(self, data: str, loc):
         super().__init__(data, loc)
         self.section_path = ()
 
@@ -45,7 +46,7 @@ class Reference:
 
         self.section_path = section_path
 
-    def parse(self, yaml_node):
+    def parse(self, yaml_node: Node):
         ref = self.WRAPPER_CLASS.parse(yaml_node)
         ref.section_path = self.section_path
         return ref

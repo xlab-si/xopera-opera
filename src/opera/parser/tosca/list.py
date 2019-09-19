@@ -1,10 +1,12 @@
-from opera.error import ParseError
+from typing import Any
 
+from opera.error import ParseError
+from opera.parser.yaml.node import Node
 from .base import Base
 
 
 class ListWrapper(Base):
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> Any:
         return self.data[index]
 
     def __iter__(self):
@@ -30,7 +32,7 @@ class List:
     def __init__(self, value_class):
         self.value_class = value_class
 
-    def parse(self, yaml_node):
+    def parse(self, yaml_node: Node):
         if not isinstance(yaml_node.value, list):
             raise ParseError("Expected list.", yaml_node.loc)
 

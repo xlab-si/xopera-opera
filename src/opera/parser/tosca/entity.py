@@ -1,3 +1,7 @@
+from typing import Dict, Set, Union
+
+from opera.parser.tosca.base import Base
+from opera.parser.yaml.node import Node
 from .map import Map, MapWrapper
 from .reference import Reference
 from .string import String
@@ -5,11 +9,11 @@ from .version import Version
 
 
 class Entity(MapWrapper):
-    ATTRS = {}  # This must be overridden in derived classes
-    REQUIRED = set()  # This can be overriden in derived classes
+    ATTRS: Dict[str, Union[Base, Reference]] = {}  # This must be overridden in derived classes
+    REQUIRED: Set[str] = set()  # This can be overridden in derived classes
 
     @classmethod
-    def validate(cls, yaml_node):
+    def validate(cls, yaml_node: Node):
         assert cls.ATTRS != {}
         assert isinstance(cls.REQUIRED, set)
 
@@ -37,7 +41,7 @@ class Entity(MapWrapper):
             )
 
     @classmethod
-    def build(cls, yaml_node):
+    def build(cls, yaml_node: Node):
         classes = cls.attrs()
         data = {
             k.value: classes[k.value].parse(v)
@@ -57,10 +61,10 @@ class Entity(MapWrapper):
 
 
 class TypeEntity(Entity):
-    REFERENCE = None  # Override in subclasses
+    REFERENCE: Reference = None  # Override in subclasses
 
     @classmethod
-    def validate(cls, yaml_node):
+    def validate(cls, yaml_node: Node):
         super().validate(yaml_node)
         for key in yaml_node.value:
             if key.value == "derived_from":

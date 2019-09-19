@@ -4,11 +4,12 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from typing import Optional, Tuple, Dict, List
 
 import yaml
 
 
-def _save_artifact_into(dest_dir, artifact, suffix=None):
+def _save_artifact_into(dest_dir: str, artifact: str, suffix: Optional[str] = None) -> str:
     dest = tempfile.NamedTemporaryFile(
         dir=dest_dir, delete=False, suffix=suffix,
     )
@@ -18,7 +19,7 @@ def _save_artifact_into(dest_dir, artifact, suffix=None):
     return dest.name
 
 
-def _save_content_into(dest_dir, content, suffix=None):
+def _save_content_into(dest_dir: str, content: str, suffix: Optional[str] = None) -> str:
     dest = tempfile.NamedTemporaryFile(
         dir=dest_dir, delete=False, suffix=suffix,
     )
@@ -27,7 +28,7 @@ def _save_content_into(dest_dir, content, suffix=None):
     return dest.name
 
 
-def _run_in(dest_dir, cmd, env):
+def _run_in(dest_dir: str, cmd: List[str], env: Dict[str, str]) -> Tuple[int, str, str]:
     fstdout = tempfile.NamedTemporaryFile(
         dir=dest_dir, delete=False, suffix=".stdout",
     )
@@ -43,7 +44,7 @@ def _run_in(dest_dir, cmd, env):
     return result.returncode, fstdout.name, fstderr.name
 
 
-def _get_inventory(host):
+def _get_inventory(host: str):
     inventory = dict(
         ansible_host=host,
         ansible_ssh_common_args="-o StrictHostKeyChecking=no",
@@ -58,12 +59,12 @@ def _get_inventory(host):
     return yaml.safe_dump(dict(all=dict(hosts=dict(opera=inventory))))
 
 
-def run(host, playbook, vars):
+def run(host: str, playbook: str, variables: Dict[str, str]) -> Tuple[bool, Dict]:
     with tempfile.TemporaryDirectory() as dir_path:
         playbook = _save_artifact_into(dir_path, playbook, suffix=".yaml")
         inventory = _save_content_into(dir_path, _get_inventory(host))
         vars_file = _save_content_into(
-            dir_path, yaml.safe_dump(vars), suffix=".yaml",
+            dir_path, yaml.safe_dump(variables), suffix=".yaml",
         )
 
         with open("{}/ansible.cfg".format(dir_path), "w") as fd:

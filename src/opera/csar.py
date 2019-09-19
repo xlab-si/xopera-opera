@@ -7,7 +7,7 @@ def save(name, csar):
         json.dump(dict(name=csar), fd)
 
 
-def load(name):
+def load(name: str):
     # TODO(@tadeboro): Temporary placeholder
     with open("{}.deploy".format(name)) as fd:
         return json.load(fd)["name"]

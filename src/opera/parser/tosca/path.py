@@ -1,11 +1,12 @@
 import pathlib
 
+from opera.parser.yaml.node import Node
 from .string import String
 
 
 class Path(String):
     @classmethod
-    def build(cls, yaml_node):
+    def build(cls, yaml_node: Node):
         return cls(pathlib.PurePath(yaml_node.value), yaml_node.loc)
 
     def prefix_path(self, parent_path):
@@ -23,7 +24,7 @@ class Path(String):
         self._validate_path(base_path)
 
     @staticmethod
-    def _compact_path(path):
+    def _compact_path(path: pathlib.PurePath):
         # Next loop removes as many path/.. pairs as possible. When the path
         # is in its canonical form, it should not start with .. since that
         # would mean that something is trying to access paths outside the
@@ -47,7 +48,7 @@ class Path(String):
 
         return pathlib.PurePath(*parts)
 
-    def _validate_path(self, base_path):
+    def _validate_path(self, base_path: str):
         # Abstract checks
         if str(self.data) == ".":
             self.abort("Path points to the CSAR root.", self.loc)
@@ -55,6 +56,7 @@ class Path(String):
             self.abort("Path points outside the CSAR.", self.loc)
 
         # Concrete checks
+        # noinspection PyUnresolvedReferences
         abs_path = base_path / self.data
         if not abs_path.exists():
             self.abort("Path does not exists.", self.loc)
