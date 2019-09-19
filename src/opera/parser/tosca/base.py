@@ -25,7 +25,7 @@ class Base:
         return cls(yaml_node.value, yaml_node.loc)
 
     @classmethod
-    def abort(cls, msg: str, loc: Optional[Location] = None) -> NoReturn:
+    def abort(cls, msg: str, loc: Location) -> NoReturn:
         raise ParseError("[{}] {}".format(cls.__name__, msg), loc)
 
     def __init__(self, data: Any, loc: Location):

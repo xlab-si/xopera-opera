@@ -1,6 +1,7 @@
-from typing import Dict, Set, Union
+from typing import Dict, Set, Union, Type
 
 from opera.parser.tosca.base import Base
+from opera.parser.tosca.list import List
 from opera.parser.yaml.node import Node
 from .map import Map, MapWrapper
 from .reference import Reference
@@ -9,7 +10,7 @@ from .version import Version
 
 
 class Entity(MapWrapper):
-    ATTRS: Dict[str, Union[Base, Reference]] = {}  # This must be overridden in derived classes
+    ATTRS: Dict[str, Union[Type[Base], Reference, Map, List]] = {}  # This must be overridden in derived classes
     REQUIRED: Set[str] = set()  # This can be overridden in derived classes
 
     @classmethod
@@ -61,7 +62,9 @@ class Entity(MapWrapper):
 
 
 class TypeEntity(Entity):
-    REFERENCE: Reference = None  # Override in subclasses
+    # Override in subclasses
+    # noinspection PyTypeHints,PyUnresolvedReferences
+    REFERENCE: Reference = None  # type: ignore[assignment]
 
     @classmethod
     def validate(cls, yaml_node: Node):

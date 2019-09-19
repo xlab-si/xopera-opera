@@ -75,7 +75,7 @@ class OrderedMap(Map):
                 "Expected list of single-key maps.", yaml_node.loc,
             )
 
-        data = collections.OrderedDict()
+        data: collections.OrderedDict[str, list] = collections.OrderedDict()
         for item in yaml_node.value:
             if not isinstance(item.value, dict) or len(item.value) != 1:
                 raise ParseError("Expected single-key map.", item.loc)

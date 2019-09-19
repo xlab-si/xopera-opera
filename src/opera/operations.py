@@ -12,6 +12,9 @@ class Operation(object):
 
     def run(self) -> Tuple[bool, Dict]:
         host = self.instance.get_host()
+        if not host:
+            # TODO: static typing allows this to be reachable, investigate which optional is incorrect
+            raise Exception("This should not happen.")
         # print("HOST: {}".format(host))
         if not self.implementation:
             return True, {}

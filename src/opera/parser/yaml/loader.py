@@ -2,7 +2,7 @@ from .constructor import Constructor
 from .resolver import Resolver
 
 try:
-    from _yaml import CParser
+    from _yaml import CParser  # type: ignore
 
 
     class Loader(CParser, Constructor, Resolver):
@@ -18,8 +18,8 @@ except ImportError:
     from yaml.reader import Reader
     from yaml.scanner import Scanner
 
-
-    class Loader(Reader, Scanner, Parser, Composer, Constructor, Resolver):
+    # noinspection PyUnresolvedReferences
+    class Loader(Reader, Scanner, Parser, Composer, Constructor, Resolver):  # type: ignore[no-redef]
         def __init__(self, stream, stream_name):
             Reader.__init__(self, stream)
             Scanner.__init__(self)

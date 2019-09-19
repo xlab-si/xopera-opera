@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path, PurePath
 
-from opera import csar, template
+from opera import csar
 from opera.error import ParseError
 from opera.parser import tosca
 

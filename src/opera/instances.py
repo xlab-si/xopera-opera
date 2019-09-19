@@ -17,7 +17,7 @@ class Instance(object):
         )
 
         # Graph fields
-        self.requirements = {}
+        self.requirements: Dict[str, List["Instance"]] = {}
 
     @property
     def id(self):
@@ -151,7 +151,7 @@ class InstanceModel(object):
     @property
     def ordered_instance_ids(self) -> List[str]:
         # Marks: 0 - unmarked, 1 - temporary, 2 - permanently
-        marks = collections.defaultdict(lambda: 0)
+        marks: DefaultDict[str, int] = collections.defaultdict(lambda: 0)
         ordered_ids = []
 
         def visit(instance_id):
