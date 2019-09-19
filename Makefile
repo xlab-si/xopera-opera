@@ -8,4 +8,4 @@ fix:
 	pipenv run pytest -x -v tests
 
 lint:
-	pipenv run mypy src/opera/
+	pipenv run mypy src/opera/ tests/opera/
