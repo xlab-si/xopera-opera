@@ -2,6 +2,9 @@ from typing import Dict, Tuple
 
 from opera import ansible
 from opera.instances import Instance
+from opera.log import get_logger
+
+logger = get_logger()
 
 
 class Operation(object):
@@ -15,11 +18,11 @@ class Operation(object):
         if not host:
             # TODO: static typing allows this to be reachable, investigate which optional is incorrect
             raise Exception("This should not happen.")
-        # print("HOST: {}".format(host))
+        logger.debug("HOST: {}".format(host))
         if not self.implementation:
             return True, {}
 
-        print("    Executing {} ...".format(self.implementation))
+        logger.info("    Executing {} ...".format(self.implementation))
         evaled_inputs = {
             k: v.eval(self.instance) for k, v in self.inputs.items()
         }

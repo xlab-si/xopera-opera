@@ -8,6 +8,10 @@ from typing import Optional, Tuple, Dict, List
 
 import yaml
 
+from opera.log import get_logger
+
+logger = get_logger()
+
 
 def _save_artifact_into(dest_dir: str, artifact: str, suffix: Optional[str] = None) -> str:
     dest = tempfile.NamedTemporaryFile(
@@ -86,12 +90,12 @@ def run(host: str, playbook: str, variables: Dict[str, str]) -> Tuple[bool, Dict
         if code != 0:
             with open(out) as fd:
                 for l in fd:
-                    print(l.rstrip())
-            print("------------")
+                    logger.debug(l.rstrip())
+            logger.debug("------------")
             with open(err) as fd:
                 for l in fd:
-                    print(l.rstrip())
-            print("============")
+                    logger.debug(l.rstrip())
+            logger.debug("============")
         with open(out) as fd:
             attributes = json.load(fd)["global_custom_stats"]
         # TODO(@tadeboro): Do something sensible on error

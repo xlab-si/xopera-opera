@@ -1,6 +1,9 @@
+from opera.log import get_logger
 from opera.parser.yaml.node import Node
 from .string import String
 from .type import Type
+
+logger = get_logger()
 
 
 class ReferenceWrapper(String):
@@ -11,7 +14,7 @@ class ReferenceWrapper(String):
     def resolve_reference(self, service_template):
         assert self.section_path, "Missing section path"
 
-        print("RESOLVING {}{} ({})".format(
+        logger.debug("RESOLVING {}{} ({})".format(
             self.section_path, self.data, self.loc,
         ))
 

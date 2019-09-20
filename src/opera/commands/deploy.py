@@ -3,7 +3,10 @@ from pathlib import Path, PurePath
 
 from opera import csar
 from opera.error import ParseError
+from opera.log import get_logger
 from opera.parser import tosca
+
+logger = get_logger()
 
 
 def add_parser(subparsers):
@@ -23,25 +26,25 @@ def deploy(args):
     csar.save(args.name, args.csar.name)
     status = 0
 
-    print("Loading service template ...")
+    logger.info("Loading service template ...")
     try:
         ast = tosca.load(Path.cwd(), PurePath(args.csar.name))
-        print("=======================")
+        logger.info("=======================")
         tmpl = template.build(ast)
-        print(tmpl)
+        logger.info(tmpl)
     except ParseError as e:
-        print("{}: {}".format(e.loc, e))
+        logger.info("{}: {}".format(e.loc, e))
         status = 1
 
-    #    print("Resolving service template links ...")
+    #    logger.info("Resolving service template links ...")
     #    service_template.resolve()
 
-    #    print("Creating instance model ...")
+    #    logger.info("Creating instance model ...")
     #    instances = service_template.instantiate()
 
-    #    print("Deploying instance model ...")
+    #    logger.info("Deploying instance model ...")
     #    instances.deploy()
 
-    print("Done.")
+    logger.info("Done.")
 
     return status

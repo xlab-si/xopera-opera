@@ -3,8 +3,12 @@ import json
 from typing import Dict, Tuple, Optional, DefaultDict, List
 
 from opera import operations
+from opera.log import get_logger
 from opera.operations import Operation
 from opera.parser.tosca.v_1_3 import ServiceTemplate
+
+
+logger = get_logger()
 
 
 class Instance(object):
@@ -57,7 +61,7 @@ class Instance(object):
             self.set_state(end_state)
 
     def deploy(self):
-        print("  Processing {} ...".format(self.id))
+        logger.info("  Processing {} ...".format(self.id))
         self.execute_workflow(dict(
             create=("creating", "created"),
             configure=("configuring", "configured"),
@@ -65,7 +69,7 @@ class Instance(object):
         ))
 
     def undeploy(self):
-        print("  Processing {} ...".format(self.id))
+        logger.info("  Processing {} ...".format(self.id))
         self.execute_workflow(dict(
             stop=("stopping", "configured"),
             delete=("deleting", "initial"),

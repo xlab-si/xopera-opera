@@ -2,7 +2,10 @@ import argparse
 from pathlib import Path, PurePath
 
 from opera.error import ParseError
+from opera.log import get_logger
 from opera.parser import tosca
+
+logger = get_logger()
 
 
 def add_parser(subparsers):
@@ -17,11 +20,11 @@ def add_parser(subparsers):
 
 
 def validate(args):
-    print("Validating service template ...")
+    logger.info("Validating service template ...")
     try:
-        print(tosca.load(Path.cwd(), PurePath(args.template.name)))
-        print("Done.")
+        logger.info(tosca.load(Path.cwd(), PurePath(args.template.name)))
+        logger.info("Done.")
         return 0
     except ParseError as e:
-        print("{}: {}".format(e.loc, e))
+        logger.error("{}: {}".format(e.loc, e))
         return 1
