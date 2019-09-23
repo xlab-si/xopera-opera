@@ -59,7 +59,7 @@ class Path(String):
         # noinspection PyUnresolvedReferences
         abs_path = base_path / self.data
         if not abs_path.exists():
-            self.abort("Path '{}' does not exists.".format(abs_path), self.loc)
+            self.abort("Path '{}' does not exist.".format(str(abs_path)), self.loc)
         # We test for symlinks separately since is_dir() and is_file() return
         # True on symlinks and this is not what we want.
         if abs_path.is_symlink():

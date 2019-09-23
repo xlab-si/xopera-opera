@@ -7,6 +7,6 @@ _RESOURCE_DIRECTORY = Path(__file__).parent.parent.parent.parent.absolute() / "r
 
 
 class TestParser:
-    @pytest.mark.parametrize("basepath,yamlpath", [(_RESOURCE_DIRECTORY, "mini.yaml")])
+    @pytest.mark.parametrize("basepath,yamlpath", [(_RESOURCE_DIRECTORY / "csar/mini/", "mini.yaml")])
     def test_load_yaml(self, basepath, yamlpath):
         tosca.load(Path(basepath), yamlpath)
