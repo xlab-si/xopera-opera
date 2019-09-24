@@ -13,6 +13,7 @@ def add_parser(subparsers):
     parser.set_defaults(func=undeploy)
 
 
+# pylint: disable=unused-argument
 def undeploy(args):
     ### template_name = csar.load(args.name)
 

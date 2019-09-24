@@ -1,7 +1,6 @@
-import abc
 import pathlib
 import zipfile
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from typing import List, IO
 
 import opera.parser.yaml as opera_yaml
@@ -11,7 +10,7 @@ from opera.log import get_logger
 logger = get_logger()
 
 
-class ToscaCsar(abc.ABC):
+class ToscaCsar(ABC):
     """
     The TOSCA Cloud Service Archive.
 
@@ -22,7 +21,7 @@ class ToscaCsar(abc.ABC):
 
     @classmethod
     def load(cls, path_string: str) -> "ToscaCsar":
-        logger.info("Loading CSAR from {}".format(path_string))
+        logger.info("Loading CSAR from %s", path_string)
         path = pathlib.Path(path_string)
         if path.is_file():
             logger.debug("Using a zipped CSAR.")
@@ -41,14 +40,12 @@ class ToscaCsar(abc.ABC):
         """
         Get a list of files and directories with paths relative to the root of the CSAR. Absolute paths not allowed.
         """
-        pass
 
     @abstractmethod
     def open_member(self, path: pathlib.PurePath) -> IO:
         """
         Opens a read-only stream for the file at the specified path.
         """
-        pass
 
     @abstractmethod
     def _member_is_dir(self, member: pathlib.PurePath) -> bool:
@@ -56,7 +53,6 @@ class ToscaCsar(abc.ABC):
         Assumes the path, relative to the CSAR root, exists, and returns whether it is a directory.
         Symlinks are resolved.
         """
-        pass
 
     @abstractmethod
     def _member_is_file(self, member: pathlib.PurePath) -> bool:
@@ -183,6 +179,6 @@ class DirectoryToscaCsar(ToscaCsar):
         try:
             relative_path = (self.backing_path / path).relative_to(self.backing_path)
         except ValueError as e:
-            logger.error("Absolute path passed to member open: {}".format(str(e)))
+            logger.error("Absolute path passed to member open: %s", e)
             return False
         return not (len(relative_path.parts) > 0 and relative_path.parts[0] == "..")

@@ -1,10 +1,7 @@
 import argparse
-from pathlib import Path, PurePath
 
-from opera import csar
 from opera.error import ParseError
 from opera.log import get_logger
-from opera.parser import tosca
 
 logger = get_logger()
 
@@ -22,18 +19,19 @@ def add_parser(subparsers):
     parser.set_defaults(func=deploy)
 
 
+# pylint: disable=unused-argument
 def deploy(args):
-    csar.save(args.name, args.csar.name)
+    # csar.save(args.name, args.csar.name)
     status = 0
 
     logger.info("Loading service template ...")
     try:
-        ast = tosca.load(Path.cwd(), PurePath(args.csar.name))
+        # ast = tosca.load(Path.cwd(), PurePath(args.csar.name))
         logger.info("=======================")
-        tmpl = template.build(ast)
-        logger.info(tmpl)
+        # tmpl = template.build(ast)
+        # logger.info(tmpl)
     except ParseError as e:
-        logger.info("{}: {}".format(e.loc, e))
+        logger.info("%s: %s", e.loc, e)
         status = 1
 
     #    logger.info("Resolving service template links ...")

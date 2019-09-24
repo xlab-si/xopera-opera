@@ -1,4 +1,3 @@
-import abc
 from abc import abstractclassmethod
 from pathlib import Path, PurePath
 from typing import TypeVar, Generic

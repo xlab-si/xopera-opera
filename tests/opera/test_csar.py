@@ -20,7 +20,7 @@ class CsarTestMode(enum.Enum):
 # https://stackoverflow.com/questions/1855095/
 def _zip_directory_contents(contents_path: str, destination_file_path: str):
     with zipfile.ZipFile(destination_file_path, mode="a") as zipf:
-        for root, dirs, files in os.walk(contents_path):
+        for root, _, files in os.walk(contents_path):
             # don't include the root directory as the dot
             relative_dir_path = os.path.relpath(root, contents_path)
             if relative_dir_path != ".":
@@ -31,7 +31,7 @@ def _zip_directory_contents(contents_path: str, destination_file_path: str):
 
 def _base_loader(path: str, mode: CsarTestMode):
     if mode == CsarTestMode.ZIP:
-        tmpfile, tmpfile_path = tempfile.mkstemp(prefix="xoperatmp-", suffix=".zip")
+        _, tmpfile_path = tempfile.mkstemp(prefix="xoperatmp-", suffix=".zip")
         _zip_directory_contents(path, tmpfile_path)
         ToscaCsar.load(tmpfile_path)
 

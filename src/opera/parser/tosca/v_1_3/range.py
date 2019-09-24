@@ -17,17 +17,17 @@ class Range(Base):
         if not isinstance(yaml_node.value, list) or len(yaml_node.value) != 2:
             cls.abort("Expected two element list.", yaml_node.loc)
 
-        lo, hi = yaml_node.value
-        if not isinstance(lo.value, int) or isinstance(lo.value, bool):
-            cls.abort("Lower bound must be integer.", lo.loc)
+        low, high = yaml_node.value
+        if not isinstance(low.value, int) or isinstance(low.value, bool):
+            cls.abort("Lower bound must be integer.", low.loc)
 
-        if isinstance(hi.value, str) and hi.value != "UNBOUNDED":
-            cls.abort("Upper bound must be integer or UNBOUNDED.", hi.loc)
+        if isinstance(high.value, str) and high.value != "UNBOUNDED":
+            cls.abort("Upper bound must be integer or UNBOUNDED.", high.loc)
 
-        if not isinstance(hi.value, (str, int)) or isinstance(hi.value, bool):
-            cls.abort("Upper bound must be integer or UNBOUNDED.", hi.loc)
+        if not isinstance(high.value, (str, int)) or isinstance(high.value, bool):
+            cls.abort("Upper bound must be integer or UNBOUNDED.", high.loc)
 
-        if isinstance(hi.value, int) and lo.value > hi.value:
+        if isinstance(high.value, int) and low.value > high.value:
             cls.abort(
                 "Upper bound must be greater or equal to lower bound.",
                 yaml_node.loc,
@@ -35,8 +35,8 @@ class Range(Base):
 
     @classmethod
     def build(cls, yaml_node):
-        lo, hi = yaml_node.value
+        low, high = yaml_node.value
         return cls(
-            (lo.value, math.inf if hi.value == "UNBOUNDED" else hi.value),
+            (low.value, math.inf if high.value == "UNBOUNDED" else high.value),
             yaml_node.loc,
         )

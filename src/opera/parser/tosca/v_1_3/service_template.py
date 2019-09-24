@@ -1,5 +1,3 @@
-from typing import Type
-
 from opera.parser import yaml
 from opera.parser.tosca.parser import ToscaParser
 from opera.parser.yaml.node import Node

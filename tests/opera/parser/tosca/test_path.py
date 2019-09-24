@@ -13,14 +13,14 @@ class TestBuild:
 
 
 class TestPrefixPath:
-    @pytest.mark.parametrize("input,prefix", [
+    @pytest.mark.parametrize("input_string,prefix", [
         ("/a/b", "c"), ("/a", "b"), ("/a", "../.."), ("/c", "."),
     ])
-    def test_prefix_absolute_path(self, input, prefix):
-        path = Path(pathlib.PurePath(input), None)
+    def test_prefix_absolute_path(self, input_string, prefix):
+        path = Path(pathlib.PurePath(input_string), None)
         path.prefix_path(pathlib.PurePath(prefix))
 
-        assert str(path.data) == input
+        assert str(path.data) == input_string
 
     @pytest.mark.parametrize("input_string,prefix,output", [
         ("a", "b", "b/a"),

@@ -14,7 +14,7 @@ class TestValidate:
         Range.validate(yaml_ast(data))
 
     @pytest.mark.parametrize("data", [
-        "abc", "4," "{}", "3.4", "false", "null",  # Invalid types
+        "abc", "4,", "{}", "3.4", "false", "null",  # Invalid types
         "[]", "[1]", "[1, 2, 3]", "[1, 2, 3, 4]",  # Invalid cardinality
         "[a, 1]", "[2.3, 1]", "[false, 1]", "[null, 1]",  # Invalid lo type
         "[0, 1.3]", "[0, true]", "[0, null]", "[0, {}]",  # Invalid hi type

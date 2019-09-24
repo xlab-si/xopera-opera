@@ -30,11 +30,13 @@ class TestListWrapperGetitem:
     def test_getitem_invalid_index(self):
         with pytest.raises(IndexError):
             # noinspection PyStatementEffect
+            # pylint: disable=expression-not-assigned
             ListWrapper([], None)[1]
 
     def test_getitem_invalid_index_type(self):
         with pytest.raises(TypeError):
             # noinspection PyStatementEffect
+            # pylint: disable=expression-not-assigned
             ListWrapper([], None)["a"]
 
 

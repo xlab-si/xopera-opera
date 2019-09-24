@@ -19,6 +19,7 @@ except ImportError:
     from yaml.scanner import Scanner
 
     # noinspection PyUnresolvedReferences
+    # pylint: disable=too-many-ancestors
     class Loader(Reader, Scanner, Parser, Composer, Constructor, Resolver):  # type: ignore[no-redef]
         def __init__(self, stream, stream_name):
             Reader.__init__(self, stream)

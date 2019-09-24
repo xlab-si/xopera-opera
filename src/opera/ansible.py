@@ -89,12 +89,12 @@ def run(host: str, playbook: str, variables: Dict[str, str]) -> Tuple[bool, Dict
         code, out, err = _run_in(dir_path, cmd, env)
         if code != 0:
             with open(out) as fd:
-                for l in fd:
-                    logger.debug(l.rstrip())
+                for line in fd:
+                    logger.debug(line.rstrip())
             logger.debug("------------")
             with open(err) as fd:
-                for l in fd:
-                    logger.debug(l.rstrip())
+                for line in fd:
+                    logger.debug(line.rstrip())
             logger.debug("============")
         with open(out) as fd:
             attributes = json.load(fd)["global_custom_stats"]

@@ -7,7 +7,7 @@ from opera.log import get_logger
 logger = get_logger()
 
 
-class Operation(object):
+class Operation:
     def __init__(self, instance: Instance, implementation, inputs):
         self.instance = instance
         self.implementation = implementation
@@ -18,11 +18,11 @@ class Operation(object):
         if not host:
             # TODO: static typing allows this to be reachable, investigate which optional is incorrect
             raise Exception("This should not happen.")
-        logger.debug("HOST: {}".format(host))
+        logger.debug("HOST: %s", host)
         if not self.implementation:
             return True, {}
 
-        logger.info("    Executing {} ...".format(self.implementation))
+        logger.info("    Executing %s ...", self.implementation)
         evaled_inputs = {
             k: v.eval(self.instance) for k, v in self.inputs.items()
         }

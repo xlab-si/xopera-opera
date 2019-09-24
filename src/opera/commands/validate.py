@@ -26,5 +26,5 @@ def validate(args):
         logger.info("Done.")
         return 0
     except ParseError as e:
-        logger.error("{}: {}".format(e.loc, e))
+        logger.error("%s: %s", e.loc, e)
         return 1

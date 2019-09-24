@@ -15,13 +15,13 @@ class Resolver:
 
     @classmethod
     def add_implicit_resolver(cls, tag: str, regex: Pattern, first: List[str]) -> None:
-        for ch in first:
-            cls.resolvers.setdefault(ch, []).append((tag, regex))
+        for char in first:
+            cls.resolvers.setdefault(char, []).append((tag, regex))
 
     def resolve(self, kind: Type[yaml.nodes.Node], value: str, implicit: Tuple[bool, bool]) -> str:
         if kind is ScalarNode and implicit[0]:
-            first_ch = value and value[0]
-            for tag, regex in self.resolvers.get(first_ch, []):
+            first_char = value and value[0]
+            for tag, regex in self.resolvers.get(first_char, []):
                 if regex.match(value):
                     return tag
         return self.defaults[kind]

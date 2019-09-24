@@ -25,7 +25,6 @@ class CsarValidationError(OperaError):
 
 class UnsupportedToscaFeatureError(OperaError):
     """ Raised when attempting to use a TOSCA feature that is not supported by xopera. """
-    pass
 
 
 class FileOutOfBoundsError(OperaError):

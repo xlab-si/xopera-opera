@@ -1,4 +1,5 @@
 import collections
+from typing import Dict
 
 from opera.error import ParseError
 from opera.parser.yaml.node import Node
@@ -75,7 +76,7 @@ class OrderedMap(Map):
                 "Expected list of single-key maps.", yaml_node.loc,
             )
 
-        data: collections.OrderedDict[str, list] = collections.OrderedDict()
+        data: Dict[str, list] = collections.OrderedDict()
         for item in yaml_node.value:
             if not isinstance(item.value, dict) or len(item.value) != 1:
                 raise ParseError("Expected single-key map.", item.loc)

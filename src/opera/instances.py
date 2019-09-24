@@ -11,7 +11,7 @@ from opera.parser.tosca.v_1_3 import ServiceTemplate
 logger = get_logger()
 
 
-class Instance(object):
+class Instance:
     def __init__(self, name: str, template):
         self.template = template
         self.attributes: Dict[str, str] = dict(
@@ -23,6 +23,7 @@ class Instance(object):
         # Graph fields
         self.requirements: Dict[str, List["Instance"]] = {}
 
+    # pylint: disable=invalid-name
     @property
     def id(self):
         return self.attributes["tosca_id"]
@@ -55,13 +56,13 @@ class Instance(object):
         for step, (transition_state, end_state) in workflow.items():
             self.set_state(transition_state)
             operation = self.get_operation("Standard", step)
-            success, attributes = operation.run()
+            success, attributes = operation.run()  # pylint: disable=unused-variable
             # TODO(@tadeboro): Handle failure here
             self.attributes.update(attributes)
             self.set_state(end_state)
 
     def deploy(self):
-        logger.info("  Processing {} ...".format(self.id))
+        logger.info("  Processing %s ...", self.id)
         self.execute_workflow(dict(
             create=("creating", "created"),
             configure=("configuring", "configured"),
@@ -69,7 +70,7 @@ class Instance(object):
         ))
 
     def undeploy(self):
-        logger.info("  Processing {} ...".format(self.id))
+        logger.info("  Processing %s ...", self.id)
         self.execute_workflow(dict(
             stop=("stopping", "configured"),
             delete=("deleting", "initial"),
@@ -118,7 +119,7 @@ class Instance(object):
         return next(iter(self.requirements[req_name])).get_host(indirect=True)
 
 
-class InstanceModel(object):
+class InstanceModel:
     def __init__(self, service_template: ServiceTemplate):
         self.service_template = service_template
         self.nodes: Dict[str, Instance] = {}

@@ -1,4 +1,4 @@
-from typing import Optional, NoReturn, Any
+from typing import NoReturn, Any
 
 from opera.error import ParseError
 from opera.parser.utils.location import Location

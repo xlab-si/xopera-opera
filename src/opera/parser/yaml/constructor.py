@@ -57,6 +57,7 @@ class Constructor(BaseConstructor):
         yield data
         data.value.update(self.construct_mapping(node))
 
+    # pylint: disable=no-self-use
     def construct_undefined(self, node: yaml.nodes.Node):
         raise ConstructorError(
             None, None,

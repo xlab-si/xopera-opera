@@ -68,10 +68,10 @@ class TestMapWrapperBare:
 
 class TestMapWrapperMerge:
     def test_merge(self):
-        map = MapWrapper({"a": 0}, None)
-        map.merge(MapWrapper({"b": 1}, None))
+        map_wrapper = MapWrapper({"a": 0}, None)
+        map_wrapper.merge(MapWrapper({"b": 1}, None))
 
-        assert map.data == dict(a=0, b=1)
+        assert map_wrapper.data == dict(a=0, b=1)
 
     def test_duplicated_key(self):
         with pytest.raises(ParseError, match="twice"):

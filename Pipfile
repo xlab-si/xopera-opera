@@ -6,6 +6,7 @@ verify_ssl = true
 [dev-packages]
 pytest = "*"
 mypy = "*"
+pylint = "*"
 
 [packages]
 opera = {editable = true,extras = ["openstack"],path = "."}

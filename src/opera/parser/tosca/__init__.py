@@ -33,6 +33,7 @@ def load(base_path: Path, template_name: str):
 
 
 # TODO: differentiate parsers between versions
+# pylint: disable=unused-argument
 def _get_parser(tosca_version: str) -> Parser:
     # noinspection PyUnresolvedReferences
     return importlib.import_module(".v_1_3", __name__).Parser  # type: ignore[attr-defined]
