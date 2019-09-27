@@ -1,7 +1,6 @@
 import pytest
 
 from opera.error import ParseError
-from opera.parser.tosca.v_1_3 import ServiceTemplateParser
 from opera.parser.tosca.v_1_3.service_template import ServiceTemplate
 from opera.parser.yaml.node import Node
 
@@ -23,7 +22,7 @@ class TestNormalizeDefinition:
 
 class TestParse:
     def test_full(self, yaml_ast):
-        ServiceTemplateParser.parse(yaml_ast(
+        ServiceTemplate.parse(yaml_ast(
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             namespace: some.namespace
@@ -49,34 +48,34 @@ class TestParse:
             policy_types: {}
             topology_template: {}
             """
-        ), None, None)
+        ))
 
     def test_minimal(self, yaml_ast):
-        ServiceTemplateParser.parse(yaml_ast(
+        ServiceTemplate.parse(yaml_ast(
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             """
-        ), None, None)
+        ))
 
 
 class TestMerge:
     def test_valid_section_merge(self, yaml_ast):
-        template = ServiceTemplateParser.parse(yaml_ast(
+        template = ServiceTemplate.parse(yaml_ast(
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             node_types:
               type_a:
                 derived_from: a
             """
-        ), None, None)
-        template.merge(ServiceTemplateParser.parse(yaml_ast(
+        ))
+        template.merge(ServiceTemplate.parse(yaml_ast(
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             node_types:
               type_b:
                 derived_from: b
             """
-        ), None, None))
+        )))
 
         assert template.node_types.bare == {
             "type_a": {"derived_from": "a"},
@@ -84,40 +83,40 @@ class TestMerge:
         }
 
     def test_valid_merge(self, yaml_ast):
-        template = ServiceTemplateParser.parse(yaml_ast(
+        template = ServiceTemplate.parse(yaml_ast(
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             data_types:
               type_a:
                 derived_from: a
             """
-        ), None, None)
-        template.merge(ServiceTemplateParser.parse(yaml_ast(
+        ))
+        template.merge(ServiceTemplate.parse(yaml_ast(
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             node_types:
               type_a:
                 derived_from: a
             """
-        ), None, None))
+        )))
 
         assert template.node_types.bare == {"type_a": {"derived_from": "a"}}
         assert template.data_types.bare == {"type_a": {"derived_from": "a"}}
 
     def test_duplicates(self, yaml_ast):
         with pytest.raises(ParseError, match="type_a"):
-            ServiceTemplateParser.parse(yaml_ast(
+            ServiceTemplate.parse(yaml_ast(
                 """
                 tosca_definitions_version: tosca_simple_yaml_1_3
                 node_types:
                   type_a:
                     derived_from: a
                 """
-            ), None, None).merge(ServiceTemplateParser.parse(yaml_ast(
+            )).merge(ServiceTemplate.parse(yaml_ast(
                 """
                 tosca_definitions_version: tosca_simple_yaml_1_3
                 node_types:
                   type_a:
                     derived_from: b
                 """
-            ), None, None))
+            )))

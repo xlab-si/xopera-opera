@@ -5,8 +5,7 @@ from typing import Dict, Tuple, Optional, DefaultDict, List
 from opera import operations
 from opera.log import get_logger
 from opera.operations import Operation
-from opera.parser.tosca.v_1_3 import ServiceTemplate
-
+from opera.parser.tosca.v_1_3.service_template import ServiceTemplate
 
 logger = get_logger()
 

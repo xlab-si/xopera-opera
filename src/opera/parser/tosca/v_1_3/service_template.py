@@ -1,5 +1,3 @@
-from opera.parser import yaml
-from opera.parser.tosca.parser import ToscaParser
 from opera.parser.yaml.node import Node
 from .artifact_type import ArtifactType
 from .capability_type import CapabilityType
@@ -51,18 +49,6 @@ class ServiceTemplate(Entity):
             for k, v in yaml_node.value.items()
             if k.value != "dsl_definitions"
         }, yaml_node.loc)
-
-    def merge_imports(self, parser: ToscaParser["ServiceTemplate"], base_path):
-        for import_def in self.data.get("imports", []):
-            import_def.file.resolve_path(base_path)
-            csar_path = import_def.file.data
-            with (base_path / csar_path).open() as fd:
-                yaml_data = yaml.load(fd, str(csar_path))
-            other_template = parser.parse(yaml_data, base_path, csar_path.parent)
-            self.merge(other_template)
-        # We do not need imports anymore, since they are preprocessor
-        # constructs and would only clutter the AST.
-        self.data.pop("imports", None)
 
     def merge(self, other: MapWrapper):
         assert isinstance(other, ServiceTemplate)

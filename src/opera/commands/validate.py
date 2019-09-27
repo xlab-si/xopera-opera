@@ -1,9 +1,7 @@
-import argparse
-from pathlib import Path, PurePath
-
+from opera.csar import ToscaCsar
 from opera.error import ParseError
 from opera.log import get_logger
-from opera.parser import tosca
+from opera.parser.parser import ToscaParser
 
 logger = get_logger()
 
@@ -13,16 +11,17 @@ def add_parser(subparsers):
         "validate",
         help="Validate service template"
     )
-    parser.add_argument("template",
-                        type=argparse.FileType("r"),
-                        help="Service template root")
+    parser.add_argument("csar",
+                        help="TOSCA CSAR directory or .zip file")
     parser.set_defaults(func=validate)
 
 
 def validate(args):
     logger.info("Validating service template ...")
     try:
-        logger.info(tosca.load(Path.cwd(), PurePath(args.template.name)))
+        csar = ToscaCsar.load(args.csar)
+        parsed = ToscaParser.parse(csar)
+        logger.info(parsed)
         logger.info("Done.")
         return 0
     except ParseError as e:

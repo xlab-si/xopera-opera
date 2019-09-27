@@ -5,27 +5,27 @@ from opera.parser.tosca.reference import (
     DataTypeReferenceWrapper, Reference, ReferenceWrapper,
 )
 from opera.parser.tosca.type import Type
-from opera.parser.tosca.v_1_3 import ServiceTemplateParser
+from opera.parser.tosca.v_1_3.service_template import ServiceTemplate
 from opera.parser.yaml.node import Node
 
 
 class TestReferenceWrapperResolveReference:
     def test_valid_type_reference(self, yaml_ast):
-        service = ServiceTemplateParser.parse(yaml_ast(
+        service = ServiceTemplate.parse(yaml_ast(
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             node_types:
               my.Type:
                 derived_from: tosca.nodes.Root
             """
-        ), None, None)
+        ))
         ref = ReferenceWrapper("my.Type", None)
         ref.section_path = ("node_types",)
 
         assert service.node_types["my.Type"] == ref.resolve_reference(service)
 
     def test_valid_template_reference(self, yaml_ast):
-        service = ServiceTemplateParser.parse(yaml_ast(
+        service = ServiceTemplate.parse(yaml_ast(
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             topology_template:
@@ -33,7 +33,7 @@ class TestReferenceWrapperResolveReference:
                 my_node:
                   type: tosca.nodes.Root
             """
-        ), None, None)
+        ))
         ref = ReferenceWrapper("my_node", None)
         ref.section_path = ("topology_template", "node_templates")
 
@@ -41,14 +41,14 @@ class TestReferenceWrapperResolveReference:
         assert target == ref.resolve_reference(service)
 
     def test_invalid_reference(self, yaml_ast):
-        service = ServiceTemplateParser.parse(yaml_ast(
+        service = ServiceTemplate.parse(yaml_ast(
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             node_types:
               my.Type:
                 derived_from: tosca.nodes.Root
             """
-        ), None, None)
+        ))
         ref = ReferenceWrapper("INVALID", None)
         ref.section_path = ("node_types",)
 
@@ -72,14 +72,14 @@ class TestDataTypeReferenceWrapperResolveReference:
         assert typ == result.data
 
     def test_valid_user_data_type_reference(self, yaml_ast):
-        service = ServiceTemplateParser.parse(yaml_ast(
+        service = ServiceTemplate.parse(yaml_ast(
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             data_types:
               my.Type:
                 derived_from: float
             """
-        ), None, None)
+        ))
         ref = DataTypeReferenceWrapper("my.Type", None)
         ref.section_path = ("data_types",)
 

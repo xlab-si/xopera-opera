@@ -1,0 +1,16 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+metadata:
+  template_name: "invalid key template"
+  template_version: "1.0"
+
+artifact_types:
+  valid.Artifact:
+    derived_from: tosca.artifacts.Root
+
+node_types:
+  valid.node.type.A:
+    derived_from: tosca.nodes.Root
+
+this_is_an_invalid_root_key:
+  with_an_invalid_sub_key: "it be"

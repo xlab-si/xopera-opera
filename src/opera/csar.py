@@ -24,8 +24,12 @@ class ToscaCsar(ABC):
         logger.info("Loading CSAR from %s", path_string)
         path = pathlib.Path(path_string)
         if path.is_file():
-            logger.debug("Using a zipped CSAR.")
-            csar: ToscaCsar = ZipToscaCsar(path_string)
+            try:
+                logger.debug("Attempting to use a zipped CSAR.")
+                csar: ToscaCsar = ZipToscaCsar(path_string)
+            except zipfile.BadZipFile:
+                logger.debug("File not a zip file, assuming a bare service template.")
+                csar = VirtualToscaCsar(path_string)
         elif path.is_dir():
             logger.debug("Using a non-standard directory CSAR.")
             csar = DirectoryToscaCsar(path_string)
@@ -139,9 +143,9 @@ class DirectoryToscaCsar(ToscaCsar):
     A non-standard xopera extension to allow for CSARs to be directories, not only ZIPs.
     """
 
-    def __init__(self, path: str):
+    def __init__(self, directory_path: str):
         super().__init__()
-        self.backing_path = pathlib.Path(path).resolve()
+        self.backing_path = pathlib.Path(directory_path).resolve()
 
     def members(self) -> List[pathlib.PurePath]:
         # queue loop instead of recursion
@@ -182,3 +186,22 @@ class DirectoryToscaCsar(ToscaCsar):
             logger.error("Absolute path passed to member open: %s", e)
             return False
         return not (len(relative_path.parts) > 0 and relative_path.parts[0] == "..")
+
+
+class VirtualToscaCsar(DirectoryToscaCsar):
+    """A virtual CSAR created when using xopera on a single file."""
+
+    def __init__(self, file_path: str):
+        super().__init__(str(pathlib.PurePath(file_path).parent))
+        full_path = pathlib.Path(file_path).resolve()
+        if not full_path.is_file():
+            raise CsarValidationError("File '{}' is not a file.".format(file_path), "n/a")
+
+        self.service_template_file = full_path.relative_to(self.backing_path)
+
+    def get_service_template(self) -> pathlib.PurePath:
+        return self.service_template_file
+
+    def validate(self):
+        # no guarantees about where this file is, so just skip checking
+        logger.debug("Skipping virtual CSAR validation.")

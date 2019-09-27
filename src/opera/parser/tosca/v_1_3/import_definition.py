@@ -1,13 +1,13 @@
 from opera.parser.yaml.node import Node
 
 from ..entity import Entity
-from ..path import Path
+from ..path import ToscaPath
 from ..string import String
 
 
 class ImportDefinition(Entity):
     ATTRS = dict(
-        file=Path,
+        file=ToscaPath,
         repository=String,
         namespace_prefix=String,
         namespace_uri=String,

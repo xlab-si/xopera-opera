@@ -17,6 +17,7 @@ class ParseError(OperaError):
 
 class CsarValidationError(OperaError):
     """ Raised when the CSAR does not conform to the TOSCA specification. """
+
     def __init__(self, msg: str, tosca_standard_section: str):
         # TODO: differentiate between standard versions?
         super().__init__("{} (TOSCA Simple Profile v1.3 section {})".format(msg, tosca_standard_section))
