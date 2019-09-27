@@ -1,21 +1,25 @@
 import collections
 import json
+from typing import Dict, Tuple, Optional, DefaultDict, List
 
 from opera import operations
+from opera.operations import Operation
+from opera.parser.tosca.v_1_3.service_template import ServiceTemplate
 
 
-class Instance(object):
-    def __init__(self, name, template):
+class Instance:
+    def __init__(self, name: str, template):
         self.template = template
-        self.attributes = dict(
+        self.attributes: Dict[str, str] = dict(
             tosca_name=name,
             tosca_id=name + ".0",  # TODO/@tadeboro): add id generator
             state="initial",  # TODO(@tadeboro): replace with enum
         )
 
         # Graph fields
-        self.requirements = {}
+        self.requirements: Dict[str, List["Instance"]] = {}
 
+    # pylint: disable=invalid-name
     @property
     def id(self):
         return self.attributes["tosca_id"]
@@ -36,7 +40,7 @@ class Instance(object):
         with open(self.path, "r") as fd:
             self.attributes = json.load(fd)
 
-    def get_operation(self, interface, name):
+    def get_operation(self, interface: str, name: str) -> Operation:
         implementation, inputs = self.template.get_operation(interface, name)
         return operations.Operation(self, implementation, inputs)
 
@@ -44,11 +48,11 @@ class Instance(object):
         self.attributes["state"] = state
         self.save()
 
-    def execute_workflow(self, workflow):
+    def execute_workflow(self, workflow: Dict[str, Tuple[str, str]]):
         for step, (transition_state, end_state) in workflow.items():
             self.set_state(transition_state)
             operation = self.get_operation("Standard", step)
-            success, attributes = operation.run()
+            success, attributes = operation.run()  # pylint: disable=unused-variable
             # TODO(@tadeboro): Handle failure here
             self.attributes.update(attributes)
             self.set_state(end_state)
@@ -71,7 +75,7 @@ class Instance(object):
     def get_property(self, *path):
         return self.template.get_property(*path)
 
-    def get_requirement_attribute(self, name, *path):
+    def get_requirement_attribute(self, name: str, *path: str) -> Optional[str]:
         if name not in self.requirements:
             return None
         if len(self.requirements[name]) != 1:
@@ -79,7 +83,7 @@ class Instance(object):
         linked_instance = next(iter(self.requirements[name]))
         return linked_instance.get_attribute("SELF", *path)
 
-    def get_attribute(self, reference, name, *path):
+    def get_attribute(self, reference: str, name: str, *path: str) -> Optional[str]:
         if reference not in ("SELF", "SOURCE", "TARGET", "HOST"):
             raise Exception(
                 "Accessing non-local stuff bad. Fix your service template."
@@ -95,7 +99,7 @@ class Instance(object):
             return attr
         return self.get_requirement_attribute(name, *path)
 
-    def get_host(self, indirect=False):
+    def get_host(self, indirect=False) -> Optional[str]:
         if self.template.is_a("tosca.nodes.Compute"):
             if indirect:
                 # TODO(@tadeboro): Think about this a bit more. Feels too
@@ -111,60 +115,60 @@ class Instance(object):
         return next(iter(self.requirements[req_name])).get_host(indirect=True)
 
 
-class InstanceModel(object):
-    def __init__(self, service_template):
+class InstanceModel:
+    def __init__(self, service_template: ServiceTemplate):
         self.service_template = service_template
-        self.nodes = {}
-        self.edges = collections.defaultdict(set)
-        self.name_ids_lut = collections.defaultdict(set)
+        self.nodes: Dict[str, Instance] = {}
+        self.edges: DefaultDict[str, set] = collections.defaultdict(set)
+        self.name_ids_lut: DefaultDict[str, set] = collections.defaultdict(set)
 
     def load(self):
         for i in self.nodes.values():
             i.load()
 
-    def add(self, instances):
+    def add(self, instances: List[Instance]):
         for i in instances:
             self.nodes[i.id] = i
             self.name_ids_lut[i.name].add(i.id)
 
     def link(self):
-        for id, instance in self.nodes.items():
+        for instance_id, instance in self.nodes.items():
             reqs = instance.template.dig("requirements")
             if reqs:
                 for kind, node in reqs.items():
                     instance.requirements[kind] = {
                         self.nodes[i] for i in self.name_ids_lut[node.name]
                     }
-                    self.edges[id].update(self.name_ids_lut[node.name])
+                    self.edges[instance_id].update(self.name_ids_lut[node.name])
 
     def deploy(self):
-        for id in self.ordered_instance_ids:
-            self.nodes[id].deploy()
+        for instance_id in self.ordered_instance_ids:
+            self.nodes[instance_id].deploy()
 
     def undeploy(self):
-        for id in reversed(self.ordered_instance_ids):
-            self.nodes[id].undeploy()
+        for instance_id in reversed(self.ordered_instance_ids):
+            self.nodes[instance_id].undeploy()
 
     @property
-    def ordered_instance_ids(self):
+    def ordered_instance_ids(self) -> List[str]:
         # Marks: 0 - unmarked, 1 - temporary, 2 - permanently
-        marks = collections.defaultdict(lambda: 0)
+        marks: DefaultDict[str, int] = collections.defaultdict(lambda: 0)
         ordered_ids = []
 
-        def visit(id):
-            if marks[id] == 2:
+        def visit(instance_id):
+            if marks[instance_id] == 2:
                 return
-            if marks[id] == 1:
+            if marks[instance_id] == 1:
                 raise Exception("Template has a cycle")
-            marks[id] = 1
-            for requirement in self.edges[id]:
+            marks[instance_id] = 1
+            for requirement in self.edges[instance_id]:
                 visit(requirement)
-            marks[id] = 2
-            ordered_ids.append(id)
+            marks[instance_id] = 2
+            ordered_ids.append(instance_id)
 
-        for id in self.nodes:
-            if marks[id] == 0:
-                visit(id)
+        for node_id in self.nodes:
+            if marks[node_id] == 0:
+                visit(node_id)
         return ordered_ids
 
     def __str__(self):

@@ -1,4 +1,4 @@
-from opera.template.topology import Topology
+# from opera.template.topology import Topology
 
 from ..entity import Entity
 from ..map import Map
@@ -23,6 +23,6 @@ class TopologyTemplate(Entity):
         # TODO(@tadeboro): substitution_mappings and workflows
     )
 
-    def get_template(self, service):
-        return Topology({
-            name: node.get_template
+    # def get_template(self, service):
+    #     return Topology({
+    #         name: node.get_template

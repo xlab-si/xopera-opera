@@ -1,14 +1,4 @@
-from opera.parser import yaml
-from typing import Type
-
-from opera.parser.tosca.parser import ToscaParser
 from opera.parser.yaml.node import Node
-
-from ..entity import Entity
-from ..list import List
-from ..map import Map, MapWrapper
-from ..string import String
-
 from .artifact_type import ArtifactType
 from .capability_type import CapabilityType
 from .data_type import DataType
@@ -21,6 +11,10 @@ from .relationship_type import RelationshipType
 from .repository_definition import RepositoryDefinition
 from .topology_template import TopologyTemplate
 from .tosca_definitions_version import ToscaDefinitionsVersion
+from ..entity import Entity
+from ..list import List
+from ..map import Map, MapWrapper
+from ..string import String
 
 
 class ServiceTemplate(Entity):
@@ -56,17 +50,6 @@ class ServiceTemplate(Entity):
             if k.value != "dsl_definitions"
         }, yaml_node.loc)
 
-    def merge_imports(self, parser: Type[ToscaParser["ServiceTemplate"]], base_path):
-        for import_def in self.data.get("imports", []):
-            csar_path = import_def.file.resolve_path(base_path).data
-            with (base_path / csar_path).open() as fd:
-                yaml_data = yaml.load(fd, str(csar_path))
-            other_template = parser.parse(yaml_data, base_path, csar_path.parent)
-            self.merge(other_template)
-        # We do not need imports anymore, since they are preprocessor
-        # construct and would only clutter the AST.
-        self.data.pop("imports", None)
-
     def merge(self, other: MapWrapper):
         assert isinstance(other, ServiceTemplate)
 
@@ -75,7 +58,7 @@ class ServiceTemplate(Entity):
                 "Incompatible TOSCA definitions: {} and {}".format(
                     self.tosca_definitions_version,
                     other.tosca_definitions_version
-                ), other.loc,
+                ), other.loc
             )
 
         # TODO(@tadeboro): Should we merge the topology templates or should we
