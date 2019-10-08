@@ -1,5 +1,5 @@
 TOSCA-Meta-File-Version: 1.1
 CSAR-Version: 1.1
-Created-By: xopera
+Created-By: xOpera
 Entry-Definitions: definitions/are-unsupported.yaml
 Other-Definitions: definitions/also-unsupported.yaml

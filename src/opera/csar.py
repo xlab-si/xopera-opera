@@ -34,7 +34,7 @@ class ToscaCsar(ABC):
             logger.debug("Using a non-standard directory CSAR.")
             csar = DirectoryToscaCsar(path_string)
         else:
-            raise CsarValidationError("The CSAR is neither a file nor a directory.", "6.1 (xopera extended)")
+            raise CsarValidationError("The CSAR is neither a file nor a directory.", "6.1 (xOpera extended)")
 
         csar.validate()
         return csar
@@ -85,7 +85,7 @@ class ToscaCsar(ABC):
                f.parent == relative_root
                and f.name == ToscaCsar.METADATA_DIRNAME
                and self._member_is_dir(f)):
-            raise UnsupportedToscaFeatureError("xopera does not support CSAR structures with a metadata directory.")
+            raise UnsupportedToscaFeatureError("xOpera does not support CSAR structures with a metadata directory.")
 
         root_files = [f for f in files if f.parent == relative_root and self._member_is_file(f)]
         if len(root_files) != 1:
@@ -140,7 +140,7 @@ class ZipToscaCsar(ToscaCsar):
 
 class DirectoryToscaCsar(ToscaCsar):
     """
-    A non-standard xopera extension to allow for CSARs to be directories, not only ZIPs.
+    A non-standard xOpera extension to allow for CSARs to be directories, not only ZIPs.
     """
 
     def __init__(self, directory_path: str):
@@ -189,7 +189,7 @@ class DirectoryToscaCsar(ToscaCsar):
 
 
 class VirtualToscaCsar(DirectoryToscaCsar):
-    """A virtual CSAR created when using xopera on a single file."""
+    """A virtual CSAR created when using xOpera on a single file."""
 
     def __init__(self, file_path: str):
         super().__init__(str(pathlib.PurePath(file_path).parent))
