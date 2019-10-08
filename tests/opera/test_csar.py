@@ -69,10 +69,32 @@ class TestCsar:
         with pytest.raises(CsarValidationError):
             _base_loader(_RESOURCE_DIRECTORY / "csar/multipleroot/", mode, tmp_path)
 
-    @pytest.mark.parametrize("where", ["../../../../../../../../../../../../../../../../etc/hosts", "/etc/hosts"])
-    def test_load_member_outside_bounds(self, where):
+    @pytest.mark.parametrize(
+        "where", [
+            "../../does/not/exist",
+            "../nonexistent",
+            "/nonexistent"
+            "/nextlevel/nonexistent"
+        ]
+    )
+    def test_load_nonexistent_member_outside_bounds(self, where):
         # this member cannot exist because .members() only returns files inside bounds
         # but the user can still pass any path to the open function
-        csar = ToscaCsar.load(_RESOURCE_DIRECTORY / "csar/barebones/")
+        csar = ToscaCsar.load(str(_RESOURCE_DIRECTORY / "csar/barebones/"))
         with pytest.raises(FileOutOfBoundsError):
             csar.open_member(pathlib.PurePath(where))
+
+    def test_load_existent_member_outside_bounds_absolute(self, tmp_path: pathlib.Path):
+        csar = ToscaCsar.load(str(_RESOURCE_DIRECTORY / "csar/barebones/"))
+        _, tmpfile_path = tempfile.mkstemp(prefix="xoperatmp-", suffix=".txt", dir=str(tmp_path))
+        absolute_path = pathlib.Path(tmpfile_path).absolute()
+        with pytest.raises(FileOutOfBoundsError):
+            csar.open_member(pathlib.PurePath(absolute_path))
+
+    def test_load_existent_member_outside_bounds_relative(self, tmp_path: pathlib.Path):
+        csar_directory = _RESOURCE_DIRECTORY / "csar/barebones/"
+        csar = ToscaCsar.load(str(csar_directory))
+        _, tmpfile_path = tempfile.mkstemp(prefix="xoperatmp-", suffix=".txt", dir=str(tmp_path))
+        relative_path = pathlib.Path(os.path.relpath(tmpfile_path, start=str(csar_directory)))
+        with pytest.raises(FileOutOfBoundsError):
+            csar.open_member(pathlib.PurePath(relative_path))
