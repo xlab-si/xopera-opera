@@ -1,0 +1,12 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+metadata:
+  template_name: "template with absolute paths"
+  template_version: "1.0"
+
+imports:
+  - /sub/absolutepath.yaml
+
+node_types:
+  my.node.type.A:
+    derived_from: tosca.nodes.Root

@@ -92,7 +92,7 @@ class TestComplex:
         csar = ToscaCsar.load(root)
         ToscaParser.parse(csar)
 
-    @pytest.mark.parametrize("csar_dir", ["invalidkey"])
+    @pytest.mark.parametrize("csar_dir", ["invalidkey", "absolutepath"])
     def test_parse_failure(self, csar_dir):
         root = _RESOURCE_DIRECTORY / "csar" / csar_dir
         csar = ToscaCsar.load(root)
