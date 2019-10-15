@@ -34,3 +34,7 @@ class FileOutOfBoundsError(OperaError):
 
     def __init__(self, base_path: pathlib.PurePath, relative_path: pathlib.PurePath):
         super().__init__("Error accessing {}, out of bounds of {}.".format(str(relative_path), str(base_path)))
+
+
+class OperaBundleError(OperaError):
+    """ Errors related to xOpera bundles. """

@@ -2,7 +2,6 @@ import enum
 import os
 import pathlib
 import tempfile
-import zipfile
 
 import pytest
 
@@ -18,23 +17,10 @@ class CsarTestMode(enum.Enum):
     VIRTUAL = 3
 
 
-# https://stackoverflow.com/questions/1855095/
-def _zip_directory_contents(contents_path: pathlib.Path, destination_file_path: str):
-    with zipfile.ZipFile(destination_file_path, mode="a") as zipf:
-        for root, _, files in os.walk(str(contents_path)):
-            # don't include the root directory as the dot
-            relative_dir_path = os.path.relpath(root, str(contents_path))
-            if relative_dir_path != ".":
-                zipf.write(root, arcname=relative_dir_path)
-            for file in files:
-                zipf.write(os.path.join(root, file),
-                           arcname=os.path.relpath(os.path.join(root, file), str(contents_path)))
-
-
-def _base_loader(path: pathlib.Path, mode: CsarTestMode, tmp_path: pathlib.Path):
+def _base_loader(path: pathlib.Path, mode: CsarTestMode, tmp_path: pathlib.Path, zip_directory_contents):
     if mode == CsarTestMode.ZIP:
         _, tmpfile_path = tempfile.mkstemp(prefix="xoperatmp-", suffix=".zip", dir=str(tmp_path))
-        _zip_directory_contents(path, tmpfile_path)
+        zip_directory_contents(path, tmpfile_path)
         ToscaCsar.load(tmpfile_path, strict=True)
 
         # on success, the temp file is deleted
@@ -47,27 +33,27 @@ def _base_loader(path: pathlib.Path, mode: CsarTestMode, tmp_path: pathlib.Path)
 
 class TestCsar:
     @pytest.mark.parametrize("mode", [CsarTestMode.ZIP, CsarTestMode.DIRECTORY])
-    def test_load_example_mini(self, mode, tmp_path: pathlib.Path):
-        _base_loader(_RESOURCE_DIRECTORY / "csar/mini/", mode, tmp_path)
+    def test_load_example_mini(self, mode, tmp_path: pathlib.Path, zip_directory_contents):
+        _base_loader(_RESOURCE_DIRECTORY / "csar/mini/", mode, tmp_path, zip_directory_contents)
 
     @pytest.mark.parametrize("mode", [CsarTestMode.ZIP, CsarTestMode.DIRECTORY])
-    def test_load_barebones(self, mode, tmp_path: pathlib.Path):
-        _base_loader(_RESOURCE_DIRECTORY / "csar/barebones/", mode, tmp_path)
+    def test_load_barebones(self, mode, tmp_path: pathlib.Path, zip_directory_contents):
+        _base_loader(_RESOURCE_DIRECTORY / "csar/barebones/", mode, tmp_path, zip_directory_contents)
 
     @pytest.mark.parametrize("mode", [CsarTestMode.ZIP, CsarTestMode.DIRECTORY])
-    def test_load_metadata_directory(self, mode, tmp_path: pathlib.Path):
+    def test_load_metadata_directory(self, mode, tmp_path: pathlib.Path, zip_directory_contents):
         with pytest.raises(UnsupportedToscaFeatureError):
-            _base_loader(_RESOURCE_DIRECTORY / "csar/metadatadir/", mode, tmp_path)
+            _base_loader(_RESOURCE_DIRECTORY / "csar/metadatadir/", mode, tmp_path, zip_directory_contents)
 
     @pytest.mark.parametrize("mode", [CsarTestMode.ZIP, CsarTestMode.DIRECTORY])
-    def test_load_missing_metadata(self, mode, tmp_path: pathlib.Path):
+    def test_load_missing_metadata(self, mode, tmp_path: pathlib.Path, zip_directory_contents):
         with pytest.raises(CsarValidationError):
-            _base_loader(_RESOURCE_DIRECTORY / "csar/missingmetadata/", mode, tmp_path)
+            _base_loader(_RESOURCE_DIRECTORY / "csar/missingmetadata/", mode, tmp_path, zip_directory_contents)
 
     @pytest.mark.parametrize("mode", [CsarTestMode.ZIP, CsarTestMode.DIRECTORY])
-    def test_load_multiple_root_files(self, mode, tmp_path: pathlib.Path):
+    def test_load_multiple_root_files(self, mode, tmp_path: pathlib.Path, zip_directory_contents):
         with pytest.raises(CsarValidationError):
-            _base_loader(_RESOURCE_DIRECTORY / "csar/multipleroot/", mode, tmp_path)
+            _base_loader(_RESOURCE_DIRECTORY / "csar/multipleroot/", mode, tmp_path, zip_directory_contents)
 
     @pytest.mark.parametrize(
         "where", [
