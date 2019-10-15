@@ -14,14 +14,14 @@ class TestMinimal:
         root = tmp_path / "root.yaml"
         root.write_text("tosca_definitions_version: tosca_simple_yaml_1_3")
 
-        csar = ToscaCsar.load(root)
+        csar = ToscaCsar.load(root, strict=True)
         doc = ToscaParser.parse(csar)
         assert doc.tosca_definitions_version.data == "tosca_simple_yaml_1_3"
 
     def test_empty_document_is_invalid(self, tmp_path):
         root = tmp_path / "root.yaml"
         root.write_text("{}")
-        csar = ToscaCsar.load(root)
+        csar = ToscaCsar.load(root, strict=True)
         with pytest.raises(ParseError):
             ToscaParser.parse(csar)
 
@@ -39,7 +39,7 @@ class TestMinimal:
         root = tmp_path / "root.yaml"
         root.write_text("tosca_definitions_version: tosca_simple_yaml_1_3")
 
-        csar = ToscaCsar.load(root)
+        csar = ToscaCsar.load(root, strict=True)
         doc = ToscaParser.parse(csar)
         assert doc.dig(*typ) is not None
 
@@ -64,7 +64,7 @@ class TestMinimal:
             """.format(*typ)
         ))
 
-        csar = ToscaCsar.load(root)
+        csar = ToscaCsar.load(root, strict=True)
         doc = ToscaParser.parse(csar)
         assert doc.dig(typ[0], "my.custom.Type") is not None
 
@@ -80,7 +80,7 @@ class TestMinimal:
             """
         ))
 
-        csar = ToscaCsar.load(root)
+        csar = ToscaCsar.load(root, strict=True)
         doc = ToscaParser.parse(csar)
         assert doc.topology_template.node_templates["my_node"] is not None
 
@@ -89,12 +89,12 @@ class TestComplex:
     @pytest.mark.parametrize("csar_dir", ["mini"])
     def test_parse_success(self, csar_dir):
         root = _RESOURCE_DIRECTORY / "csar" / csar_dir
-        csar = ToscaCsar.load(root)
+        csar = ToscaCsar.load(root, strict=True)
         ToscaParser.parse(csar)
 
     @pytest.mark.parametrize("csar_dir", ["invalidkey", "absolutepath"])
     def test_parse_failure(self, csar_dir):
         root = _RESOURCE_DIRECTORY / "csar" / csar_dir
-        csar = ToscaCsar.load(root)
+        csar = ToscaCsar.load(root, strict=True)
         with pytest.raises(ParseError):
             ToscaParser.parse(csar)

@@ -18,7 +18,13 @@ class ToscaCsar(abc.ABC):
     METADATA_FILENAME = "TOSCA.meta"
 
     @classmethod
-    def load(cls, path_string: str) -> "ToscaCsar":
+    def load(cls, path_string: str, strict: bool) -> "ToscaCsar":
+        """Load a CSAR from a .zip, directory or service template.
+
+        :param path_string: The CSAR location.
+        :param strict: Whether to validate the CSAR structure and contents.
+        """
+
         print("Loading CSAR from {}".format(path_string))
         path = pathlib.Path(path_string)
         if path.is_file():
@@ -34,7 +40,8 @@ class ToscaCsar(abc.ABC):
         else:
             raise CsarValidationError("The CSAR is neither a file nor a directory.", "6.1 (xopera extended)")
 
-        csar.validate()
+        if strict:
+            csar.validate()
         return csar
 
     @abstractmethod

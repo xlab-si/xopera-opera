@@ -16,7 +16,7 @@ def add_parser(subparsers):
 def validate(args):
     print("Validating service template ...")
     try:
-        csar = ToscaCsar.load(args.csar)
+        csar = ToscaCsar.load(args.csar, strict=True)
         parsed = ToscaParser.parse(csar)
         print(parsed)
         print("Done.")
