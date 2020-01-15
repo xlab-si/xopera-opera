@@ -639,6 +639,13 @@ class NodeType(Entity):
             self.derived_from.get_hosted_on_requirement_name()
         )
 
+    def get_property(self, name, *path):
+        return (
+            self.dig("properties", name, "default") or
+            self.derived_type.get_property(name, *path) or
+            self.dig("capabilities", "properties", name, "default")
+        )
+
 
 class NodeTypeCollection(Entity):
     ITEM_CLASS = NodeType
