@@ -170,6 +170,9 @@ class Function(Base):
     @classmethod
     def parse(cls, name, data, path):
         (function, arguments), = data.items()
+        if not isinstance(arguments, list):
+            arguments = [arguments]
+
         return super().parse(name, dict(
             function=String.from_data(function, function, path + [function]),
             arguments=[
