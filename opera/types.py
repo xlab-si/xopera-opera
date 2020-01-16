@@ -75,7 +75,8 @@ class Base(object):
 
 class Pass(Base):
     # TODO(@tadeboro): Remove when we have enough classes implemented.
-    pass
+    def eval(self, _reference):
+        return self.data
 
 
 class String(Base):
