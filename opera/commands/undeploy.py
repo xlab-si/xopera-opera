@@ -16,7 +16,7 @@ def add_parser(subparsers):
 
 
 def undeploy(args):
-    template_name = csar.load(args.name)
+    template_name, inputs = csar.load(args.name)
 
     print("Loading service template ...")
     service_template = types.ServiceTemplate.from_data(stdlib.load())
@@ -27,6 +27,7 @@ def undeploy(args):
 
     print("Resolving service template links ...")
     service_template.resolve()
+    service_template.set_inputs(inputs)
 
     print("Loading instance model ...")
     instances = service_template.instantiate()

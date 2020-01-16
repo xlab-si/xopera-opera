@@ -63,7 +63,8 @@ class Base(object):
     def dump(self, _level):
         return str(self)
 
-    def resolve(self, _service_tempate):
+    def resolve(self, service_template):
+        self._service_template = service_template
         return self
 
     def __str__(self):
@@ -118,6 +119,8 @@ class Reference(String):
                 "{} did not override SECTION_PATH".format(type(self).__name__)
             )
 
+        super().resolve(service_template)
+
         # print("Resolving {} in {}".format(self.data, self.SECTION_PATH))
         target = service_template.dig(*self.SECTION_PATH, self.data)
         if target is None:
@@ -157,6 +160,8 @@ class Function(Base):
         (name, args), = data.items()
         if name not in cls.VALID_NAMES:
             raise BadType("Invalid function name: " + name)
+        if name == "get_input" and not isinstance(args, list):
+            args = [args]
         if not isinstance(args, list):
             raise BadType("Function arguments should be specified as array")
         if len(args) < 1:
@@ -178,10 +183,6 @@ class Function(Base):
             self.data["function"],
             ", ".join(map(str, self.data["arguments"])),
         )
-
-    def resolve(self, service_template):
-        # TODO(@tadeboro): resolve arguments here
-        return self
 
     def eval(self, reference):
         function = str(self.data["function"])
@@ -262,6 +263,7 @@ class Entity(Base):
         return "\n".join(children)
 
     def resolve(self, service_template):
+        super().resolve(service_template)
         for k, v in self.data.items():
             self.data[k] = v.resolve(service_template)
         return self
@@ -540,6 +542,9 @@ class NodeTemplate(Entity):
             return attr.eval(self)
         return None
 
+    def get_input(self, name, *path):
+        return self._service_template.get_input(name)
+
     def is_a(self, type):
         return self.type.is_a(type)
 
@@ -734,3 +739,11 @@ class ServiceTemplate(Entity):
         instance_model.link()
         # TODO(@tadeboro): validate graph
         return instance_model
+
+    def set_inputs(self, inputs):
+        self._inputs = inputs
+
+    def get_input(self, name):
+        if name not in self._inputs:
+            raise Exception("Input '{}' is not defined".format(name))
+        return self._inputs[name]

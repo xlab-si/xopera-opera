@@ -10,6 +10,9 @@ def add_parser(subparsers):
         "deploy",
         help="Deploy service template from CSAR"
     )
+    parser.add_argument("--inputs", "-i",
+                        type=argparse.FileType("r"),
+                        help="YAML file with inputs")
     parser.add_argument("name",
                         help="name of deployment to create")
     parser.add_argument("csar",
@@ -19,7 +22,8 @@ def add_parser(subparsers):
 
 
 def deploy(args):
-    csar.save(args.name, args.csar.name)
+    inputs = yaml.safe_load(args.inputs) if args.inputs else {}
+    csar.save(args.name, args.csar.name, inputs)
 
     print("Loading service template ...")
     service_template = types.ServiceTemplate.from_data(stdlib.load())
@@ -29,6 +33,7 @@ def deploy(args):
 
     print("Resolving service template links ...")
     service_template.resolve()
+    service_template.set_inputs(inputs)
 
     print("Creating instance model ...")
     instances = service_template.instantiate()
