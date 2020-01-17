@@ -206,7 +206,6 @@ class Value(Base):
             try:
                 return klass.from_data(name, data, path)
             except BadType as e:
-                # print(e)
                 pass
         raise Exception("Should not be here: Pass should always parse")
 
