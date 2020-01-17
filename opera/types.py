@@ -648,11 +648,16 @@ class NodeType(Entity):
         )
 
     def get_property(self, name, *path):
-        return (
-            self.dig("properties", name, "default") or
-            self.derived_type.get_property(name, *path) or
-            self.dig("capabilities", "properties", name, "default")
-        )
+        result = self.dig("properties", name, "default")
+        if result:
+            return result
+
+        if "derived_from" in self.data:
+            result = self.derived_from.get_property(name, *path)
+            if result:
+                return result
+
+        return self.dig("capabilities", "properties", name, "default")
 
 
 class NodeTypeCollection(Entity):
