@@ -28,3 +28,11 @@ class Node:
 
     def is_a(self, typ):
         return typ in self.types
+
+    def instantiate(self):
+        # NOTE(@tadeboro): This is where we should handle multiple instances.
+        # At the moment, we simply create one instance per node template. But
+        # the algorithm is fully prepared for multiple instances.
+        node_id = self.name + "_0"
+        self.instances = {node_id: Instance(self, node_id)}
+        return self.instances.values()
