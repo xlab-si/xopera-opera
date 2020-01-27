@@ -1,3 +1,5 @@
+from opera.value import Value
+
 from ..entity import Entity
 from ..reference import DataTypeReference
 from ..string import String
@@ -17,3 +19,12 @@ class AttributeDefinition(Entity):
         entry_schema=SchemaDefinition,
     )
     REQUIRED = {"type"}
+
+    def get_value(self, typ):
+        if "default" in self:
+            return self.default.get_value(typ)
+        return Value(typ, False)
+
+    def get_value_type(self, service_ast):
+        # TODO(@tadeboro): Implement type checks later.
+        return None

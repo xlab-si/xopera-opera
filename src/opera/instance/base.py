@@ -61,6 +61,17 @@ class Base:
         self.set_attribute("state", state)
         self.write()
 
+    def run_operation(self, host, interface, operation):
+        success, attributes = self.template.run_operation(
+            host, interface, operation, self,
+        )
+
+        if not success:
+            raise OperationError("Failed")
+
+        self.update_attributes(attributes)
+        self.write()
+
     def update_attributes(self, attributes):
         for name, value in attributes.items():
             self.set_attribute(name, value)

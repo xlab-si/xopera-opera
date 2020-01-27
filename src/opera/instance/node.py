@@ -49,6 +49,11 @@ class Node(Base):
             for relationship in requirement_relationships.values()
         )
 
+    def get_host(self):
+        # Try to transitively find a HostedOn requirement and resort to
+        # localhost if nothing suitable is found.
+        return self.template.get_host() or "localhost"
+
     def deploy(self):
         print("  Deploying {}".format(self.tosca_id))
 
@@ -101,3 +106,38 @@ class Node(Base):
 
         self.reset_attributes()
         self.write()
+
+    #
+    # TOSCA functions
+    #
+    def get_attribute(self, params):
+        host, attr, *rest = params
+
+        if host != "SELF":
+            raise DataError(
+                "Accessing non-local stuff is bad. Fix your service template."
+            )
+        if host == "HOST":
+            raise DataError("HOST is not yet supported in opera.")
+
+        # TODO(@tadeboro): Add support for nested attribute values once we
+        # have data type support.
+        if attr in self.attributes:
+            return self.attributes[attr].eval(self)
+
+        # TODO(@tadeboro): Add capability access.
+
+        # If we have no attribute, try searching for requirement.
+        relationships = self.out_edges.get(attr, {})
+        if len(relationships) == 0:
+            raise DataError("Cannot find attribute '{}'.".format(attr))
+        if len(relationships) > 1:
+            raise DataError(
+                "Targeting more than one instance via '{}'.".format(attr),
+            )
+        return next(iter(relationships.values())).target.get_attribute(
+            ["SELF"] + rest,
+        )
+
+    def get_property(self, params):
+        return self.template.get_property(params)

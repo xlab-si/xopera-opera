@@ -1,3 +1,4 @@
+from opera.value import Value
 from opera.parser.yaml.node import Node
 
 from .base import Base
@@ -16,3 +17,6 @@ class Void(Base):
     def __init__(self, yaml_node):
         super().__init__(yaml_node.bare, yaml_node.loc)
         self.raw = yaml_node
+
+    def get_value(self, typ):
+        return Value(typ, True, self.data)

@@ -1,3 +1,5 @@
+from opera.value import Value
+
 from ..bool import Bool
 from ..entity import Entity
 from ..list import List
@@ -25,3 +27,14 @@ class PropertyDefinition(Entity):
         metadata=Map(String),
     )
     REQUIRED = {"type"}
+
+    def get_value(self, typ):
+        if "value" in self:
+            return self.value.get_value(typ)
+        if "default" in self:
+            return self.default.get_value(typ)
+        return Value(typ, False)
+
+    def get_value_type(self, service_ast):
+        # TODO(@tadeboro): Implement types later.
+        return None
