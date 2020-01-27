@@ -20,14 +20,17 @@ The simplest way to test ``opera`` is to install it into virtual environment::
 To test if everything is working as expected, we can now try to deploy a
 hello-world service::
 
-  (.venv) $ curl -L \
-        https://github.com/xlab-si/xopera-examples/archive/master.tar.gz \
-    | tar -xzf -
-  (.venv) $ cd xopera-examples-master/01-hello-world
-  (.venv) $ opera deploy hello service.yaml
+  (.venv) $ cd examples/hello
+  (.venv) $ opera deploy service.yaml
 
 If nothing went wrong, new empty file has been created at
 ``/tmp/playing-opera/hello/hello.txt``.
+
+To delete the created directory, we can undeploy our stuff by running::
+
+   (.venv) $ opera undeploy
+
+And that is it.
 
 
 Prerequisites

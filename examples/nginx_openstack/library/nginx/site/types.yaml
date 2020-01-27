@@ -1,0 +1,18 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  nginx.Site:
+    derived_from: tosca.nodes.SoftwareComponent
+    requirements:
+      - host:
+          capability: tosca.capabilities.Compute
+          relationship: my.relationships.NginxSiteHosting
+    interfaces:
+      Standard:
+        inputs:
+          site_config_dir:
+            default: { get_attribute: [ SELF, host, site_config_dir ] }
+            type: string
+        operations:
+          create: playbooks/create.yaml
+          delete: playbooks/delete.yaml

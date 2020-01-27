@@ -1,0 +1,27 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+imports:
+  - library/nginx/main.yaml
+  - library/openstack/main.yaml
+
+topology_template:
+  node_templates:
+    nginx:
+      type: nginx.Server
+      requirements:
+        - host: vm
+
+    vm:
+      type: openstack.VM
+      properties:
+        name: nginx_host
+        image: 9ea4856a-32b2-4553-b408-cfa4cb1bb40b
+        flavor: d3046a41-245a-4042-862e-59568e81f8fa
+        network: 753940e0-c2a7-4c9d-992e-4d5bd71f85aa
+        security_groups: default
+        key_name: tadej_borovsak
+
+    site:
+      type: nginx.Site
+      requirements:
+        - host: nginx

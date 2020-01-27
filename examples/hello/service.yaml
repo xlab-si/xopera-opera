@@ -1,0 +1,23 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  hello_type:
+    derived_from: tosca.nodes.SoftwareComponent
+    interfaces:
+      Standard:
+        operations:
+          create: playbooks/create.yaml
+          delete: playbooks/delete.yaml
+
+topology_template:
+  node_templates:
+    my-workstation:
+      type: tosca.nodes.Compute
+      attributes:
+        private_address: localhost
+        public_address: localhost
+
+    hello:
+      type: hello_type
+      requirements:
+        - host: my-workstation

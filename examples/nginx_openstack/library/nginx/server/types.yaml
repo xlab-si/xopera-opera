@@ -1,0 +1,37 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  nginx.Server:
+    derived_from: tosca.nodes.SoftwareComponent
+    attributes:
+      site_config_dir:
+        type: string
+        description: Location of nginx site configs
+    capabilities:
+      host:
+        type: tosca.capabilities.Compute
+        valid_source_types: [nginx.Site]
+    interfaces:
+      Standard:
+        type: tosca.interfaces.node.lifecycle.Standard
+        operations:
+          create:
+            implementation:
+              primary: playbooks/install.yaml
+          delete:
+            implementation:
+              primary: playbooks/uninstall.yaml
+
+
+relationship_types:
+  my.relationships.NginxSiteHosting:
+    derived_from: tosca.relationships.HostedOn
+    interfaces:
+      Configure:
+        operations:
+          post_configure_target:
+            inputs:
+              marker:
+                default: { get_attribute: [ TARGET, host, id ] }
+            implementation:
+              primary: playbooks/reload.yaml
