@@ -3,9 +3,6 @@ from .string import String
 
 class Type(String):
     INTERNAL_TYPES = {
-        # Root meta type
-        "tosca.entity.Root",
-
         # YAML 1.2 types
         "string", "integer", "float", "boolean", "null",
 
