@@ -14,3 +14,8 @@ class Topology:
     def resolve_requirements(self):
         for node in self.nodes.values():
             node.resolve_requirements(self)
+
+    def instantiate(self, storage):
+        return Instance(storage, itertools.chain.from_iterable(
+            node.instantiate() for node in self.nodes.values()
+        ))

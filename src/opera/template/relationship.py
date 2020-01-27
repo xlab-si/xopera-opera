@@ -11,3 +11,7 @@ class Relationship:
 
     def is_a(self, typ):
         return typ in self.types
+
+    def instantiate(self, source, target):
+        relationship_id = "{}--{}".format(source.tosca_id, target.tosca_id)
+        return Instance(self, relationship_id, source, target)
