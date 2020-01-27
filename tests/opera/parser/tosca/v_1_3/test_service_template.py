@@ -77,10 +77,9 @@ class TestMerge:
             """
         ), None, None))
 
-        assert template.node_types.bare == {
-            "type_a": {"derived_from": "a"},
-            "type_b": {"derived_from": "b"},
-        }
+        assert len(template.node_types.data) == 2
+        assert template.node_types["type_a"].data["derived_from"].data == "a"
+        assert template.node_types["type_b"].data["derived_from"].data == "b"
 
     def test_valid_merge(self, yaml_ast):
         template = ServiceTemplate.parse(yaml_ast(
@@ -100,8 +99,8 @@ class TestMerge:
             """
         ), None, None))
 
-        assert template.node_types.bare == {"type_a": {"derived_from": "a"}}
-        assert template.data_types.bare == {"type_a": {"derived_from": "a"}}
+        assert len(template.data_types.data) == 1
+        assert template.node_types["type_a"].data["derived_from"].data == "a"
 
     def test_duplicates(self, yaml_ast):
         with pytest.raises(ParseError, match="type_a"):

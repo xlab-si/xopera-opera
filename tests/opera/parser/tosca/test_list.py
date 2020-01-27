@@ -15,12 +15,14 @@ class TestListParse:
             List(Base).parse(Node(data))
 
     def test_empty_list_is_ok(self):
-        assert List(Base).parse(Node([])).bare == []
+        assert List(Base).parse(Node([])).data == []
 
     def test_list_is_ok(self):
         obj = List(Base).parse(Node([Node("a"), Node("b")]))
 
-        assert obj.bare == ["a", "b"]
+        assert len(obj.data) == 2
+        assert obj.data[0].data == "a"
+        assert obj.data[1].data == "b"
 
 
 class TestListWrapperGetitem:
@@ -60,13 +62,6 @@ class TestListWrapperDig:
 
     def test_bad_index_type(self):
         assert ListWrapper([], None).dig("a") is None
-
-
-class TestBare:
-    def test_bare(self):
-        obj = ListWrapper([Base("a", None), Base("b", None)], None)
-
-        assert obj.bare == ["a", "b"]
 
 
 class TestListWrapperVisit:

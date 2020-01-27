@@ -22,16 +22,15 @@ class MapWrapper(Base):
     def items(self):
         return self.data.items()
 
+    def get(self, key, default=None):
+        return self.data.get(key, default)
+
     def dig(self, key, *subpath):
         if key not in self.data:
             return None
         if not subpath:
             return self.data[key]
         return self.data[key].dig(*subpath)
-
-    @property
-    def bare(self):
-        return {k: v.bare for k, v in self.data.items()}
 
     def merge(self, other):
         duplicates = set(self.keys()) & set(other.keys())
@@ -44,9 +43,8 @@ class MapWrapper(Base):
         self.data.update(other.data)
 
     def visit(self, method, *args, **kwargs):
-        return type(self)(collections.OrderedDict(
-            (k, v.visit(method, *args, **kwargs)) for k, v in self.items()
-        ), self.loc)
+        for v in self.values():
+            v.visit(method, *args, **kwargs)
 
 
 class Map:

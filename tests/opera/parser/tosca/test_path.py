@@ -44,7 +44,10 @@ class TestResolvePath:
         abs_path = tmp_path / rel_path
         abs_path.mkdir(parents=True)
 
-        assert rel_path == Path(rel_path, None).resolve_path(tmp_path).data
+        path = Path(rel_path, None)
+        path.resolve_path(tmp_path)
+
+        assert rel_path == path.data
 
     def test_valid_file_path(self, tmp_path):
         rel_path = pathlib.PurePath("some/file.txt")
@@ -52,23 +55,30 @@ class TestResolvePath:
         abs_path.parent.mkdir(parents=True)
         abs_path.write_text("sample_text")
 
-        assert rel_path == Path(rel_path, None).resolve_path(tmp_path).data
+        path = Path(rel_path, None)
+        path.resolve_path(tmp_path)
+
+        assert rel_path == path.data
 
     def test_valid_rel_path_with_dots(self, tmp_path):
         rel_path = pathlib.PurePath("a/././b/../c/../d")
         abs_path = (tmp_path / rel_path).resolve()
         abs_path.mkdir(parents=True)
 
-        result = Path(rel_path, None).resolve_path(tmp_path).data
-        assert pathlib.PurePath("a/d") == result
+        path = Path(rel_path, None)
+        path.resolve_path(tmp_path)
+
+        assert pathlib.PurePath("a/d") == path.data
 
     def test_valid_abs_path_with_dots(self, tmp_path):
         rel_path = pathlib.PurePath("e/./f/g/h/../i/..")
         abs_path = (tmp_path / rel_path).resolve()
         abs_path.mkdir(parents=True)
 
-        result = Path("/" / rel_path, None).resolve_path(tmp_path).data
-        assert pathlib.PurePath("e/f/g") == result
+        path = Path("/" / rel_path, None)
+        path.resolve_path(tmp_path)
+
+        assert pathlib.PurePath("e/f/g") == path.data
 
     def test_missing_file(self, tmp_path):
         with pytest.raises(ParseError):

@@ -61,11 +61,6 @@ class TestMapWrapperDig:
         assert MapWrapper({}, None).dig(1) is None
 
 
-class TestMapWrapperBare:
-    def test_bare(self):
-        assert MapWrapper({"a": Base("b", None)}, None).bare == {"a": "b"}
-
-
 class TestMapWrapperMerge:
     def test_merge(self):
         map = MapWrapper({"a": 0}, None)
@@ -87,14 +82,15 @@ class TestMapParse:
             Map(Base).parse(Node(data))
 
     def test_empty_dict_is_ok(self):
-        assert Map(Base).parse(Node({})).bare == {}
+        assert Map(Base).parse(Node({})).data == {}
 
     def test_dict_is_ok(self):
         obj = Map(Base).parse(Node({
             Node("a"): Node("b"),
         }))
 
-        assert obj.bare == dict(a="b")
+        assert len(obj.data) == 1
+        assert obj.data["a"].data == "b"
 
 
 class TestOrderedMapParse:
@@ -104,7 +100,7 @@ class TestOrderedMapParse:
             OrderedMap(Base).parse(Node(data))
 
     def test_empty_list_is_ok(self):
-        assert OrderedMap(Base).parse(Node([])).bare == {}
+        assert OrderedMap(Base).parse(Node([])).data == {}
 
     def test_dict_is_ok(self):
         obj = OrderedMap(Base).parse(Node([
