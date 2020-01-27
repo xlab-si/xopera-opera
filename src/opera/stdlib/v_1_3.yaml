@@ -406,8 +406,8 @@ node_types:
         type: string
       networks:
         type: map
-      entry_schema:
-        type: tosca.datatypes.network.NetworkInfo
+        entry_schema:
+          type: tosca.datatypes.network.NetworkInfo
       ports:
         type: map
         entry_schema:
