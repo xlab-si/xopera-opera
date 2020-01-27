@@ -1,8 +1,9 @@
 import argparse
+from pathlib import Path, PurePath
 
-import yaml
-
-from opera import csar, stdlib, types
+from opera.error import DataError, ParseError
+from opera.parser import tosca
+from opera.storage import Storage
 
 
 def add_parser(subparsers):
@@ -10,8 +11,6 @@ def add_parser(subparsers):
         "deploy",
         help="Deploy service template from CSAR"
     )
-    parser.add_argument("name",
-                        help="name of deployment to create")
     parser.add_argument("csar",
                         type=argparse.FileType("r"),
                         help="cloud service archive file")
@@ -19,23 +18,19 @@ def add_parser(subparsers):
 
 
 def deploy(args):
-    csar.save(args.name, args.csar.name)
+    storage = Storage(Path(".opera"))
+    storage.write(args.csar.name, "root_file")
 
-    print("Loading service template ...")
-    service_template = types.ServiceTemplate.from_data(stdlib.load())
-    service_template.merge(
-        types.ServiceTemplate.from_data(yaml.safe_load(args.csar))
-    )
-
-    print("Resolving service template links ...")
-    service_template.resolve()
-
-    print("Creating instance model ...")
-    instances = service_template.instantiate()
-
-    print("Deploying instance model ...")
-    instances.deploy()
-
-    print("Done.")
+    try:
+        ast = tosca.load(Path.cwd(), PurePath(args.csar.name))
+        template = ast.get_template()
+        topology = template.instantiate(storage)
+        topology.deploy()
+    except ParseError as e:
+        print("{}: {}".format(e.loc, e))
+        return 1
+    except DataError as e:
+        print(str(e))
+        return 1
 
     return 0

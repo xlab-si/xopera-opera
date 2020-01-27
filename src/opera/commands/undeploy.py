@@ -1,8 +1,9 @@
 import argparse
+from pathlib import Path, PurePath
 
-import yaml
-
-from opera import csar, stdlib, types
+from opera.error import DataError, ParseError
+from opera.parser import tosca
+from opera.storage import Storage
 
 
 def add_parser(subparsers):
@@ -10,31 +11,23 @@ def add_parser(subparsers):
         "undeploy",
         help="Undeploy service template"
     )
-    parser.add_argument("name",
-                        help="name of deployment to undeploy")
     parser.set_defaults(func=undeploy)
 
 
 def undeploy(args):
-    template_name = csar.load(args.name)
+    storage = Storage(Path(".opera"))
+    root = storage.read("root_file")
 
-    print("Loading service template ...")
-    service_template = types.ServiceTemplate.from_data(stdlib.load())
-    with open(template_name) as fd:
-        service_template.merge(
-            types.ServiceTemplate.from_data(yaml.safe_load(fd))
-        )
-
-    print("Resolving service template links ...")
-    service_template.resolve()
-
-    print("Loading instance model ...")
-    instances = service_template.instantiate()
-    instances.load()
-
-    print("Undeploying instance model ...")
-    instances.undeploy()
-
-    print("Done.")
+    try:
+        ast = tosca.load(Path.cwd(), PurePath(root))
+        template = ast.get_template()
+        topology = template.instantiate(storage)
+        topology.undeploy()
+    except ParseError as e:
+        print("{}: {}".format(e.loc, e))
+        return 1
+    except DataError as e:
+        print(str(e))
+        return 1
 
     return 0
