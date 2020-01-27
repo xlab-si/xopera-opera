@@ -129,16 +129,6 @@ class TestEntityValues:
         assert {1, 2, 3} == set(obj.values())
 
 
-class TestEntityBare:
-    def test_bare(self):
-        obj = DummyEntity({
-            "required": DummyAttr(3, None),
-            "optional": DummyAttr(2, None),
-        }, None)
-
-        assert obj.bare == dict(required=3, optional=2)
-
-
 class Goodie(TypeEntity):
     REFERENCE = Reference("path")
     ATTRS = dict(dummy=Base)

@@ -4,7 +4,6 @@ from opera.error import ParseError
 class Base:
     @classmethod
     def parse(cls, yaml_node):
-        print("Parsing [{}] {}".format(cls.__name__, yaml_node.loc))
         yaml_node = cls.normalize(yaml_node)
         cls.validate(yaml_node)
         return cls.build(yaml_node)
@@ -19,7 +18,7 @@ class Base:
 
     @classmethod
     def build(cls, yaml_node):
-        return cls(yaml_node.value, yaml_node.loc)
+        return cls(yaml_node.bare, yaml_node.loc)
 
     @classmethod
     def abort(cls, msg, loc=None):
@@ -29,14 +28,9 @@ class Base:
         self.data = data
         self.loc = loc
 
-    @property
-    def bare(self):
-        return self.data
-
     def __str__(self):
-        return str(self.bare)
+        return str(self.data)
 
     def visit(self, method, *args, **kwargs):
         if hasattr(self, method):
-            return getattr(self, method)(*args, **kwargs)
-        return self
+            getattr(self, method)(*args, **kwargs)

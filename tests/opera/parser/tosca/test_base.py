@@ -9,9 +9,7 @@ from opera.parser.yaml.node import Node
 
 
 class TestParse:
-    @pytest.mark.parametrize(
-        "data", ["", 4, "a", (), (1, 2, 3), [], ["a", "b"]],
-    )
+    @pytest.mark.parametrize("data", ["", 4, "a", (), (1, 2, 3)])
     def test_creates_new_instance(self, data):
         obj = Base.parse(Node(data, Location("s", 1, 2)))
 
@@ -38,9 +36,7 @@ class TestValidate:
 
 
 class TestBuild:
-    @pytest.mark.parametrize(
-        "data", ["", 4, "a", (), (1, 2, 3), [], ["a", "b"]],
-    )
+    @pytest.mark.parametrize("data", ["", 4, "a", (), (1, 2, 3)])
     def test_build_creates_new_instance(self, data):
         obj = Base.build(Node(data, Location("stream", 1, 2)))
 
@@ -54,14 +50,6 @@ class TestAbort:
     def test_abort(self):
         with pytest.raises(ParseError, match="Error MsG"):
             Base.abort("Error MsG", None)
-
-
-class TestBare:
-    @pytest.mark.parametrize(
-        "data", ["", 4, "a", (), (1, 2, 3), [], ["a", "b"]],
-    )
-    def test_bare(self, data):
-        assert Base(data, None).bare == data
 
 
 class TestStr:
