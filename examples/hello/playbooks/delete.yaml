@@ -1,0 +1,9 @@
+---
+- hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Remove the location
+      file:
+        path: /tmp/playing-opera
+        state: absent

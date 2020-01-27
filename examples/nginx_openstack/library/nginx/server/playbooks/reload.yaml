@@ -1,0 +1,13 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted
+
+    - name: Place temporary file
+      copy:
+        dest: /tmp/opera.mark
+        content: "{{ marker }}"

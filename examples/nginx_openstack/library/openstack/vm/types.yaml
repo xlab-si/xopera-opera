@@ -1,0 +1,48 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  openstack.VM:
+    derived_from: tosca.nodes.Compute
+    properties:
+      name:
+        type: string
+        description: Name that should be given to the VM in OpenStack
+      image:
+        type: string
+        description: OpenStack image id (image names are not accepted)
+      flavor:
+        type: string
+        description: OpenStack flavor id (flavor names are not accepted)
+      network:
+        type: string
+        description: OpenStack network id (network names are not accepted)
+      security_groups:
+        type: string
+        description: >
+          OpenStack names of the security groups to which the instance should
+          be added. Comma separated string.
+      key_name:
+        type: string
+        description: OpenStack SSH key name that should be placed on the VM
+    attributes:
+      id:
+        type: string
+        description: OpenStack id of the VM
+    interfaces:
+      Standard:
+        type: tosca.interfaces.node.lifecycle.Standard
+        operations:
+          create:
+            inputs:
+              vm_name:  { default: { get_property: [ SELF, name     ] } }
+              image:    { default: { get_property: [ SELF, image    ] } }
+              flavor:   { default: { get_property: [ SELF, flavor   ] } }
+              network:  { default: { get_property: [ SELF, network  ] } }
+              key_name: { default: { get_property: [ SELF, key_name ] } }
+              security_groups:
+                default: { get_property: [ SELF, security_groups  ] }
+            implementation: playbooks/create.yaml
+          delete:
+            inputs:
+              id: { default: { get_attribute: [ SELF, id ] } }
+            implementation: playbooks/delete.yaml
