@@ -17,10 +17,11 @@ def add_parser(subparsers):
 def undeploy(args):
     storage = Storage(Path(".opera"))
     root = storage.read("root_file")
+    inputs = storage.read_json("inputs")
 
     try:
         ast = tosca.load(Path.cwd(), PurePath(root))
-        template = ast.get_template()
+        template = ast.get_template(inputs)
         topology = template.instantiate(storage)
         topology.undeploy()
     except ParseError as e:

@@ -6,8 +6,8 @@ from opera.error import DataError
 class Value:
     FUNCTIONS = frozenset((
         "get_attribute",
+        "get_input",
         "get_property",
-        # TODO(@tadeboro): Add get_input as soon as possible.
     ))
 
     def __init__(self, typ, present, data=None):

@@ -19,6 +19,9 @@ class Node:
         self.requirements = requirements
         self.interfaces = interfaces
 
+        # This will be set when the node is inserted into a topology
+        self.topology = None
+
         # This will be set at instantiation time.
         self.instances = None
 
@@ -99,3 +102,6 @@ class Node:
                 prop,
             ))
         return requirements[0].target.get_property(["SELF"] + rest)
+
+    def get_input(self, params):
+        return self.topology.get_input(params)
