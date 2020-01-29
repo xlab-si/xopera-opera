@@ -5,11 +5,20 @@ node_types:
     derived_from: tosca.nodes.SoftwareComponent
     interfaces:
       Standard:
+        inputs:
+          marker:
+            default: { get_input: marker }
+            type: string
         operations:
           create: playbooks/create.yaml
           delete: playbooks/delete.yaml
 
 topology_template:
+  inputs:
+    marker:
+      type: string
+      default: default-marker
+
   node_templates:
     my-workstation:
       type: tosca.nodes.Compute

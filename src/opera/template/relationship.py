@@ -40,3 +40,6 @@ class Relationship:
         if prop not in self.properties:
             raise DataError("Template has no '{}' property".format(prop))
         return self.properties[prop].eval(self)
+
+    def get_input(self, params):
+        return self.topology.get_input(params)

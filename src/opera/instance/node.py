@@ -141,3 +141,6 @@ class Node(Base):
 
     def get_property(self, params):
         return self.template.get_property(params)
+
+    def get_input(self, params):
+        return self.template.get_input(params)

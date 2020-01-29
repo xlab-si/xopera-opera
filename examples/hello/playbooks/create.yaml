@@ -10,6 +10,6 @@
         state: directory
 
     - name: Ansible was here
-      file:
-        path: /tmp/playing-opera/hello/hello.txt
-        state: touch
+      copy:
+        dest: /tmp/playing-opera/hello/hello.txt
+        content: "{{ marker }}"

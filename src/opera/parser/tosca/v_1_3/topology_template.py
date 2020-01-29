@@ -1,3 +1,4 @@
+from opera.error import DataError
 from opera.template.topology import Topology
 
 from ..entity import Entity
@@ -23,8 +24,9 @@ class TopologyTemplate(Entity):
         # TODO(@tadeboro): substitution_mappings and workflows
     )
 
-    def get_template(self, service_ast):
+    def get_template(self, inputs, service_ast):
         topology = Topology(
+            inputs=self.collect_inputs(inputs, service_ast),
             nodes={
                 name: node_ast.get_template(name, service_ast)
                 for name, node_ast in self.node_templates.items()
@@ -32,3 +34,22 @@ class TopologyTemplate(Entity):
         )
         topology.resolve_requirements()
         return topology
+
+    def collect_inputs(self, inputs, service_ast):
+        declared_inputs = self.get("inputs", {})
+        undeclared_inputs = set(inputs.keys()) - declared_inputs.keys()
+
+        if undeclared_inputs:
+            raise DataError("Undeclared inputs: {}".format(
+                ", ".join(undeclared_inputs),
+            ))
+
+        input_values = {
+            name: definition.get_value(definition.get_value_type(service_ast))
+            for name, definition in declared_inputs.items()
+        }
+
+        for name, value in inputs.items():
+            input_values[name].set(value)
+
+        return input_values
