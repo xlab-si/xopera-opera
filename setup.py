@@ -2,4 +2,4 @@
 
 import setuptools
 
-setuptools.setup(setup_requires=["pbr"], pbr=True)
+setuptools.setup(use_scm_version=True)
