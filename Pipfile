@@ -5,6 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 pytest = "*"
+selinux = "*"
 
 [packages]
 opera = {editable = true,extras = ["openstack"],path = "."}

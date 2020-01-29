@@ -53,7 +53,7 @@ class Node:
         ), None)
         if host:
             instance = next(iter(host.instances.values()))
-            return instance.attributes["public_address"].data
+            return instance.attributes["public_address"].eval(self)
 
         host = next((
             r.target.get_host()
