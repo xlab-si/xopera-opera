@@ -104,6 +104,8 @@ class Instance(object):
             return "localhost"
 
         req_name = self.template.get_hosted_on_requirement_name()
+        if not req_name:
+            return "localhost"
         if len(self.requirements[req_name]) != 1:
             raise Exception(
                 "{} cannot be hosted on more than one node".format(self.name)
