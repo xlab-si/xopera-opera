@@ -2,10 +2,10 @@ Introduction
 ============
 
 ``opera`` aims to be a lightweight orchestrator compliant with `OASIS TOSCA`_.
-The initial compliance is with the `TOSCA Simple Profile YAML v1.2`_.
+The current compliance is with the `TOSCA Simple Profile in YAML v1.3`_.
 
 .. _OASIS TOSCA: https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=tosca
-.. _TOSCA Simple Profile YAML v1.2: https://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.2/os/TOSCA-Simple-Profile-YAML-v1.2-os.html
+.. _TOSCA Simple Profile in YAML v1.3: https://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.3/TOSCA-Simple-Profile-YAML-v1.3.html
 
 
 Quickstart
