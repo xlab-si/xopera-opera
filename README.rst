@@ -64,3 +64,9 @@ we must source the rc file by running::
 
 After we enter the password, we are ready to start using the OpenStack modules
 in playbooks that implement life cycle operations.
+
+Acknowledgement
+---------------
+
+This project has received funding from the European Union’s `Horizon 2020`
+research and innovation programme under Grant Agreement No. 825040 (RADON).
