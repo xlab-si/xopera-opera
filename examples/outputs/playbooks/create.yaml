@@ -1,0 +1,9 @@
+---
+- hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Set attribute
+      set_stats:
+        data:
+          my_attribute: my_custom_attribute_value
