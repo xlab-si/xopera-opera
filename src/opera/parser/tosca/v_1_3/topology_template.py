@@ -27,6 +27,7 @@ class TopologyTemplate(Entity):
     def get_template(self, inputs, service_ast):
         topology = Topology(
             inputs=self.collect_inputs(inputs, service_ast),
+            outputs=self.collect_outputs(service_ast),
             nodes={
                 name: node_ast.get_template(name, service_ast)
                 for name, node_ast in self.node_templates.items()
@@ -53,3 +54,13 @@ class TopologyTemplate(Entity):
             input_values[name].set(value)
 
         return input_values
+
+    def collect_outputs(self, service_ast):
+        return {
+            name: dict(
+                description=getattr(definition.get("description"), "data", ""),
+                value=definition.get_value(
+                    definition.get_value_type(service_ast),
+                ),
+            ) for name, definition in self.outputs.items()
+        }
