@@ -103,5 +103,19 @@ class Node:
             ))
         return requirements[0].target.get_property(["SELF"] + rest)
 
+    def get_attribute(self, params):
+        host, prop, *rest = params
+
+        if host != "SELF":
+            raise DataError(
+                "Accessing non-local stuff is bad. Fix your service template."
+            )
+        if host == "HOST":
+            raise DataError("HOST is not yet supported in opera.")
+        if len(self.instances) != 1:
+            raise DataError("Cannot get an attribute from multiple instances")
+
+        return next(iter(self.instances.values())).get_attribute(params)
+
     def get_input(self, params):
         return self.topology.get_input(params)
