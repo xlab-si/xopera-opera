@@ -58,12 +58,5 @@ class Value:
         (function_name, params), = self.data.items()
         return getattr(instance, function_name)(params)
 
-    def get_property(self, params, instance):
-        if params[0] == "SELF":
-            return instance.get_property(params)
-        elif params[0] == "SOURCE":
-            return instance.source.get_property(params)
-        return instance.target.get_property(params)
-
     def __str__(self):
         return "Value({})[{}]".format(self.present, self._data)
