@@ -62,5 +62,5 @@ class TopologyTemplate(Entity):
                 value=definition.get_value(
                     definition.get_value_type(service_ast),
                 ),
-            ) for name, definition in self.outputs.items()
+            ) for name, definition in self.get("outputs", {}).items()
         }
