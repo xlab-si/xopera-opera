@@ -107,6 +107,6 @@ class ServiceTemplate(Entity):
 
     def get_template(self, inputs):
         if "topology_template" not in self:
-            self.abort("No topology template section", other.loc)
+            self.abort("No topology template section", self.loc)
 
         return self.topology_template.get_template(inputs, self)
