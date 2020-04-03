@@ -22,3 +22,9 @@ class RequirementDefinition(Entity):
         if isinstance(yaml_node.value, str):
             return Node({Node("capability"): yaml_node})
         return yaml_node
+
+    @classmethod
+    def validate(cls, yaml_node):
+        super().validate(yaml_node)
+        if "relationship" in yaml_node.bare and not isinstance(yaml_node.bare["relationship"], str):
+            cls.abort("Expected a relationship type name as a 'relationship' value.", yaml_node.loc)
