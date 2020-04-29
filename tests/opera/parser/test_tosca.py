@@ -101,3 +101,42 @@ class TestLoad:
 
         doc = tosca.load(tmp_path, name)
         assert doc.data_types["my_type"]
+
+    def test_duplicate_import(self, tmp_path, yaml_text):
+        name = pathlib.PurePath("template.yaml")
+        (tmp_path / name).write_text(yaml_text(
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            imports: [ template.yaml ]
+            """
+        ))
+        tosca.load(tmp_path, name)
+
+    def test_imports_from_multiple_levels(self, tmp_path, yaml_text):
+        name = pathlib.PurePath("template.yaml")
+        (tmp_path / name).write_text(yaml_text(
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            imports:
+              - subfolder/a.yaml
+              - subfolder/b.yaml
+            """
+        ))
+        (tmp_path / "subfolder").mkdir()
+        (tmp_path / "subfolder/a.yaml").write_text(yaml_text(
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            imports:
+              - b.yaml
+            """
+        ))
+        (tmp_path / "subfolder/b.yaml").write_text(yaml_text(
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            data_types:
+              my_type:
+                derived_from: tosca.datatypes.xml
+            """
+        ))
+
+        tosca.load(tmp_path, name)
