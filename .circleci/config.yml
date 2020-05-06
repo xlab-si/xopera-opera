@@ -20,6 +20,11 @@ executors:
       - image: circleci/python:3.7.4
     environment:
       PIPENV_VENV_IN_PROJECT: true
+  python38:
+    docker:
+      - image: circleci/python:3.8.2
+    environment:
+      PIPENV_VENV_IN_PROJECT: true
 
 jobs:
   test36:
@@ -30,6 +35,10 @@ jobs:
     executor: python37
     steps:
       - run_tests
+  test38:
+    executor: python38
+    steps:
+      - run_tests
 
 workflows:
   version: 2
@@ -37,3 +46,4 @@ workflows:
     jobs:
       - test36
       - test37
+      - test38
