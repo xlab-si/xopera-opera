@@ -4,10 +4,30 @@ commands:
   run_tests:
     description: Run test suite
     steps:
+      - common_setup
+      - run: make test
+
+  deploy_to_test_pypi:
+    description: Publish opera package to Python Package Index (PyPI) for testing
+    steps:
+      - common_setup
+      - run: env
+      - run: make build
+      - run: make test_release
+
+  deploy_to_production_pypi:
+    description: Publish opera package to Python Package Index (PyPI)
+    steps:
+      - common_setup
+      - run: make build
+      - run: make release
+
+  common_setup:
+    description: Prepare the repository for work
+    steps:
       - checkout
       - run: sudo pip install pipenv
       - run: make init
-      - run: make test
 
 executors:
   python36:
@@ -39,6 +59,14 @@ jobs:
     executor: python38
     steps:
       - run_tests
+  pypi_test_deploy:
+    executor: python37
+    steps:
+      - deploy_to_test_pypi
+  pypi_production_deploy:
+    executor: python37
+    steps:
+      - deploy_to_production_pypi
 
 workflows:
   version: 2
@@ -47,3 +75,22 @@ workflows:
       - test36
       - test37
       - test38
+      - pypi_test_deploy:
+          requires:
+            - test36
+            - test37
+            - test38
+          context: opera-test-pypi
+          filters:
+            branches:
+              only: master
+
+  deploy:
+    jobs:
+      - pypi_production_deploy:
+          context: opera-production-pypi
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/

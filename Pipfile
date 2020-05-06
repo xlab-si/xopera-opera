@@ -6,6 +6,9 @@ verify_ssl = true
 [dev-packages]
 pytest = "*"
 selinux = "*"
+setuptools = "*"
+wheel = "*"
+twine = ">=3.0.0"
 
 [packages]
 opera = {editable = true,extras = ["openstack"],path = "."}
