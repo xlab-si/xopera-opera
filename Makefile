@@ -1,8 +1,9 @@
 init:
 	pipenv install -d
 
-test:
-	pipenv run pytest tests
+.PHONY: unit_test
+unit_test:
+	pipenv run pytest tests/unit
 
 fix:
 	pipenv run pytest -x tests

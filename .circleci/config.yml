@@ -5,7 +5,7 @@ commands:
     description: Run test suite
     steps:
       - common_setup
-      - run: make test
+      - run: make unit_test
 
   deploy_to_test_pypi:
     description: Publish opera package to Python Package Index (PyPI) for testing
