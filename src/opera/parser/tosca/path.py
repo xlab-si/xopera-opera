@@ -12,7 +12,7 @@ class Path(String):
         if not self.data.is_absolute():
             self.data = parent_path / self.data
 
-    def resolve_path(self, base_path):
+    def resolve_path(self, base_path, error_on_missing=True):
         # Absolute path is relative to the CSAR root folder, so we need to
         # strip the root off of it.
         if self.data.is_absolute():
@@ -20,7 +20,7 @@ class Path(String):
         else:
             path = self.data
         self.data = self._compact_path(path)
-        self._validate_path(base_path)
+        return self._validate_path(base_path, error_on_missing)
 
     @staticmethod
     def _compact_path(path):
@@ -47,7 +47,7 @@ class Path(String):
 
         return pathlib.PurePath(*parts)
 
-    def _validate_path(self, base_path):
+    def _validate_path(self, base_path, error_on_missing=True):
         # Abstract checks
         if str(self.data) == ".":
             self.abort("Path points to the CSAR root.", self.loc)
@@ -57,7 +57,10 @@ class Path(String):
         # Concrete checks
         abs_path = base_path / self.data
         if not abs_path.exists():
-            self.abort("Path {} does not exist.".format(abs_path), self.loc)
+            if error_on_missing:
+                self.abort("Path {} does not exist.".format(abs_path), self.loc)
+            else:
+                return False
         # We test for symlinks separately since is_dir() and is_file() return
         # True on symlinks and this is not what we want.
         if abs_path.is_symlink():
@@ -66,3 +69,4 @@ class Path(String):
             self.abort(
                 "Path {} is not file or folder.".format(abs_path), self.loc,
             )
+        return True
