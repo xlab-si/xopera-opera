@@ -3,6 +3,7 @@ from opera.commands import (
     info,
     init,
     outputs,
+    package,
     undeploy,
     unpackage,
     validate
