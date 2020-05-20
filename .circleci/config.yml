@@ -15,6 +15,15 @@ commands:
       - run: make unit_test
       - run: make integration_test
 
+  run_integration_tests_using_released_opera_version:
+    description: Test xOpera CLI commands with testing service template
+    steps:
+      - checkout
+      - run: pip install --user --upgrade pip
+      - run: pip install --user wheel
+      - run: pip install --user opera
+      - run: OPERA=opera make integration_test
+
   deploy_to_test_pypi:
     description: Publish opera package to Python Package Index (PyPI) for testing
     steps:
@@ -70,6 +79,10 @@ jobs:
     executor: python38
     steps:
       - run_tests
+  nightly_xopera_test:
+    executor: python37
+    steps:
+      - run_integration_tests_using_released_opera_version
   pypi_test_deploy:
     executor: python37
     steps:
@@ -112,3 +125,13 @@ workflows:
       - push_stable_relase_branch:
           requires:
             - pypi_production_deploy
+
+  nightly_test:
+    triggers:
+      - schedule:
+          cron: "0 3 * * *"
+          filters:
+            branches:
+              only: stable
+    jobs:
+      - nightly_xopera_test
