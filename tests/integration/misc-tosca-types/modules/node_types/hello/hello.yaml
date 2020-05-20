@@ -1,0 +1,35 @@
+---
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  daily_test.nodes.hello:
+    derived_from: tosca.nodes.SoftwareComponent
+    properties:
+      slovenian_greeting:
+        type: string
+        description: Slovenian Greeting
+        default: Zdravo!
+      croatian_greeting:
+        type: string
+        description: Croatian Greeting
+        default: Cao đaci!
+    attributes:
+      something_to_pass_on:
+        type: string
+        description: Test for passing data between nodes
+        default: tralala
+    interfaces:
+      Standard:
+        inputs:
+          slovenian_greeting: {default: { get_property: [SELF, slovenian_greeting] }, type: string}
+          croatian_greeting: {default: { get_property: [SELF, croatian_greeting] }, type: string}
+          something_to_pass_on: {default: { get_attribute: [SELF, something_to_pass_on] }, type: string}
+        operations:
+          create:
+            implementation:
+              primary: playbooks/create.yaml
+              dependencies:
+                - playbooks/files/test.txt
+
+...
+

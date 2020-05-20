@@ -1,0 +1,109 @@
+---
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+imports:
+  - modules/artifact_types/test/test.yaml
+  - modules/capability_types/test/test.yaml
+  - modules/data_types/test/test.yaml
+  - modules/interface_types/test/test.yaml
+  - modules/node_types/file/file.yaml
+  - modules/node_types/hello/hello.yaml
+  - modules/node_types/noimpl/noimpl.yaml
+  - modules/node_types/setter/setter.yaml
+  - modules/node_types/test/test.yaml
+  - modules/policy_types/test/test.yaml
+  - modules/relationship_types/test/test.yaml
+
+metadata:
+  targetNamespace: "daily_test.templates"
+  file_name: "service-template.yaml"
+
+description: This is a service template for daily testing with xOpera.
+namespace: "daily_test.templates"
+
+repositories:
+  test_repo:
+    description: Opera repository on GitHub
+    url: https://github.com/xlab-si/xopera-opera
+
+dsl_definitions:
+    test: &test test123
+
+topology_template:
+  inputs:
+    host_ip:
+      type: string
+    file_content:
+      type: string
+      description: Content for created file
+      default: "Hello from Ansible and xOpera!\n"
+    slovenian_greeting:
+      type: string
+      description: Greeting from Slovenia
+
+  node_templates:
+    my-workstation1:
+      type: tosca.nodes.Compute
+      attributes:
+        private_address: { get_input: host_ip }
+        public_address: { get_input: host_ip }
+
+    my-workstation2:
+      type: tosca.nodes.Compute
+      attributes:
+        private_address: { get_input: host_ip }
+        public_address: { get_input: host_ip }
+
+    file:
+      type: daily_test.nodes.file
+
+    hello:
+      type: daily_test.nodes.hello
+      properties:
+        slovenian_greeting: { get_input: slovenian_greeting }
+      requirements:
+        - host: my-workstation1
+
+    noimpl:
+      type: daily_test.nodes.noimpl
+      requirements:
+        - host: my-workstation1
+
+    setter:
+      type: daily_test.nodes.setter
+      properties:
+        my_property: 123
+      requirements:
+        - host: my-workstation1
+        - receives_notification: hello
+
+    test:
+      type: daily_test.nodes.test
+      requirements:
+        - host: my-workstation1
+
+  relationship_templates:
+    test:
+      type: daily_test.relationships.test
+      properties:
+        relationship_property: test123
+
+  groups:
+    workstation_group:
+      type: tosca.groups.Root
+      members: [ my-workstation1, my-workstation2 ]
+
+  policies:
+    test:
+      type: daily_test_policies.test
+      properties:
+        test_id: *test
+
+  outputs:
+    output_prop:
+      description: Example of property output
+      value: { get_property: [ setter, my_property ] }
+    output_attr:
+      description: Example of attribute output
+      value: { get_attribute: [ setter, my_attribute ] }
+...

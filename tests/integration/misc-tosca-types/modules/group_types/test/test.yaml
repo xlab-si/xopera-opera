@@ -1,0 +1,9 @@
+---
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+group_types:
+  daily_test.groups.test:
+    derived_from: tosca.groups.Root
+    description: My test group type for placing nodes of type Compute
+    members: [ tosca.nodes.Compute ]
+...

@@ -1,0 +1,16 @@
+---
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  daily_test.nodes.file:
+    derived_from: tosca.nodes.SoftwareComponent
+    interfaces:
+      Standard:
+        inputs:
+          file_content:
+            default: { get_input: file_content }
+            type: string
+        operations:
+          create: playbooks/create.yaml
+          delete: playbooks/delete.yaml
+...

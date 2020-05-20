@@ -1,0 +1,16 @@
+---
+- hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Create the new folder structure
+      file:
+        path: /tmp/opera-test/hello
+        recurse: true
+        state: directory
+
+    - name: Create hello.txt and add content
+      copy:
+        dest: /tmp/opera-test/hello/hello.txt
+        content: "{{ file_content }}"
+...

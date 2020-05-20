@@ -1,0 +1,10 @@
+---
+- hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Remove the location
+      file:
+        path: /tmp/opera-test
+        state: absent
+...

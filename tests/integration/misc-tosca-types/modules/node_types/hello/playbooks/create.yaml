@@ -1,0 +1,21 @@
+---
+- hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Say hello in Slovenian
+      debug:
+        msg: "{{ slovenian_greeting }}"
+
+    - name: Say hello like the do it in Croatia
+      debug:
+        msg: "{{ croatian_greeting }}"
+
+    - name: See what's in that linked file
+      shell: "cat test.txt"
+
+    - name: Set attributes for the setter node
+      set_stats:
+        data:
+          something_to_pass_on: "{{ something_to_pass_on }}"
+...

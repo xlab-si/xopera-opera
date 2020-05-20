@@ -1,0 +1,13 @@
+---
+- hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Say test
+      debug:
+        msg: "test"
+
+    - name: Print whatever lies in relationship_property
+      debug:
+        msg: "{{ relationship_property }}"
+...

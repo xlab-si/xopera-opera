@@ -1,0 +1,27 @@
+---
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+data_types:
+  daily_test.datatypes.test:
+    derived_from: tosca.datatypes.Root
+    properties:
+      a:
+        type: string
+        required: false
+      b:
+        type: integer
+        required: false
+        default: 3
+      c:
+        type: float
+        required: false
+        default: 0.5
+      d:
+        type: list
+        required: false
+        default: [1, 2, 3]
+      e:
+        type: map
+        required: false
+        default: { one: one, two: two }
+...

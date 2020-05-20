@@ -1,0 +1,10 @@
+---
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+interface_types:
+  daily_test.interfaces.test:
+    derived_from: tosca.interfaces.Root
+    operations:
+      test_operation:
+        description: Simple operation for testing.
+...
