@@ -1,3 +1,13 @@
+# List of all integration test scenarios
+integration_test_scenarios := $(wildcard tests/integration/*/runme.sh)
+
+# Default opera executable (tailored for developers). Can be overridden by
+# setting the OPERA environment variable to something else.
+OPERA ?= "pipenv run opera"
+
+# Point pipenv to the right file since we can execute tests from a subdir.
+export PIPENV_PIPFILE := $(realpath Pipfile)
+
 .PHONY: init
 init:
 	pipenv install -d
@@ -9,6 +19,13 @@ unit_test:
 .PHONY: fix
 fix:
 	pipenv run pytest -x tests
+
+.PHONY: integration_test
+integration_test: $(integration_test_scenarios)
+
+.PHONY: $(integration_test_scenarios)
+$(integration_test_scenarios):
+	cd $(dir $@) && bash $(notdir $@) $(OPERA)
 
 .PHONY: build
 build:

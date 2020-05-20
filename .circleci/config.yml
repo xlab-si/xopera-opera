@@ -1,11 +1,19 @@
 version: "2.1"
 
 commands:
+  common_setup:
+    description: Prepare the repository for work
+    steps:
+      - checkout
+      - run: sudo pip install pipenv
+      - run: make init
+
   run_tests:
     description: Run test suite
     steps:
       - common_setup
       - run: make unit_test
+      - run: make integration_test
 
   deploy_to_test_pypi:
     description: Publish opera package to Python Package Index (PyPI) for testing
@@ -21,13 +29,6 @@ commands:
       - common_setup
       - run: make build
       - run: make release
-
-  common_setup:
-    description: Prepare the repository for work
-    steps:
-      - checkout
-      - run: sudo pip install pipenv
-      - run: make init
 
 executors:
   python36:
