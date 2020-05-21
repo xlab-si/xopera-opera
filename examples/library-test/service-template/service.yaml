@@ -9,3 +9,12 @@ topology_template:
   node_templates:
     dummy:
       type: tosca.nodes.Root
+      
+    steam_valve:
+      type: steampunk.valves.Root
+      
+    landing_gear:
+      type: steampunk.gears.Root
+
+    my_big_fella:
+      type: big_valve
