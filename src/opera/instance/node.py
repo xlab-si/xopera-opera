@@ -62,8 +62,8 @@ class Node(Base):
         self.set_state("created")
 
         self.set_state("configuring")
-        for requirement in self.template.requirements:
-            for relationship in self.out_edges[requirement.name].values():
+        for requirement in set([r.name for r in self.template.requirements]):
+            for relationship in self.out_edges[requirement].values():
                 relationship.run_operation(
                     "SOURCE", "Configure", "pre_configure_source",
                 )
@@ -73,8 +73,8 @@ class Node(Base):
                     "TARGET", "Configure", "pre_configure_target",
                 )
         self.run_operation("HOST", "Standard", "configure")
-        for requirement in self.template.requirements:
-            for relationship in self.out_edges[requirement.name].values():
+        for requirement in set([r.name for r in self.template.requirements]):
+            for relationship in self.out_edges[requirement].values():
                 relationship.run_operation(
                     "SOURCE", "Configure", "post_configure_source",
                 )
