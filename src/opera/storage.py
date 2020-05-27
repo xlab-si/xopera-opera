@@ -22,3 +22,7 @@ class Storage:
 
     def read_json(self, *path):
         return json.loads(self.read(*path))
+
+    def exists(self, *path):
+        return (self.path / pathlib.PurePath(*path)).exists()
+

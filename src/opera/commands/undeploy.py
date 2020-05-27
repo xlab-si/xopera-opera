@@ -29,7 +29,7 @@ def undeploy(args):
     if args.instance_path and not path.isdir(args.instance_path):
         raise argparse.ArgumentTypeError("Directory {0} is not a valid path!".format(args.instance_path))
 
-    storage = Storage(Path(args.instance_path).joinpath(".opera")) if args.instance_path else Storage(Path(".opera"))
+    storage = Storage(Path(args.instance_path) / ".opera") if args.instance_path else Storage(Path(".opera"))
     root = storage.read("root_file")
     inputs = storage.read_json("inputs")
 
