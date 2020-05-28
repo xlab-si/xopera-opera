@@ -62,18 +62,20 @@ class Base:
         self.write()
 
     def run_operation(self, host, interface, operation):
-        success, attributes = self.template.run_operation(
+        success, outputs, attributes = self.template.run_operation(
             host, interface, operation, self,
         )
 
         if not success:
             raise OperationError("Failed")
 
+        for params, value in outputs:
+            self.map_attribute(params, value)
         self.update_attributes(attributes)
         self.write()
 
-    def update_attributes(self, attributes):
-        for name, value in attributes.items():
+    def update_attributes(self, outputs):
+        for name, value in outputs.items():
             self.set_attribute(name, value)
 
     def set_attribute(self, name, value):

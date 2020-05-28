@@ -103,6 +103,18 @@ class CollectorMixin:
                         ", ".join(undeclared_inputs),
                     ), self.loc)
 
+                # Outputs, which define the attribute mapping, come from:
+                #  1. inteface operation definition,
+                #  2. inteface operation assignment in template section
+                outputs = {
+                    k: [s.data for s in v.data]
+                    for k, v in op_definition.get("outputs", {}).items()
+                }
+                outputs.update({
+                    k: [s.data for s in v.data]
+                    for k, v in op_assignment.get("outputs", {}).items()
+                })
+
                 # Operation implementation details
                 impl = (
                     op_assignment.get("implementation") or
@@ -122,6 +134,7 @@ class CollectorMixin:
                         d.file.data for d in impl.get("dependencies", [])
                     ],
                     inputs=inputs,
+                    outputs=outputs,
                     timeout=timeout,
                     host=operation_host,
                 )

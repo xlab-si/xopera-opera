@@ -48,3 +48,18 @@ class Relationship(Base):
 
     def get_input(self, params):
         return self.template.get_input(params)
+
+    def map_attribute(self, params, value):
+        host, attr, *rest = params
+
+        if host not in ("SELF", "SOURCE", "TARGET"):
+            raise DataError(
+                "Accessing non-local stuff is bad. Fix your service template."
+            )
+
+        if host == "SOURCE":
+            self.source.map_attribute(["SELF", attr] + rest, value)
+        elif host == "TARGET":
+            self.target.map_attribute(["SELF", attr] + rest, value)
+        else:
+            self.set_attribute(attr, value)
