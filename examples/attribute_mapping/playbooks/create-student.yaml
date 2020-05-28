@@ -1,0 +1,10 @@
+---
+- hosts: all
+  gather_facts: false
+
+  tasks:
+
+    - name: Set attributes
+      set_stats:
+        data:
+          student_id: "student-{{ id }}"

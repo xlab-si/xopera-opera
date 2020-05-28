@@ -1,0 +1,101 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  steampunk.test.Student:
+    derived_from: tosca.nodes.Root
+    properties:
+      student_name:
+        type: string
+        description: The name of the student
+      enrolment_number:
+        type: integer
+        description: The number in the class register assigned to the student
+    attributes:
+      student_id:
+        type: string
+        description: Unique ID of the student.
+    interfaces:
+      Standard:
+        type: tosca.interfaces.node.lifecycle.Standard
+        operations:
+          create:
+            inputs:
+              id: { default: { get_property: [ SELF, enrolment_number ] } }
+            outputs:
+              student_id: [ SELF, student_id ]
+            implementation: playbooks/create-student.yaml
+
+  steampunk.test.Teacher:
+    derived_from: tosca.nodes.Root
+    requirements:
+      - student:
+          capability: tosca.capabilities.Root
+          relationship: steampunk.test.relationships.TeacherTeachesStudent
+    attributes:
+      student_ids:
+        type: list
+        description: >
+          The list of IDs of the students that the teacher teaches
+        default: []
+
+
+relationship_types:
+  steampunk.test.relationships.TeacherTeachesStudent:
+    derived_from: tosca.relationships.DependsOn
+    description: >
+      Associates a teacher with a student.
+    interfaces:
+      Configure:
+        operations:
+          pre_configure_source:
+            inputs:
+              student_id:
+                default: { get_attribute: [ TARGET, student_id ] }
+              student_ids:
+                default: { get_attribute: [ SOURCE, student_ids ] }
+            outputs:
+              new_list: [ SOURCE, student_ids ]
+            implementation: playbooks/teacher-teaches-student--preconfigure-source.yaml
+
+
+topology_template:
+
+  node_templates:
+
+    student-ben:
+      type: steampunk.test.Student
+      properties:
+        student_name: Ben
+        enrolment_number: 1
+
+    student-anne:
+      type: steampunk.test.Student
+      properties:
+        student_name: Anne
+        enrolment_number: 3
+
+    student-tina:
+      type: steampunk.test.Student
+      properties:
+        student_name: Tina
+        enrolment_number: 4
+
+    student-chris:
+      type: steampunk.test.Student
+      properties:
+        student_name: Tina
+        enrolment_number: 6
+
+    teacher-paul:
+      type: steampunk.test.Teacher
+      requirements:
+        - student: student-ben
+        - student: student-tina
+        - student: student-chris
+        - student: student-anne
+
+  outputs:
+    student_id_list:
+      type: list
+      description: The final list of IDs of Paul's students
+      value: { get_attribute: [ teacher-paul, student_ids ] }
