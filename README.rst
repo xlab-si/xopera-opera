@@ -17,10 +17,11 @@ The simplest way to test ``opera`` is to install it into virtual environment::
   $ python3 -m venv .venv && . .venv/bin/activate
   (.venv) $ pip install opera
 
-To test if everything is working as expected, we can now try to deploy a
+To test if everything is working as expected, we can now clone xOpera's GitHub repository and try to deploy a
 hello-world service::
 
-  (.venv) $ cd examples/hello
+  (.venv) $ git clone git@github.com:xlab-si/xopera-opera.git
+  (.venv) $ cd xopera-opera/examples/hello
   (.venv) $ opera deploy service.yaml
 
 If nothing went wrong, new empty file has been created at
