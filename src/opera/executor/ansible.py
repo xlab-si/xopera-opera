@@ -62,5 +62,5 @@ def run(host, primary, dependencies, vars):
             return False, {}
 
         with open(out) as fd:
-            attributes = json.load(fd)["global_custom_stats"]
-        return code == 0, attributes
+            outputs = json.load(fd)["global_custom_stats"]
+        return code == 0, outputs

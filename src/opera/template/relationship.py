@@ -20,7 +20,7 @@ class Relationship:
         operation = self.interfaces[interface].operations.get(operation)
         if operation:
             return operation.run(host, instance)
-        return True, {}
+        return True, {}, {}
 
     #
     # TOSCA functions

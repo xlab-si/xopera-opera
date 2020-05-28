@@ -16,7 +16,7 @@ class OperationDefinitionForTemplate(Entity):
         description=String,
         implementation=OperationImplementationDefinition,
         inputs=Map(Void),
-        outputs=Map(List(Void)),
+        outputs=Map(List(String)),
     )
 
     @classmethod

@@ -70,7 +70,7 @@ class Node:
         operation = self.interfaces[interface].operations.get(operation)
         if operation:
             return operation.run(host, instance)
-        return True, {}
+        return True, {}, {}
 
     #
     # TOSCA functions
@@ -119,3 +119,19 @@ class Node:
 
     def get_input(self, params):
         return self.topology.get_input(params)
+
+    def map_attribute(self, params, value):
+        host, prop, *rest = params
+
+        if host != "SELF":
+            raise DataError(
+                "Accessing non-local stuff is bad. Fix your service template."
+            )
+        if host == "HOST":
+            raise DataError("HOST is not yet supported in opera.")
+
+        if len(self.instances) != 1:
+            raise DataError(
+                "Mapping an attribute for multiple instances not supported")
+
+        next(iter(self.instances.values())).map_attribute(params, value)

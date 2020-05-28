@@ -17,7 +17,7 @@ class OperationDefinitionForType(Entity):
         description=String,
         implementation=OperationImplementationDefinition,
         inputs=Map(ParameterDefinition),
-        outputs=Map(List(Void)),
+        outputs=Map(List(String)),
     )
 
     @classmethod

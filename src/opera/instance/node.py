@@ -144,3 +144,20 @@ class Node(Base):
 
     def get_input(self, params):
         return self.template.get_input(params)
+
+    def map_attribute(self, params, value):
+        host, attr, *rest = params
+
+        if host != "SELF":
+            raise DataError(
+                "Accessing non-local stuff is bad. Fix your service template."
+            )
+        if host == "HOST":
+            raise DataError("HOST is not yet supported in opera.")
+
+        # TODO(@tadeboro): Add support for nested attribute values once we
+        # have data type support.
+        if attr not in self.attributes:
+            raise DataError("Cannot find attribute '{}'.".format(attr))
+
+        self.set_attribute(attr, value)
