@@ -7,12 +7,17 @@ import yaml
 from opera.error import DataError, ParseError
 from opera.parser import tosca
 from opera.storage import Storage
+from os import path
 
 
 def add_parser(subparsers):
     parser = subparsers.add_parser(
         "outputs",
         help="Retrieve service template outputs"
+    )
+    parser.add_argument(
+        "--instance-path", "-p",
+        help=".opera storage folder location"
     )
     parser.add_argument(
         "--format", "-f", choices=("yaml", "json"), type=str,
@@ -22,7 +27,10 @@ def add_parser(subparsers):
 
 
 def outputs(args):
-    storage = Storage(Path(".opera"))
+    if args.instance_path and not path.isdir(args.instance_path):
+        raise argparse.ArgumentTypeError("Directory {0} is not a valid path!".format(args.instance_path))
+
+    storage = Storage(Path(args.instance_path).joinpath(".opera")) if args.instance_path else Storage(Path(".opera"))
     root = storage.read("root_file")
     inputs = storage.read_json("inputs")
 

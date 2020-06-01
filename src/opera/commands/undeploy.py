@@ -4,6 +4,7 @@ from pathlib import Path, PurePath
 from opera.error import DataError, ParseError
 from opera.parser import tosca
 from opera.storage import Storage
+from os import path
 
 
 def add_parser(subparsers):
@@ -11,11 +12,18 @@ def add_parser(subparsers):
         "undeploy",
         help="Undeploy service template"
     )
+    parser.add_argument(
+        "--instance-path", "-p",
+        help=".opera storage folder location"
+    )
     parser.set_defaults(func=undeploy)
 
 
 def undeploy(args):
-    storage = Storage(Path(".opera"))
+    if args.instance_path and not path.isdir(args.instance_path):
+        raise argparse.ArgumentTypeError("Directory {0} is not a valid path!".format(args.instance_path))
+
+    storage = Storage(Path(args.instance_path).joinpath(".opera")) if args.instance_path else Storage(Path(".opera"))
     root = storage.read("root_file")
     inputs = storage.read_json("inputs")
 
