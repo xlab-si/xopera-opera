@@ -64,3 +64,20 @@ class TopologyTemplate(Entity):
                 ),
             ) for name, definition in self.get("outputs", {}).items()
         }
+
+    def merge(self, other):
+        for key in (
+                "inputs",
+                "node_templates",
+                "data_types",
+                "relationship_templates",
+                "groups",
+                "policies",
+                "outputs"
+        ):
+            if key not in other.data:
+                continue
+            if key in self.data:
+                self.data[key].merge(other.data[key])
+            else:
+                self.data[key] = other.data[key]
