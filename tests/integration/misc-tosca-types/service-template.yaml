@@ -5,6 +5,7 @@ imports:
   - modules/artifact_types/test/test.yaml
   - modules/capability_types/test/test.yaml
   - modules/data_types/test/test.yaml
+  - modules/group_types/test/test.yaml
   - modules/interface_types/test/test.yaml
   - modules/node_types/file/file.yaml
   - modules/node_types/hello/hello.yaml
@@ -90,7 +91,7 @@ topology_template:
 
   groups:
     workstation_group:
-      type: tosca.groups.Root
+      type: daily_test.groups.test
       members: [ my-workstation1, my-workstation2 ]
 
   policies:
@@ -98,6 +99,7 @@ topology_template:
       type: daily_test_policies.test
       properties:
         test_id: *test
+      targets: [ hello, setter, workstation_group ]
 
   outputs:
     output_prop:

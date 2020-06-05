@@ -11,6 +11,7 @@ class TestParse:
               key: value
             version: "1.2"
             properties: {}
+            targets: [ node_type, group_type ]
             """
         ))
 
