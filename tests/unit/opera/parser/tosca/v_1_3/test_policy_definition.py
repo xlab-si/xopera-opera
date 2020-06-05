@@ -10,6 +10,7 @@ class TestParse:
             metadata: {}
             properties:
               prop: 6.7
+            targets: [node_type_a, node_type_b, node_type_c]
             """
         ))
 
