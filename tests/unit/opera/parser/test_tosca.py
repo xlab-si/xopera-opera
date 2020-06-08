@@ -140,3 +140,68 @@ class TestLoad:
         ))
 
         tosca.load(tmp_path, name)
+
+    def test_merge_topology_template(self, tmp_path, yaml_text):
+        name = pathlib.PurePath("template.yaml")
+        (tmp_path / name).write_text(yaml_text(
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            imports:
+              - merge.yaml
+            topology_template:
+              inputs:
+                some-input:
+                  type: string
+              node_templates:
+                my_node:
+                  type: tosca.nodes.SoftwareComponent              
+            """
+        ))
+        (tmp_path / "merge.yaml").write_text(yaml_text(
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            topology_template:
+              inputs:
+                other-input:
+                  type: string
+              node_templates:
+                other_node:
+                  type: tosca.nodes.SoftwareComponent 
+            """
+        ))
+        tosca.load(tmp_path, name)
+
+    def test_merge_duplicate_node_templates_invalid(self, tmp_path, yaml_text):
+        name = pathlib.PurePath("template.yaml")
+        (tmp_path / name).write_text(yaml_text(
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            imports:
+              - merge1.yaml
+              - merge2.yaml
+            topology_template:
+              node_templates:
+                my_node:
+                  type: tosca.nodes.SoftwareComponent              
+            """
+        ))
+        (tmp_path / "merge1.yaml").write_text(yaml_text(
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            topology_template:
+              node_templates:
+                other_node:
+                  type: tosca.nodes.SoftwareComponent 
+            """
+        ))
+        (tmp_path / "merge2.yaml").write_text(yaml_text(
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            topology_template:
+              node_templates:
+                other_node:
+                  type: tosca.nodes.SoftwareComponent 
+            """
+        ))
+        with pytest.raises(ParseError):        
+            tosca.load(tmp_path, name)      
