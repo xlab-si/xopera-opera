@@ -9,6 +9,8 @@ selinux = "*"
 setuptools = "*"
 wheel = "*"
 twine = ">=3.0.0"
+sphinx = "*"
+sphinx-rtd-theme = "*"
 
 [packages]
 opera = {editable = true,extras = ["openstack"],path = "."}
