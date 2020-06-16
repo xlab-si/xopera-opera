@@ -49,6 +49,26 @@ commands:
       - run: git branch -f stable HEAD
       - run: git push origin stable
 
+  build_and_deploy_docs_to_github_pages:
+    description: Build Sphinx documentation and push GitHub stable branch which points to the latest relased tag/commit
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "b6:94:61:c3:e1:8f:25:e5:43:6d:51:9e:43:c4:16:11"
+      - common_setup
+      - run: make docs
+      - run: git worktree add gh-pages gh-pages
+      - run: |
+          cd gh-pages
+          git rm -rf .
+          cp -r ../docs/_build/* .
+          touch .nojekyll
+          git add .
+          git config --global user.email circleci@circleci
+          git config --global user.name CircleCI
+          git commit -m "Add generated opera docs for GitHub pages"
+          git push origin gh-pages
+
 executors:
   python36:
     docker:
@@ -95,6 +115,14 @@ jobs:
     executor: python37
     steps:
       - create_and_push_stable_branch
+  documentation_build:
+    executor: python37
+    steps:
+      - build_sphinx_documentation
+  doc_build_and_push_gh_pages_branch:
+    executor: python37
+    steps:
+      - build_and_deploy_docs_to_github_pages
 
 workflows:
   version: 2
@@ -125,6 +153,10 @@ workflows:
       - push_stable_relase_branch:
           requires:
             - pypi_production_deploy
+      - doc_build_and_push_gh_pages_branch:
+          filters:
+            branches:
+              only: master
 
   nightly_test:
     triggers:

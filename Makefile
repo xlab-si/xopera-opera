@@ -5,6 +5,12 @@ integration_test_scenarios := $(wildcard tests/integration/*/runme.sh)
 # setting the OPERA environment variable to something else.
 OPERA ?= "pipenv run opera"
 
+# Variables for Sphinx documentation build (you can set these variables from the command line).
+SPHINXOPTS    =
+SPHINXBUILD   = sphinx-build
+SOURCEDIR     = docs
+BUILDDIR      = docs/_build
+
 # Point pipenv to the right file since we can execute tests from a subdir.
 export PIPENV_PIPFILE := $(realpath Pipfile)
 
@@ -44,3 +50,7 @@ env-guard-%:
 	  echo "Environment variable $* not set"; \
 	  exit 1; \
 	fi
+
+.PHONY: docs
+docs:
+	pipenv run sphinx-build docs docs/_build
