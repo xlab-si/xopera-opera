@@ -19,6 +19,9 @@ def _get_inventory(host):
         inventory["ansible_python_interpreter"] = sys.executable
     else:
         inventory["ansible_user"] = os.environ.get("OPERA_SSH_USER", "centos")
+        opera_ssh_identity_file = os.environ.get("OPERA_SSH_IDENTITY_FILE")
+        if opera_ssh_identity_file is not None:
+            inventory["ansible_ssh_private_key_file"] = opera_ssh_identity_file
 
     return yaml.safe_dump(dict(all=dict(hosts=dict(opera=inventory))))
 
