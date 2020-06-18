@@ -1,6 +1,6 @@
 from opera.error import DataError
-
 from .base import Base
+from opera.threading import utils as thread_utils
 
 
 class Node(Base):
@@ -15,7 +15,7 @@ class Node(Base):
 
         for requirement in self.template.requirements:
             rname = requirement.name
-            self.out_edges[rname] =  self.out_edges.get(rname, {})
+            self.out_edges[rname] = self.out_edges.get(rname, {})
 
             for target in requirement.target.instances.values():
                 target.in_edges[rname] = target.in_edges.get(rname, {})
@@ -55,7 +55,7 @@ class Node(Base):
         return self.template.get_host() or "localhost"
 
     def deploy(self):
-        print("  Deploying {}".format(self.tosca_id))
+        thread_utils.print_thread("  Deploying {}".format(self.tosca_id))
 
         self.set_state("creating")
         self.run_operation("HOST", "Standard", "create")
@@ -90,9 +90,12 @@ class Node(Base):
         self.set_state("started")
 
         # TODO(@tadeboro): Execute various add hooks
+        thread_utils.print_thread(
+            "  Deployment of {} complete".format(self.tosca_id)
+        )
 
     def undeploy(self):
-        print("  Undeploying {}".format(self.tosca_id))
+        thread_utils.print_thread("  Undeploying {}".format(self.tosca_id))
 
         self.set_state("stopping")
         self.run_operation("HOST", "Standard", "stop")
@@ -107,6 +110,9 @@ class Node(Base):
         self.reset_attributes()
         self.write()
 
+        thread_utils.print_thread(
+            "  Undeployment of {} complete".format(self.tosca_id)
+        )
     #
     # TOSCA functions
     #

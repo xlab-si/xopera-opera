@@ -1,5 +1,6 @@
 from opera.error import DataError
 from opera.executor import ansible
+from opera.threading import utils as thread_utils
 
 
 class Operation:
@@ -14,7 +15,9 @@ class Operation:
         self.host = host
 
     def run(self, host, instance):
-        print("    Executing {} on {}".format(self.name, instance.tosca_id))
+        thread_utils.print_thread(
+            "    Executing {} on {}".format(self.name, instance.tosca_id)
+        )
 
         # TODO(@tadeboro): Respect the timeout option.
         # TODO(@tadeboro): Add host validation.

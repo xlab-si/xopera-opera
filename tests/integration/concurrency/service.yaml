@@ -1,0 +1,140 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  hello_type:
+    derived_from: tosca.nodes.SoftwareComponent
+    properties:
+      time:
+        default: "1" 
+        type: string     
+    interfaces:
+      Standard:
+        inputs:
+          time:
+            default: { get_property: [SELF, time] } 
+            type: string            
+        operations:
+          create: playbooks/sleep.yaml
+          start: playbooks/sleep.yaml
+          delete: playbooks/sleep.yaml
+
+topology_template:
+  inputs:
+    marker:
+      type: string
+      default: default-marker
+
+  node_templates:
+    my-workstation:
+      type: tosca.nodes.Compute
+      attributes:
+        private_address: localhost
+        public_address: localhost
+
+    hello-1:
+      type: hello_type
+      properties:
+        time: "5"
+      requirements:
+        - host: my-workstation
+
+    hello-2:
+      type: hello_type
+      properties:
+        time: "5"
+      requirements:
+        - host: my-workstation     
+        
+    hello-3:
+      type: hello_type
+      properties:
+        time: "1"
+      requirements:
+        - host: my-workstation     
+        
+    hello-4:
+      type: hello_type
+      properties:
+        time: "1"
+      requirements:
+        - host: my-workstation         
+        
+    hello-5:
+      type: hello_type
+      properties:
+        time: "1"
+      requirements:
+        - host: my-workstation
+        - dependency:  hello-1
+
+    hello-6:
+      type: hello_type
+      properties:
+        time: "1"
+      requirements:
+        - host: my-workstation
+        - dependency:  hello-5            
+
+    hello-7:
+      type: hello_type
+      properties:
+        time: "3"
+      requirements:
+        - host: my-workstation     
+        - dependency:  hello-6
+
+    hello-8:
+      type: hello_type
+      properties:
+        time: "5"
+      requirements:
+        - host: my-workstation
+
+    hello-9:
+      type: hello_type
+      properties:
+        time: "1"
+      requirements:
+        - host: my-workstation     
+        
+    hello-10:
+      type: hello_type
+      properties:
+        time: "3"
+      requirements:
+        - host: my-workstation     
+        
+    hello-11:
+      type: hello_type
+      properties:
+        time: "1"
+      requirements:
+        - host: my-workstation
+        - dependency:  hello-1
+
+    hello-12:
+      type: hello_type
+      properties:
+        time: "2"
+      requirements:
+        - host: my-workstation
+        - dependency:  hello-3            
+
+    hello-13:
+      type: hello_type
+      properties:
+        time: "3"
+      requirements:
+        - host: my-workstation     
+        - dependency:  hello-4        
+
+    hello-14:
+      type: hello_type
+      properties:
+        time: "1"
+      requirements:
+        - host: my-workstation
+        - dependency:  hello-1
+        - dependency:  hello-2
+        - dependency:  hello-7
+        - dependency:  hello-13

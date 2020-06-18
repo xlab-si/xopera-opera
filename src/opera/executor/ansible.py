@@ -6,6 +6,7 @@ import tempfile
 import yaml
 
 from . import utils
+from opera.threading import utils as thread_utils
 
 
 def _get_inventory(host):
@@ -51,14 +52,15 @@ def run(host, primary, dependencies, vars):
         )
         code, out, err = utils.run_in_directory(dir_path, cmd, env)
         if code != 0:
+            thread_utils.print_thread("------------")
             with open(out) as fd:
                 for l in fd:
                     print(l.rstrip())
-            print("------------")
+            thread_utils.print_thread("------------")
             with open(err) as fd:
                 for l in fd:
                     print(l.rstrip())
-            print("============")
+            thread_utils.print_thread("============")
             return False, {}
 
         with open(out) as fd:
