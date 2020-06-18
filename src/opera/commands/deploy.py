@@ -22,6 +22,12 @@ def add_parser(subparsers):
         "--inputs", "-i", type=argparse.FileType("r"),
         help="YAML file with inputs",
     )
+    parser.add_argument(
+        "--workers", "-w",
+        help="Maximum number of concurrent deployment \
+            threads (positive number, default 1)",
+        type=int, default=1
+    )
     parser.add_argument("csar",
                         type=argparse.FileType("r"),
                         help="cloud service archive file")
@@ -34,6 +40,10 @@ def deploy(args):
 
     storage = Storage(Path(args.instance_path).joinpath(".opera")) if args.instance_path else Storage(Path(".opera"))
     storage.write(args.csar.name, "root_file")
+
+    if args.workers < 1:
+        print("{0} is not a positive number!".format(args.workers))
+        return 1
 
     # TODO(@tadeboro): This should be part of the init command that we do not
     # have yet.
@@ -48,7 +58,7 @@ def deploy(args):
         ast = tosca.load(Path.cwd(), PurePath(args.csar.name))
         template = ast.get_template(inputs)
         topology = template.instantiate(storage)
-        topology.deploy()
+        topology.deploy(args.workers)
     except ParseError as e:
         print("{}: {}".format(e.loc, e))
         return 1
