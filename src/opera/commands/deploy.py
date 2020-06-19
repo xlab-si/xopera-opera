@@ -39,7 +39,7 @@ def deploy(args):
     if args.instance_path and not path.isdir(args.instance_path):
         raise argparse.ArgumentTypeError("Directory {0} is not a valid path!".format(args.instance_path))
 
-    storage = Storage(Path(args.instance_path) / ".opera") if args.instance_path else Storage(Path(".opera"))
+    storage = Storage(Path(args.instance_path)) if args.instance_path else Storage(Path(".opera"))
 
     if args.workers < 1:
         print("{0} is not a positive number!".format(args.workers))
