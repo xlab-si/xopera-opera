@@ -1,0 +1,14 @@
+---
+- hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: See what's in that linked file
+      command: "cat {{ file }}"
+      register: file_contents
+
+    - name: Set attribute
+      set_stats:
+        data:
+          my_attribute: "{{ file_contents.stdout }}"
+...

@@ -1,0 +1,32 @@
+---
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  opera.nodes.file:
+    derived_from: tosca.nodes.SoftwareComponent
+    attributes:
+      my_attribute:
+        type: string
+    interfaces:
+      Standard:
+        operations:
+          create:
+            implementation: playbooks/create.yaml
+            inputs:
+              file:
+                default: { get_artifact: [ SELF, file ] }
+    artifacts:
+        file:
+          type: tosca.artifacts.File
+          file: files/file.txt
+
+topology_template:
+  node_templates:
+    artifacts_file:
+      type: opera.nodes.file
+
+  outputs:
+    output_attr:
+      description: Example of attribute output
+      value: { get_attribute: [ artifacts_file, my_attribute ] }
+...

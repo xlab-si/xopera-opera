@@ -8,6 +8,7 @@ class Value:
         "get_attribute",
         "get_input",
         "get_property",
+        "get_artifact",
     ))
 
     def __init__(self, typ, present, data=None):

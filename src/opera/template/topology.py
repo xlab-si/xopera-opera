@@ -63,3 +63,8 @@ class Topology:
         node_name, *rest = params
 
         return self.find_node(node_name).get_attribute(["SELF"] + rest)
+
+    def get_artifact(self, params):
+        node_name, *rest = params
+
+        return self.find_node(node_name).get_artifact(["SELF"] + rest)

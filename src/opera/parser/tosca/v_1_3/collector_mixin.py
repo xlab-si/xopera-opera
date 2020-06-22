@@ -1,7 +1,6 @@
 from opera.template.interface import Interface
 from opera.template.operation import Operation
 from opera.template.capability import Capability
-from opera.value import Value
 
 
 class CollectorMixin:
@@ -134,6 +133,7 @@ class CollectorMixin:
                     dependencies=[
                         d.file.data for d in impl.get("dependencies", [])
                     ],
+                    artifacts=[a.data for a in self.collect_artifacts(service_ast).values()],
                     inputs=inputs,
                     outputs=outputs,
                     timeout=timeout,
@@ -159,3 +159,20 @@ class CollectorMixin:
                            assignment.get("properties", None),
                            assignment.get("attributes", None))
                 for name, assignment in assignments.items()]
+
+    def collect_artifacts(self, service_ast):
+        typ = self.type.resolve_reference(service_ast)
+        definitions = typ.collect_artifact_definitions(service_ast)
+        assignments = self.get("artifacts", {})
+
+        undeclared_artifacts = set(assignments.keys()) - definitions.keys()
+        if undeclared_artifacts:
+            self.abort("Invalid artifacts: {}.".format(
+                ", ".join(undeclared_artifacts),
+            ), self.loc)
+
+        return {
+            name: (assignments.get(name) or definition).get_value(
+                definition.get_value_type(service_ast),
+            ) for name, definition in definitions.items()
+        }

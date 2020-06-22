@@ -4,11 +4,11 @@ from opera.threading import utils as thread_utils
 
 
 class Operation:
-    def __init__(self, name, primary, dependencies, inputs, outputs, timeout,
-                 host):
+    def __init__(self, name, primary, dependencies, artifacts, inputs, outputs, timeout, host):
         self.name = name
         self.primary = primary
         self.dependencies = dependencies
+        self.artifacts = artifacts
         self.inputs = inputs
         self.outputs = outputs
         self.timeout = timeout
@@ -40,7 +40,8 @@ class Operation:
         # TODO(@tadeboro): Generalize executors.
         success, ansible_outputs = ansible.run(
             actual_host, str(self.primary),
-            tuple(str(i) for i in self.dependencies), operation_inputs, verbose
+            tuple(str(i) for i in self.dependencies),
+            tuple(str(i) for i in self.artifacts), operation_inputs, verbose,
         )
         if not success:
             return False, {}, {}

@@ -43,3 +43,6 @@ class DefinitionCollectorMixin:
             defs[name]["operations"].update(definition.get("operations", {}))
 
         return dict(defs)
+
+    def collect_artifact_definitions(self, service_ast):
+        return self._collect_definitions("artifacts", service_ast)

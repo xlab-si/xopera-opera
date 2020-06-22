@@ -1,5 +1,9 @@
 from opera.error import DataError
 from opera.instance.node import Node as Instance
+from pathlib import Path
+
+import tempfile, os
+from ..executor import utils
 
 
 class Node:
@@ -12,6 +16,7 @@ class Node:
             requirements,
             capabilities,
             interfaces,
+            artifacts,
     ):
         self.name = name
         self.types = types
@@ -20,6 +25,7 @@ class Node:
         self.requirements = requirements
         self.capabilities = capabilities
         self.interfaces = interfaces
+        self.artifacts = artifacts
 
         # This will be set when the node is inserted into a topology
         self.topology = None
@@ -153,3 +159,32 @@ class Node:
                 "Mapping an attribute for multiple instances not supported")
 
         next(iter(self.instances.values())).map_attribute(params, value)
+
+    def get_artifact(self, params):
+        host, prop, *rest = params
+
+        location = None
+        remove = None
+
+        if len(rest) == 1:
+            location = rest[0]
+
+        if len(rest) == 2:
+            location, remove = rest
+
+        if host != "SELF":
+            raise DataError(
+                "Accessing non-local stuff is bad. Fix your service template."
+            )
+        if host == "HOST":
+            raise DataError("HOST is not yet supported in opera.")
+
+        if location == "LOCAL_FILE":
+            raise DataError("Location get_artifact property is not yet supported in opera.")
+
+        if remove:
+            raise DataError("Remove get_artifact property artifacts is not yet supported in opera.")
+
+        if prop in self.artifacts:
+            self.artifacts[prop].eval(self)
+            return Path(self.artifacts[prop].data).name
