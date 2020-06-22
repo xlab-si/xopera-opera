@@ -63,3 +63,17 @@ class Relationship(Base):
             self.target.map_attribute(["SELF", attr] + rest, value)
         else:
             self.set_attribute(attr, value)
+
+    def get_artifact(self, params):
+        host, prop, *rest = params
+
+        if host not in ("SELF", "SOURCE", "TARGET"):
+            raise DataError(
+                "Accessing non-local stuff is bad. Fix your service template."
+            )
+
+        if host == "SOURCE":
+            return self.source.get_property(["SELF", prop] + rest)
+        if host == "TARGET":
+            return self.target.get_property(["SELF", prop] + rest)
+        return self.template.get_artifact(params)

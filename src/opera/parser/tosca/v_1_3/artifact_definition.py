@@ -1,4 +1,7 @@
 from opera.parser.yaml.node import Node
+from opera.value import Value
+
+import yaml
 
 from ..entity import Entity
 from ..map import Map
@@ -7,7 +10,6 @@ from ..reference import Reference
 from ..string import String
 from ..version import Version
 from ..void import Void
-
 
 
 class ArtifactDefinition(Entity):
@@ -34,3 +36,14 @@ class ArtifactDefinition(Entity):
                 Node("file"): yaml_node,
             })
         return yaml_node
+
+    def get_value(self, typ):
+        if "file" in self:
+            yaml_data = yaml.safe_load(str(self.file))
+            return Value(typ, True, yaml_data)
+        return Value(typ, False)
+
+    def get_value_type(self, service_ast):
+        # TODO(@tadeboro): Implement types later.
+        return None
+
