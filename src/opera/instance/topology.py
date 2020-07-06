@@ -11,7 +11,7 @@ class Topology:
             node.instantiate_relationships()
             node.read()
 
-    def deploy(self, num_workers=None):
+    def deploy(self, verbose, num_workers=None):
         # Currently, we are running a really stupid O(n^3) algorithm, but
         # unless we get to the templates with millions of node instances, we
         # should be fine.
@@ -22,10 +22,11 @@ class Topology:
                     if (not node.deployed
                             and node.ready_for_deploy
                             and executor.not_submitted(node.tosca_id)):
-                        executor.submit_operation(node.deploy, node.tosca_id)
+                        executor.submit_operation(node.deploy, node.tosca_id,
+                                                  verbose)
                 do_deploy = executor.wait_results()
 
-    def undeploy(self, num_workers=None):
+    def undeploy(self, verbose, num_workers=None):
         # Currently, we are running a really stupid O(n^3) algorithm, but
         # unless we get to the templates with millions of node instances, we
         # should be fine.
@@ -36,7 +37,8 @@ class Topology:
                     if (not node.undeployed
                             and node.ready_for_undeploy
                             and executor.not_submitted(node.tosca_id)):
-                        executor.submit_operation(node.undeploy, node.tosca_id)
+                        executor.submit_operation(node.undeploy, node.tosca_id,
+                                                  verbose)
                 do_undeploy = executor.wait_results()
 
     def write(self, data, instance_id):

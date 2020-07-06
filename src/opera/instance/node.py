@@ -54,39 +54,39 @@ class Node(Base):
         # localhost if nothing suitable is found.
         return self.template.get_host() or "localhost"
 
-    def deploy(self):
+    def deploy(self, verbose):
         thread_utils.print_thread("  Deploying {}".format(self.tosca_id))
 
         self.set_state("creating")
-        self.run_operation("HOST", "Standard", "create")
+        self.run_operation("HOST", "Standard", "create", verbose)
         self.set_state("created")
 
         self.set_state("configuring")
         for requirement in set([r.name for r in self.template.requirements]):
             for relationship in self.out_edges[requirement].values():
                 relationship.run_operation(
-                    "SOURCE", "Configure", "pre_configure_source",
+                    "SOURCE", "Configure", "pre_configure_source", verbose,
                 )
         for requirement_dependants in self.in_edges.values():
             for relationship in requirement_dependants.values():
                 relationship.run_operation(
-                    "TARGET", "Configure", "pre_configure_target",
+                    "TARGET", "Configure", "pre_configure_target", verbose,
                 )
-        self.run_operation("HOST", "Standard", "configure")
+        self.run_operation("HOST", "Standard", "configure", verbose)
         for requirement in set([r.name for r in self.template.requirements]):
             for relationship in self.out_edges[requirement].values():
                 relationship.run_operation(
-                    "SOURCE", "Configure", "post_configure_source",
+                    "SOURCE", "Configure", "post_configure_source", verbose,
                 )
         for requirement_dependants in self.in_edges.values():
             for relationship in requirement_dependants.values():
                 relationship.run_operation(
-                    "TARGET", "Configure", "post_configure_target",
+                    "TARGET", "Configure", "post_configure_target", verbose,
                 )
         self.set_state("configured")
 
         self.set_state("starting")
-        self.run_operation("HOST", "Standard", "start")
+        self.run_operation("HOST", "Standard", "start", verbose)
         self.set_state("started")
 
         # TODO(@tadeboro): Execute various add hooks
@@ -94,15 +94,15 @@ class Node(Base):
             "  Deployment of {} complete".format(self.tosca_id)
         )
 
-    def undeploy(self):
+    def undeploy(self, verbose):
         thread_utils.print_thread("  Undeploying {}".format(self.tosca_id))
 
         self.set_state("stopping")
-        self.run_operation("HOST", "Standard", "stop")
+        self.run_operation("HOST", "Standard", "stop", verbose)
         self.set_state("configured")
 
         self.set_state("deleting")
-        self.run_operation("HOST", "Standard", "delete")
+        self.run_operation("HOST", "Standard", "delete", verbose)
         self.set_state("initial")
 
         # TODO(@tadeboro): Execute various remove hooks

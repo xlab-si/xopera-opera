@@ -23,6 +23,10 @@ def add_parser(subparsers):
         "--format", "-f", choices=("yaml", "json"), type=str,
         default="yaml", help="Output format",
     )
+    parser.add_argument(
+        "--verbose", "-v", action='store_true',
+        help="Turns on verbose mode",
+    )
     parser.set_defaults(func=_parser_callback)
 
 

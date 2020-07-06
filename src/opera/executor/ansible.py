@@ -27,7 +27,7 @@ def _get_inventory(host):
     return yaml.safe_dump(dict(all=dict(hosts=dict(opera=inventory))))
 
 
-def run(host, primary, dependencies, vars):
+def run(host, primary, dependencies, vars, verbose):
     with tempfile.TemporaryDirectory() as dir_path:
         playbook = os.path.join(dir_path, os.path.basename(primary))
         utils.copy(primary, playbook)
@@ -43,6 +43,11 @@ def run(host, primary, dependencies, vars):
             fd.write("[defaults]\n")
             fd.write("retry_files_enabled = False\n")
 
+        if verbose:
+            print("***inputs***")
+            print(["{}: {}".format(key, vars[key]) for key in vars])
+            print("***inputs***")
+
         cmd = [
             "ansible-playbook",
             "-i", inventory,
@@ -54,7 +59,7 @@ def run(host, primary, dependencies, vars):
             ANSIBLE_STDOUT_CALLBACK="json",
         )
         code, out, err = utils.run_in_directory(dir_path, cmd, env)
-        if code != 0:
+        if code != 0 or verbose:
             thread_utils.print_thread("------------")
             with open(out) as fd:
                 for l in fd:
@@ -64,6 +69,8 @@ def run(host, primary, dependencies, vars):
                 for l in fd:
                     print(l.rstrip())
             thread_utils.print_thread("============")
+
+        if code != 0:
             return False, {}
 
         with open(out) as fd:

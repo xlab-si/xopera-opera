@@ -14,7 +14,7 @@ class Operation:
         self.timeout = timeout
         self.host = host
 
-    def run(self, host, instance):
+    def run(self, host, instance, verbose):
         thread_utils.print_thread(
             "    Executing {} on {}".format(self.name, instance.tosca_id)
         )
@@ -40,7 +40,7 @@ class Operation:
         # TODO(@tadeboro): Generalize executors.
         success, ansible_outputs = ansible.run(
             actual_host, str(self.primary),
-            tuple(str(i) for i in self.dependencies), operation_inputs,
+            tuple(str(i) for i in self.dependencies), operation_inputs, verbose
         )
         if not success:
             return False, {}, {}
