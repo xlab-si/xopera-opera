@@ -22,6 +22,10 @@ def add_parser(subparsers):
             threads (positive number, default 1)",
         type=int, default=1
     )
+    parser.add_argument(
+        "--verbose", "-v", action='store_true',
+        help="Turns on verbose mode",
+    )
     parser.set_defaults(func=_parser_callback)
 
 
@@ -35,7 +39,7 @@ def _parser_callback(args):
 
     storage = Storage.create(args.instance_path)
     try:
-        undeploy(storage, args.workers)
+        undeploy(storage, args.verbose, args.workers)
     except ParseError as e:
         print("{}: {}".format(e.loc, e))
         return 1
@@ -46,7 +50,7 @@ def _parser_callback(args):
     return 0
 
 
-def undeploy(storage: Storage, num_workers: int):
+def undeploy(storage: Storage, verbose_mode: bool, num_workers: int):
     """
     :raises ParseError:
     :raises DataError:
@@ -57,4 +61,4 @@ def undeploy(storage: Storage, num_workers: int):
     ast = tosca.load(Path.cwd(), PurePath(service_template))
     template = ast.get_template(inputs)
     topology = template.instantiate(storage)
-    topology.undeploy(num_workers)
+    topology.undeploy(verbose_mode, num_workers)

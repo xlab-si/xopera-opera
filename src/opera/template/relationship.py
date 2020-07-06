@@ -1,6 +1,7 @@
 from opera.error import DataError
 from opera.instance.relationship import Relationship as Instance
 
+
 class Relationship:
     def __init__(self, name, types, properties, attributes, interfaces):
         self.name = name
@@ -16,10 +17,10 @@ class Relationship:
         relationship_id = "{}--{}".format(source.tosca_id, target.tosca_id)
         return Instance(self, relationship_id, source, target)
 
-    def run_operation(self, host, interface, operation, instance):
+    def run_operation(self, host, interface, operation, instance, verbose):
         operation = self.interfaces[interface].operations.get(operation)
         if operation:
-            return operation.run(host, instance)
+            return operation.run(host, instance, verbose)
         return True, {}, {}
 
     #

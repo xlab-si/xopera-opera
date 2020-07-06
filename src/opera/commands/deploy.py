@@ -29,6 +29,10 @@ def add_parser(subparsers):
             threads (positive number, default 1)",
         type=int, default=1
     )
+    parser.add_argument(
+        "--verbose", "-v", action='store_true',
+        help="Turns on verbose mode",
+    )
     parser.add_argument("template",
                         type=argparse.FileType("r"), nargs='?',
                         help="TOSCA YAML service template file",
@@ -67,7 +71,7 @@ def _parser_callback(args):
         return 1
 
     try:
-        deploy(service_template, inputs, storage, args.workers)
+        deploy(service_template, inputs, storage, args.verbose, args.workers)
     except ParseError as e:
         print("{}: {}".format(e.loc, e))
         return 1
@@ -78,7 +82,7 @@ def _parser_callback(args):
     return 0
 
 
-def deploy(service_template: str, inputs: typing.Optional[dict], storage: Storage, num_workers: int):
+def deploy(service_template: str, inputs: typing.Optional[dict], storage: Storage, verbose_mode: bool, num_workers: int):
     """
     :raises ParseError:
     :raises DataError:
@@ -94,4 +98,4 @@ def deploy(service_template: str, inputs: typing.Optional[dict], storage: Storag
     ast = tosca.load(Path.cwd(), PurePath(service_template))
     template = ast.get_template(inputs)
     topology = template.instantiate(storage)
-    topology.deploy(num_workers)
+    topology.deploy(verbose_mode, num_workers)

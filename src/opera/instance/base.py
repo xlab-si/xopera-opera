@@ -61,9 +61,9 @@ class Base:
         self.set_attribute("state", state)
         self.write()
 
-    def run_operation(self, host, interface, operation):
+    def run_operation(self, host, interface, operation, verbose):
         success, outputs, attributes = self.template.run_operation(
-            host, interface, operation, self,
+            host, interface, operation, self, verbose,
         )
 
         if not success:

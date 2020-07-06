@@ -25,6 +25,10 @@ def add_parser(subparsers):
         "--inputs", "-i", type=argparse.FileType("r"),
         help="YAML file with inputs",
     )
+    parser.add_argument(
+        "--verbose", "-v", action='store_true',
+        help="Turns on verbose mode",
+    )
     parser.add_argument("csar",
                         type=argparse.FileType("r"),
                         help="Cloud service archive or service template file")
