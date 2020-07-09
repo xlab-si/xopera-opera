@@ -1,0 +1,84 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  my_first_node_type:
+    derived_from: tosca.nodes.Root
+    attributes:
+      my_attribute:
+        type: string
+    properties:
+      my_property:
+        type: string
+
+  my_second_node_type:
+    derived_from: tosca.nodes.Root
+    attributes:
+      cap_attribute:
+        type: string
+        description: Capability attribute
+      cap_property:
+        type: string
+        description: Capability property
+      req_attribute:
+        type: string
+        description: Requirement attribute
+      req_property:
+        type: string
+        description: Requirement property
+    capabilities:
+      my_capability:
+        type: tosca.capabilities.Root
+        attributes:
+          capability_attribute:
+            type: string
+        properties:
+          capability_property:
+            type: string
+    interfaces:
+      Standard:
+        operations:
+          create:
+            implementation: playbooks/create.yaml
+            inputs:
+              cap_attr_input: { default: { get_attribute: [ SELF, my_capability, capability_attribute ] }, type: string }
+              cap_prop_input: { default: { get_property: [ SELF, my_capability, capability_property ] }, type: string }
+              req_attr_input: { default: { get_attribute: [ SELF, my_target, my_attribute] }, type: string }
+              req_prop_input: { default: { get_property: [ SELF, my_target, my_property] }, type: string }
+    requirements:
+      - my_target:
+          capability: tosca.capabilities.Root
+          relationship: tosca.relationships.DependsOn
+
+topology_template:
+  node_templates:
+    my_first_node:
+      type: my_first_node_type
+      attributes:
+        my_attribute: some_integer
+      properties:
+        my_property: some_string
+
+    my_second_node:
+      type: my_second_node_type
+      capabilities:
+        my_capability:
+          attributes:
+            capability_attribute: some_attribute
+          properties:
+            capability_property: some_property
+      requirements:
+        - my_target: my_first_node
+
+  outputs:
+    output_cap_attr:
+      description: Capability attribute output
+      value: { get_attribute: [ my_second_node, cap_attribute ] }
+    output_cap_prop:
+      description: Capability property output
+      value: { get_attribute: [ my_second_node, cap_property ] }
+    output_req_attr:
+      description: Requirement attribute output
+      value: { get_attribute: [ my_second_node, req_attribute ] }
+    output_req_prop:
+      description: Requirement property output
+      value: { get_attribute: [ my_second_node, req_property ] }

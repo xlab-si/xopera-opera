@@ -113,6 +113,7 @@ class Node(Base):
         thread_utils.print_thread(
             "  Undeployment of {} complete".format(self.tosca_id)
         )
+
     #
     # TOSCA functions
     #
@@ -131,7 +132,23 @@ class Node(Base):
         if attr in self.attributes:
             return self.attributes[attr].eval(self)
 
-        # TODO(@tadeboro): Add capability access.
+        # Check if there are capability and requirement with the same name.
+        if attr in self.out_edges and attr in [c.name for c in
+                                               self.template.capabilities]:
+            raise DataError("There are capability and requirement with the "
+                            "same name: '{}'.".format(attr, ))
+
+        # If we have no attribute, try searching for capability.
+        capabilities = tuple(
+            c for c in self.template.capabilities if c.name == attr
+        )
+        if len(capabilities) > 1:
+            raise DataError(
+                "More than one capability is named '{}'.".format(attr, ))
+
+        if len(capabilities) == 1 and capabilities[0].attributes and len(
+                rest) != 0:
+            return capabilities[0].attributes.get(rest[0]).data
 
         # If we have no attribute, try searching for requirement.
         relationships = self.out_edges.get(attr, {})

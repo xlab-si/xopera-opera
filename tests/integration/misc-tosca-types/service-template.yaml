@@ -80,6 +80,12 @@ topology_template:
 
     test:
       type: daily_test.nodes.test
+      capabilities:
+        test_capability:
+          attributes:
+            capability_attribute: 42
+          properties:
+            capability_property: capability_property_value
       requirements:
         - host: my-workstation1
 

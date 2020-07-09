@@ -1,5 +1,6 @@
 from opera.template.interface import Interface
 from opera.template.operation import Operation
+from opera.template.capability import Capability
 from opera.value import Value
 
 
@@ -142,3 +143,19 @@ class CollectorMixin:
             interfaces[name] = Interface(name, operations)
 
         return dict(interfaces)
+
+    def collect_capabilities(self, service_ast):
+        typ = self.type.resolve_reference(service_ast)
+        definitions = typ.collect_capability_definitions(service_ast)
+        assignments = self.get("capabilities", {})
+
+        undeclared_caps = set(assignments.keys()) - definitions.keys()
+        if undeclared_caps:
+            self.abort("Invalid capabilities: {}.".format(
+                ", ".join(undeclared_caps),
+            ), self.loc)
+
+        return [Capability(name,
+                           assignment.get("properties", None),
+                           assignment.get("attributes", None))
+                for name, assignment in assignments.items()]
