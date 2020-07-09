@@ -4,9 +4,13 @@ tosca_definitions_version: tosca_simple_yaml_1_3
 capability_types:
   daily_test.capabilities.test:
     derived_from: tosca.capabilities.Root
+    attributes:
+      capability_attribute:
+        type: integer
+        status: supported
     properties:
       capability_property:
         type: string
-        required: false
+        required: true
         status: supported
 ...

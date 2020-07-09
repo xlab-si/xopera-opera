@@ -17,6 +17,9 @@ class DefinitionCollectorMixin:
     def collect_requirement_definitions(self, service_ast):
         return self._collect_definitions("requirements", service_ast)
 
+    def collect_capability_definitions(self, service_ast):
+        return self._collect_definitions("capabilities", service_ast)
+
     def _collect_definitions(self, section, service_ast):
         defs = {}
         parent = self.derived_from.resolve_reference(service_ast)

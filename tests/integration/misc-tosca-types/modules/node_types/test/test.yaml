@@ -23,6 +23,9 @@ node_types:
       Standard:
         operations:
           create:
+            inputs:
+              capability_attribute_input: { default: { get_attribute: [ SELF, test_capability, capability_attribute ] } }
+              capability_property_input: { default: { get_property: [ SELF, test_capability, capability_property ] } }
             implementation:
               primary: playbooks/create.yaml
       test:
@@ -32,7 +35,7 @@ node_types:
         type: daily_test.artifacts.test
         file: file.test
     capabilities:
-      test:
+      test_capability:
         type: daily_test.capabilities.test
     requirements:
       - host:

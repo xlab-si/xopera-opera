@@ -1,0 +1,11 @@
+---
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: Set attributes from the inputs collected from capability and requirement
+      set_stats:
+        data:
+          cap_attribute: " {{ cap_attr_input }}"
+          cap_property: " {{ cap_prop_input }}"
+          req_attribute: " {{ req_attr_input }}"
+          req_property: " {{ req_prop_input }}"

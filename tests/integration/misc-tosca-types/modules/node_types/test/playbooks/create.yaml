@@ -6,4 +6,12 @@
     - name: Say test
       debug:
         msg: "test"
+
+    - name: Print out input that got its value from capability property
+      debug:
+        msg: "Property: {{ capability_property_input }}"
+
+    - name: Print out input that got its value from capability attribute
+      debug:
+        msg: "Attribute: {{ capability_attribute_input }}"
 ...
