@@ -70,4 +70,7 @@ Acknowledgement
 ---------------
 
 This project has received funding from the European Union’s `Horizon 2020`
-research and innovation programme under Grant Agreement No. 825040 (RADON).
+research and innovation programme under Grant Agreements No. 825040 (`RADON`_) and No. 825480 (`SODALITE`_).
+
+.. _RADON: http://radon-h2020.eu/
+.. _SODALITE: http://www.sodalite.eu/
