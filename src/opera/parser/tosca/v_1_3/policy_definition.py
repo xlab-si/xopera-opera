@@ -5,6 +5,8 @@ from ..reference import Reference, ReferenceXOR
 from ..string import String
 from ..void import Void
 
+from .trigger_definition import TriggerDefinition
+
 
 class PolicyDefinition(Entity):
     ATTRS = dict(
@@ -12,10 +14,7 @@ class PolicyDefinition(Entity):
         description=String,
         metadata=Map(String),
         properties=Map(Void),
-        targets=List(ReferenceXOR(("topology_template", "node_templates"), ("topology_template", "groups")))
-        # TODO(@tadeboro): triggers
+        targets=List(ReferenceXOR(("topology_template", "node_templates"), ("topology_template", "groups"))),
+        triggers=Map(TriggerDefinition),
     )
     REQUIRED = {"type"}
-
-    def get_targets(self):
-        return

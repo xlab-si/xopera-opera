@@ -1,0 +1,211 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  radon.nodes.OpenStack.VM:
+    derived_from: tosca.nodes.Compute
+    attributes:
+      available_instances:
+        type: integer
+        default: 42
+      available_space:
+        type: integer
+        default: 1000
+    properties:
+      name:
+        type: string
+      image:
+        type: string
+      flavor:
+        type: string
+      network:
+        type: string
+      key_name:
+        type: string
+    interfaces:
+      Standard:
+        type: tosca.interfaces.node.lifecycle.Standard
+        operations:
+          create:
+            implementation: playbooks/create.yaml
+
+interface_types:
+  radon.interfaces.scaling.ScaleDown:
+    derived_from: tosca.interfaces.Root
+    operations:
+      scale_down:
+        inputs:
+          adjustment: { default: { get_property: [ SELF, name ] } }
+        description: Operation for scaling down.
+        implementation: playbooks/scale_down.yaml
+
+  radon.interfaces.scaling.ScaleUp:
+    derived_from: tosca.interfaces.Root
+    operations:
+      scale_up:
+        inputs:
+          adjustment: { default: { get_property: [ SELF, name ] } }
+        description: Operation for scaling up.
+        implementation: playbooks/scale_up.yaml
+
+  radon.interfaces.scaling.AutoScale:
+    derived_from: tosca.interfaces.Root
+    operations:
+      retrieve_info:
+        description: Operation for autoscaling.
+        implementation: playbooks/retrieve_info.yaml
+      autoscale:
+        description: Operation for autoscaling.
+        implementation: playbooks/auto_scale.yaml
+
+policy_types:
+  radon.policies.scaling.ScaleDown:
+    derived_from: tosca.policies.Scaling
+    properties:
+      cpu_upper_bound:
+        description: The upper bound for the CPU
+        type: float
+        required: false
+        constraints:
+          - less_or_equal: 20.0
+      adjustment:
+        description: The amount by which to scale
+        type: integer
+        required: false
+        constraints:
+          - less_or_equal: -1
+    targets: [ radon.nodes.OpenStack.VM ]
+    triggers:
+      radon.triggers.scaling:
+        description: A trigger for scaling down
+        event: scale_down_trigger
+        target_filter:
+          node: radon.nodes.OpenStack.VM
+        condition:
+          - not:
+            - and:
+              - available_instances: [ { greater: 42 } ]
+              - available_space: [ { greater: 1000 } ]
+        action:
+          - call_operation:
+              operation: radon.interfaces.scaling.ScaleDown.scale_down
+              inputs:
+                adjustment: { get_property: [ SELF, adjustment ] }
+
+  radon.policies.scaling.ScaleUp:
+    derived_from: tosca.policies.Scaling
+    properties:
+      cpu_upper_bound:
+        description: The upper bound for the CPU
+        type: float
+        required: false
+        constraints:
+          - greater_or_equal: 80.0
+      adjustment:
+        description: The amount by which to scale
+        type: integer
+        required: false
+        constraints:
+          - greater_or_equal: 1
+    targets: [ radon.nodes.OpenStack.VM ]
+    triggers:
+      radon.triggers.scaling:
+        description: A trigger for scaling up
+        event: scale_up_trigger
+        target_filter:
+          node: radon.nodes.OpenStack.VM
+        condition:
+          - not:
+            - and:
+              - available_instances: [ { greater: 42 } ]
+              - available_space: [ { greater: 1000 } ]
+        action:
+          - call_operation:
+              operation: radon.interfaces.scaling.ScaleUp.scale_up
+              inputs:
+                adjustment: { get_property: [ SELF, adjustment ] }
+
+  radon.policies.scaling.AutoScale:
+    derived_from: tosca.policies.Scaling
+    properties:
+      min_size:
+        type: integer
+        description: The minimum number of instances
+        required: true
+        status: supported
+        constraints:
+          - greater_or_equal: 1
+      max_size:
+        type: integer
+        description: The maximum number of instances
+        required: true
+        status: supported
+        constraints:
+          - greater_or_equal: 10
+
+topology_template:
+  node_templates:
+    workstation:
+      type: tosca.nodes.Compute
+      attributes:
+        private_address: localhost
+        public_address: localhost
+
+    openstack_vm:
+      type: radon.nodes.OpenStack.VM
+      properties:
+        name: HostVM
+        image: centos7
+        flavor: m1.xsmall
+        network: provider_64_net
+        key_name: my_key
+      requirements:
+        - host: workstation
+      capabilities:
+        host_capability:
+         properties:
+           num_cpus: 1
+           disk_size: 10 GB
+           mem_size: 4096 MB
+
+  policies:
+    scale_down:
+      type: radon.policies.scaling.ScaleDown
+      properties:
+        cpu_upper_bound: 90
+        adjustment: 1
+
+    scale_up:
+      type: radon.policies.scaling.ScaleUp
+      properties:
+        cpu_upper_bound: 90
+        adjustment: 1
+
+    autoscale:
+      type: radon.policies.scaling.AutoScale
+      properties:
+        min_size: 3
+        max_size: 7
+      targets: [ openstack_vm ]
+      triggers:
+        radon.triggers.scaling:
+          description: A trigger for autoscaling
+          event: auto_scale_trigger
+          schedule:
+            start_time: 2020-04-08T21:59:43.10-06:00
+            end_time: 2022-04-08T21:59:43.10-06:00
+          target_filter:
+            node: openstack_vm
+            requirement: workstation
+            capability: host_capability
+          condition:
+            constraint:
+              - not:
+                - and:
+                  - available_instances: [ { greater: 42 } ]
+                  - available_space: [ { greater: 1000 } ]
+            period: 60 sec
+            evaluations: 2
+            method: average
+          action:
+            - call_operation: radon.interfaces.scaling.AutoScale.retrieve_info
+            - call_operation: radon.interfaces.scaling.AutoScale.autoscale

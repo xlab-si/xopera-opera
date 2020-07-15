@@ -1,0 +1,8 @@
+---
+- hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Retrieve info tasks
+      debug:
+        msg: Insert tasks for retrieving info before auto-scaling

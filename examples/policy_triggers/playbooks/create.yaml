@@ -1,0 +1,8 @@
+---
+- hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: OpenStack tasks
+      debug:
+        msg: Insert OpenStack tasks

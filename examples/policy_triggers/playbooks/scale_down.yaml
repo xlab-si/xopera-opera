@@ -1,0 +1,8 @@
+---
+- hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Scale down tasks
+      debug:
+        msg: Insert tasks for scaling down
