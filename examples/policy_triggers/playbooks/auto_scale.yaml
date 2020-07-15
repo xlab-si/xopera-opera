@@ -1,0 +1,8 @@
+---
+- hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Autoscale tasks
+      debug:
+        msg: Insert tasks for auto-scaling

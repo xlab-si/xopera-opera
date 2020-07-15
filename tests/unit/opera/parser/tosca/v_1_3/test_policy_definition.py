@@ -11,6 +11,15 @@ class TestParse:
             properties:
               prop: 6.7
             targets: [node_type_a, node_type_b, node_type_c]
+            triggers:
+              my_first_trigger:
+                event: my_first_trigger
+                action:
+                  - call_operation: test.interfaces.Test1.test2
+              my_second_trigger:
+                event: my_second_trigger
+                action:
+                  - call_operation: test.interfaces.Test2.test1
             """
         ))
 
