@@ -46,7 +46,10 @@ class MultipleReferenceWrapper(String):
         target_result = None
         targets = []
         for section_path in self.section_paths:
-            target = service_template.dig(*section_path, self.data)
+            if isinstance(section_path, tuple):
+                target = service_template.dig(*section_path, self.data)
+            else:
+                target = service_template.dig(section_path, self.data)
             if target:
                 path_exists = True
                 targets.append(target)
@@ -60,8 +63,9 @@ class MultipleReferenceWrapper(String):
 
         if not path_exists:
             self.abort("Invalid reference, {} is not in {}".format(
-                str(self.data), str(['/'.join(path_tuple) for path_tuple in self.section_paths])
-            ), self.loc)
+                str(self.data), str(
+                    ['/'.join(path_tuple) if isinstance(path_tuple, tuple) else path_tuple for path_tuple in
+                     self.section_paths])), self.loc)
         return target_result
 
 
