@@ -1,4 +1,5 @@
 from yaml.constructor import BaseConstructor, ConstructorError
+from collections import Counter
 
 from opera.parser.utils.location import Location
 
@@ -56,6 +57,14 @@ class Constructor(BaseConstructor):
         data = Node({}, self._pos(node))
         yield data
         data.value.update(self.construct_mapping(node))
+        counts = Counter(n.bare for n in data.value)
+        duplicates = [k for k, v in counts.items() if v > 1]
+        if duplicates:
+            raise ConstructorError(
+                None, None,
+                "Duplicate map names: {}".format(', '.join(duplicates)),
+                node.start_mark,
+            )
 
     def construct_undefined(self, node):
         raise ConstructorError(

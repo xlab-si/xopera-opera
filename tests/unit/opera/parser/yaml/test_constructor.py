@@ -3,6 +3,7 @@ import math
 import pytest
 from yaml.error import Mark
 from yaml.nodes import MappingNode, ScalarNode, SequenceNode
+from yaml.constructor import ConstructorError
 
 from opera.parser.yaml.constructor import Constructor
 
@@ -138,3 +139,19 @@ class TestNull:
         assert res.loc.line == 9
         assert res.loc.column == 9
         assert res.loc.stream_name == "map"
+
+    def test_construct_map_duplicate(self):
+        mark = Mark(None, None, 8, 8, None, None)
+        children = [
+            (
+                ScalarNode("tag:yaml.org,2002:str", "node1", start_mark=mark),
+                ScalarNode("tag:yaml.org,2002:str", "node1", start_mark=mark),
+            ),
+            (
+                ScalarNode("tag:yaml.org,2002:str", "node1", start_mark=mark),
+                ScalarNode("tag:yaml.org,2002:str", "node1", start_mark=mark),
+            )
+        ]
+        node = MappingNode("tag:yaml.org,2002:map", children, start_mark=mark)
+        with pytest.raises(ConstructorError):
+            res, = Constructor("map").construct_yaml_map(node)
