@@ -31,7 +31,8 @@ def add_parser(subparsers):
 
 def _parser_callback(args):
     if args.instance_path and not path.isdir(args.instance_path):
-        raise argparse.ArgumentTypeError("Directory {0} is not a valid path!".format(args.instance_path))
+        raise argparse.ArgumentTypeError("Directory {0} is not a valid path!"
+                                         .format(args.instance_path))
 
     if args.workers < 1:
         print("{0} is not a positive number!".format(args.workers))

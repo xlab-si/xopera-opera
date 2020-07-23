@@ -41,7 +41,8 @@ def format_outputs(outputs, format):
 
 def _parser_callback(args):
     if args.instance_path and not path.isdir(args.instance_path):
-        raise argparse.ArgumentTypeError("Directory {0} is not a valid path!".format(args.instance_path))
+        raise argparse.ArgumentTypeError("Directory {0} is not a valid path!"
+                                         .format(args.instance_path))
 
     storage = Storage.create(args.instance_path)
     try:
@@ -66,6 +67,7 @@ def outputs(storage: Storage) -> dict:
 
     ast = tosca.load(Path.cwd(), PurePath(service_template))
     template = ast.get_template(inputs)
-    # We need to instantiate the template in order to get access to the instance state.
+    # We need to instantiate the template in order
+    # to get access to the instance state.
     template.instantiate(storage)
     return template.get_outputs()
