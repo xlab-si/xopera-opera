@@ -15,7 +15,8 @@ from opera.storage import Storage
 def add_parser(subparsers):
     parser = subparsers.add_parser(
         "init",
-        help="Initialize the deployment environment for the service template or CSAR"
+        help="Initialize the deployment environment "
+             "for the service template or CSAR"
     )
     parser.add_argument(
         "--instance-path", "-p",
@@ -37,7 +38,8 @@ def add_parser(subparsers):
 
 def _parser_callback(args):
     if args.instance_path and not path.isdir(args.instance_path):
-        raise argparse.ArgumentTypeError("Directory {0} is not a valid path!".format(args.instance_path))
+        raise argparse.ArgumentTypeError("Directory {0} is not a valid path!"
+                                         .format(args.instance_path))
 
     storage = Storage.create(args.instance_path)
 
@@ -67,7 +69,9 @@ def _parser_callback(args):
     return 0
 
 
-def initialize_compressed_csar(csar_name: str, inputs: typing.Optional[dict], storage):
+def initialize_compressed_csar(csar_name: str,
+                               inputs: typing.Optional[dict],
+                               storage: Storage):
     if inputs is None:
         inputs = {}
     storage.write_json(inputs, "inputs")
@@ -91,7 +95,9 @@ def initialize_compressed_csar(csar_name: str, inputs: typing.Optional[dict], st
     template.instantiate(storage)
 
 
-def initialize_service_template(service_template: str, inputs: typing.Optional[dict], storage: Storage):
+def initialize_service_template(service_template: str,
+                                inputs: typing.Optional[dict],
+                                storage: Storage):
     if inputs is None:
         inputs = {}
     storage.write_json(inputs, "inputs")
