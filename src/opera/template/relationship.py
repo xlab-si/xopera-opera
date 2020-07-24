@@ -1,6 +1,7 @@
 from opera.error import DataError
 from opera.instance.relationship import Relationship as Instance
 
+
 class Relationship:
     def __init__(self, name, types, properties, attributes, interfaces):
         self.name = name
@@ -39,7 +40,7 @@ class Relationship:
         # have data type support.
         if prop not in self.properties:
             raise DataError("Template has no '{}' property".format(prop))
-        return self.properties[prop].eval(self)
+        return self.properties[prop].eval(self, prop)
 
     def get_input(self, params):
         return self.topology.get_input(params)

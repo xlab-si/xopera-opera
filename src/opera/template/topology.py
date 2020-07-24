@@ -29,7 +29,7 @@ class Topology:
         return {
             k: dict(
                 description=v["description"],
-                value=v["value"].eval(self),
+                value=v["value"].eval(self, "value"),
             ) for k, v in self.outputs.items()
         }
 
@@ -52,7 +52,7 @@ class Topology:
         if params[0] not in self.inputs:
             raise DataError("Invalid input: '{}'".format(params[0]))
 
-        return self.inputs[params[0]].eval(self)
+        return self.inputs[params[0]].eval(self, params[0])
 
     def get_property(self, params):
         node_name, *rest = params

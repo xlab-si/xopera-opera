@@ -58,7 +58,9 @@ class Node:
         ), None)
         if host:
             instance = next(iter(host.instances.values()))
-            return instance.attributes["public_address"].eval(self)
+            return instance.attributes["public_address"].eval(
+                self, "public_address"
+            )
 
         host = next((
             r.target.get_host()
@@ -89,7 +91,7 @@ class Node:
 
         # TODO(@tadeboro): Add support for nested property values.
         if prop in self.properties:
-            return self.properties[prop].eval(self)
+            return self.properties[prop].eval(self, prop)
 
         # Check if there are capability and requirement with the same name.
         if prop in [r.name for r in self.requirements] and prop \

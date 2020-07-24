@@ -34,7 +34,7 @@ class Operation:
             actual_host = "localhost"
 
         operation_inputs = {
-            k: v.eval(instance) for k, v in self.inputs.items()
+            k: v.eval(instance, k) for k, v in self.inputs.items()
         }
 
         # TODO(@tadeboro): Generalize executors.

@@ -130,7 +130,7 @@ class Node(Base):
         # TODO(@tadeboro): Add support for nested attribute values once we
         # have data type support.
         if attr in self.attributes:
-            return self.attributes[attr].eval(self)
+            return self.attributes[attr].eval(self, attr)
 
         # Check if there are capability and requirement with the same name.
         if attr in self.out_edges and attr in [c.name for c in

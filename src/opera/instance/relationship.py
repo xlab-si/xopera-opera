@@ -30,7 +30,7 @@ class Relationship(Base):
         # have data type support.
         if attr not in self.attributes:
             raise DataError("Instance has no '{}' attribute".format(attr))
-        return self.attributes[attr].eval(self)
+        return self.attributes[attr].eval(self, attr)
 
     def get_property(self, params):
         host, prop, *rest = params
