@@ -39,9 +39,9 @@ class Value:
         self._data = None
         self.present = False
 
-    def eval(self, instance):
+    def eval(self, instance, key):
         if not self.present:
-            raise DataError("Cannot use an unset value.")
+            raise DataError("Cannot use an unset value: {}".format(key))
 
         if self.is_function:
             return self.eval_function(instance)

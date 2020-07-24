@@ -40,7 +40,7 @@ class Relationship:
         # have data type support.
         if prop not in self.properties:
             raise DataError("Template has no '{}' property".format(prop))
-        return self.properties[prop].eval(self)
+        return self.properties[prop].eval(self, prop)
 
     def get_input(self, params):
         return self.topology.get_input(params)
