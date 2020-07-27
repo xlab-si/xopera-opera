@@ -1,6 +1,6 @@
 import argparse
 import typing
-from os import path
+from os import chdir, path
 from pathlib import Path, PurePath
 
 import yaml
@@ -143,7 +143,14 @@ def deploy(service_template: str, inputs: typing.Optional[dict],
     storage.write_json(inputs, "inputs")
     storage.write(service_template, "root_file")
 
-    ast = tosca.load(Path.cwd(), PurePath(service_template))
+    if storage.exists("csars"):
+        csar_dir = Path(storage.path) / "csars" / "csar"
+        ast = tosca.load(Path(csar_dir),
+                         PurePath(service_template).relative_to(csar_dir))
+        chdir(csar_dir)
+    else:
+        ast = tosca.load(Path.cwd(), PurePath(service_template))
+
     template = ast.get_template(inputs)
     topology = template.instantiate(storage)
     topology.deploy(verbose_mode, num_workers)

@@ -4,7 +4,7 @@ from pathlib import Path, PurePath
 from opera.error import DataError, ParseError
 from opera.parser import tosca
 from opera.storage import Storage
-from os import path
+from os import path, chdir
 
 
 def add_parser(subparsers):
@@ -18,8 +18,8 @@ def add_parser(subparsers):
     )
     parser.add_argument(
         "--workers", "-w",
-        help="Maximum number of concurrent undeployment \
-            threads (positive number, default 1)",
+        help="Maximum number of concurrent undeployment "
+             "threads (positive number, default 1)",
         type=int, default=1
     )
     parser.add_argument(
@@ -59,7 +59,14 @@ def undeploy(storage: Storage, verbose_mode: bool, num_workers: int):
     service_template = storage.read("root_file")
     inputs = storage.read_json("inputs")
 
-    ast = tosca.load(Path.cwd(), PurePath(service_template))
+    if storage.exists("csars"):
+        csar_dir = Path(storage.path) / "csars" / "csar"
+        ast = tosca.load(Path(csar_dir),
+                         PurePath(service_template).relative_to(csar_dir))
+        chdir(csar_dir)
+    else:
+        ast = tosca.load(Path.cwd(), PurePath(service_template))
+
     template = ast.get_template(inputs)
     topology = template.instantiate(storage)
     topology.undeploy(verbose_mode, num_workers)
