@@ -90,7 +90,7 @@ def initialize_compressed_csar(csar_name: str,
     storage.write(str(csar_tosca_service_template_path), "root_file")
 
     # try to initiate service template from csar
-    ast = tosca.load(Path.cwd(), csar_tosca_service_template_path)
+    ast = tosca.load(Path(csar_dir), Path(tosca_service_template))
     template = ast.get_template(inputs)
     template.instantiate(storage)
 
