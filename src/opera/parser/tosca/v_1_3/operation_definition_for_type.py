@@ -4,19 +4,18 @@ from ..entity import Entity
 from ..list import List
 from ..map import Map
 from ..string import String
-from ..void import Void
 
 from .operation_implementation_definition import (
     OperationImplementationDefinition,
 )
-from .parameter_definition import ParameterDefinition
+from .property_definition import PropertyDefinition
 
 
 class OperationDefinitionForType(Entity):
     ATTRS = dict(
         description=String,
         implementation=OperationImplementationDefinition,
-        inputs=Map(ParameterDefinition),
+        inputs=Map(PropertyDefinition),
         outputs=Map(List(String)),
     )
 

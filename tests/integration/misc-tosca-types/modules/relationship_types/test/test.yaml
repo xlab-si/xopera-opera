@@ -15,6 +15,7 @@ relationship_types:
             inputs:
               relationship_property:
                 default: { get_property: relationship_property }
+                type: string
             implementation:
               primary: playbooks/test.yaml
 ...
