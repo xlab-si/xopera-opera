@@ -3,6 +3,12 @@ import pathlib
 
 
 class Storage:
+    DEFAULT_INSTANCE_PATH = ".opera"
+
+    @classmethod
+    def create(cls, instance_path: str = None) -> "Storage":
+        return Storage(pathlib.Path(instance_path or cls.DEFAULT_INSTANCE_PATH))
+
     def __init__(self, path):
         self.path = path
 
