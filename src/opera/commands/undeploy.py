@@ -22,26 +22,20 @@ def add_parser(subparsers):
             threads (positive number, default 1)",
         type=int, default=1
     )
-    parser.set_defaults(func=undeploy)
+    parser.set_defaults(func=_parser_callback)
 
 
-def undeploy(args):
+def _parser_callback(args):
     if args.instance_path and not path.isdir(args.instance_path):
         raise argparse.ArgumentTypeError("Directory {0} is not a valid path!".format(args.instance_path))
-
-    storage = Storage(Path(args.instance_path)) if args.instance_path else Storage(Path(".opera"))
-    root = storage.read("root_file")
-    inputs = storage.read_json("inputs")
 
     if args.workers < 1:
         print("{0} is not a positive number!".format(args.workers))
         return 1
 
+    storage = Storage.create(args.instance_path)
     try:
-        ast = tosca.load(Path.cwd(), PurePath(root))
-        template = ast.get_template(inputs)
-        topology = template.instantiate(storage)
-        topology.undeploy(args.workers)
+        undeploy(storage, args.workers)
     except ParseError as e:
         print("{}: {}".format(e.loc, e))
         return 1
@@ -50,3 +44,17 @@ def undeploy(args):
         return 1
 
     return 0
+
+
+def undeploy(storage: Storage, num_workers: int):
+    """
+    :raises ParseError:
+    :raises DataError:
+    """
+    service_template = storage.read("root_file")
+    inputs = storage.read_json("inputs")
+
+    ast = tosca.load(Path.cwd(), PurePath(service_template))
+    template = ast.get_template(inputs)
+    topology = template.instantiate(storage)
+    topology.undeploy(num_workers)

@@ -1,4 +1,6 @@
 import argparse
+import typing
+from os import path
 from pathlib import Path, PurePath
 
 import yaml
@@ -6,7 +8,6 @@ import yaml
 from opera.error import DataError, ParseError
 from opera.parser import tosca
 from opera.storage import Storage
-from os import path
 
 
 def add_parser(subparsers):
@@ -32,14 +33,14 @@ def add_parser(subparsers):
                         type=argparse.FileType("r"), nargs='?',
                         help="TOSCA YAML service template file",
                         )
-    parser.set_defaults(func=deploy)
+    parser.set_defaults(func=_parser_callback)
 
 
-def deploy(args):
+def _parser_callback(args):
     if args.instance_path and not path.isdir(args.instance_path):
         raise argparse.ArgumentTypeError("Directory {0} is not a valid path!".format(args.instance_path))
 
-    storage = Storage(Path(args.instance_path)) if args.instance_path else Storage(Path(".opera"))
+    storage = Storage.create(args.instance_path)
 
     if args.workers < 1:
         print("{0} is not a positive number!".format(args.workers))
@@ -58,25 +59,16 @@ def deploy(args):
             return 1
 
     try:
-        if storage.exists("inputs"):
-            inputs = yaml.safe_load(storage.read("inputs"))
-        else:
-            inputs = {}
-            storage.write_json(inputs, "inputs")
-
         if args.inputs:
             inputs = yaml.safe_load(args.inputs)
-            storage.write_json(inputs, "inputs")
-
+        else:
+            inputs = None
     except Exception as e:
         print("Invalid inputs: {}".format(e))
         return 1
 
     try:
-        ast = tosca.load(Path.cwd(), PurePath(service_template))
-        template = ast.get_template(inputs)
-        topology = template.instantiate(storage)
-        topology.deploy(args.workers)
+        deploy(service_template, inputs, storage, args.workers)
     except ParseError as e:
         print("{}: {}".format(e.loc, e))
         return 1
@@ -85,3 +77,21 @@ def deploy(args):
         return 1
 
     return 0
+
+
+def deploy(service_template: str, inputs: typing.Optional[dict], storage: Storage, num_workers: int):
+    """
+    :raises ParseError:
+    :raises DataError:
+    """
+    if inputs is None:
+        if storage.exists("inputs"):
+            inputs = yaml.safe_load(storage.read("inputs"))
+        else:
+            inputs = {}
+    storage.write_json(inputs, "inputs")
+
+    ast = tosca.load(Path.cwd(), PurePath(service_template))
+    template = ast.get_template(inputs)
+    topology = template.instantiate(storage)
+    topology.deploy(num_workers)
