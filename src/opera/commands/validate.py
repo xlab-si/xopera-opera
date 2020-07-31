@@ -1,8 +1,10 @@
 import argparse
+import typing
 from pathlib import Path, PurePath
 
 import yaml
-from opera.error import ParseError
+
+from opera.error import ParseError, DataError
 from opera.parser import tosca
 
 
@@ -18,10 +20,10 @@ def add_parser(subparsers):
     parser.add_argument("csar",
                         type=argparse.FileType("r"),
                         help="Cloud service archive file")
-    parser.set_defaults(func=validate)
+    parser.set_defaults(func=_parser_callback)
 
 
-def validate(args):
+def _parser_callback(args):
     print("Validating service template ...")
 
     try:
@@ -31,10 +33,20 @@ def validate(args):
         return 1
 
     try:
-        ast = tosca.load(Path.cwd(), PurePath(args.csar.name))
-        ast.get_template(inputs)
+        validate(args.csar.name, inputs)
         print("Done.")
-        return 0
     except ParseError as e:
         print("{}: {}".format(e.loc, e))
         return 1
+    except DataError as e:
+        print(str(e))
+        return 1
+
+    return 0
+
+
+def validate(service_template: str, inputs: typing.Optional[dict]):
+    if inputs is None:
+        inputs = {}
+    ast = tosca.load(Path.cwd(), PurePath(service_template))
+    ast.get_template(inputs)
