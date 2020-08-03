@@ -49,7 +49,6 @@ def _parser_callback(args):
     # TODO(@tadeboro): This should be part of the init command that we do not
     # have yet.
     if args.template:
-        storage.write(args.template.name, "root_file")
         service_template = args.template.name
     else:
         if storage.exists("root_file"):
@@ -90,6 +89,7 @@ def deploy(service_template: str, inputs: typing.Optional[dict], storage: Storag
         else:
             inputs = {}
     storage.write_json(inputs, "inputs")
+    storage.write(service_template, "root_file")
 
     ast = tosca.load(Path.cwd(), PurePath(service_template))
     template = ast.get_template(inputs)

@@ -48,7 +48,6 @@ def _parser_callback(args):
             initialize_compressed_csar(args.csar.name, inputs, storage)
             print("CSAR was initialized")
         else:
-            storage.write(args.csar.name, "root_file")
             initialize_service_template(args.csar.name, inputs, storage)
             print("Service template was initialized")
     except ParseError as e:
@@ -92,6 +91,7 @@ def initialize_service_template(service_template: str, inputs: typing.Optional[d
     if inputs is None:
         inputs = {}
     storage.write_json(inputs, "inputs")
+    storage.write(service_template, "root_file")
 
     ast = tosca.load(Path.cwd(), PurePath(service_template))
     template = ast.get_template(inputs)
