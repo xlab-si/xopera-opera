@@ -1,3 +1,5 @@
+from collections import Counter
+
 from opera.error import DataError
 from opera.instance.node import Node as Instance
 from pathlib import Path
@@ -31,7 +33,24 @@ class Node:
         self.instances = None
 
     def resolve_requirements(self, topology):
+        requirement_occurrences = Counter([r.name for r in self.requirements])
         for r in self.requirements:
+            occurrences_range = r.occurrences.data if r.occurrences else None
+            min_occurrences = occurrences_range[0] if occurrences_range else 1
+            max_occurrences = occurrences_range[1] if occurrences_range else 1
+
+            if requirement_occurrences[r.name] < min_occurrences:
+                raise DataError(
+                    "Not enough occurrences found for requirement '{}'. "
+                    "Minimum is: {}".format(
+                        r.name, min_occurrences
+                    ))
+            if requirement_occurrences[r.name] > max_occurrences:
+                raise DataError(
+                    "Too many occurrences found for requirement '{}'. "
+                    "Maximum is: {}".format(
+                        r.name, max_occurrences
+                    ))
             r.resolve(topology)
 
     def is_a(self, typ):
