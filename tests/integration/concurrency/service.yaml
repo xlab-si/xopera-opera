@@ -134,7 +134,7 @@ topology_template:
         time: "1"
       requirements:
         - host: my-workstation
-        - dependency:  hello-1
-        - dependency:  hello-2
-        - dependency:  hello-7
-        - dependency:  hello-13
+        - dependency1:  hello-1
+        - dependency2:  hello-2
+        - dependency7:  hello-7
+        - dependency13:  hello-13

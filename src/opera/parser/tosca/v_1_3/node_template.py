@@ -87,9 +87,12 @@ class NodeTemplate(CollectorMixin, Entity):
                     node_name, name, assignment.node.data,
                 )
 
+            occurrences = definitions[name].get("occurrences")
+
             requirements.append(Requirement(
                 name, assignment.node.data,
                 relationship.get_template(relationship_name, service_ast),
+                occurrences,
             ))
 
         return requirements

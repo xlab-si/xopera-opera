@@ -9,7 +9,7 @@ from ..base import Base
 #  1. TOSCA's range type is a bit ugly to parse because upper bound can be
 #     string (UNBOUNDED) and should be treated as infinity.
 #  2. Python's bool type subclasses int, which makes isinstance(False, int)
-#     truthy. Thsi is why we have separate checks for bool.
+#     trusty. This is why we have separate checks for bool.
 
 class Range(Base):
     @classmethod
