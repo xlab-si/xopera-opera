@@ -77,3 +77,12 @@ class Relationship(Base):
         if host == "TARGET":
             return self.target.get_property(["SELF", prop] + rest)
         return self.template.get_artifact(params)
+
+    def concat(self, params):
+        return self.template.concat(params)
+
+    def join(self, params):
+        return self.template.join(params)
+
+    def token(self, params):
+        return self.template.token(params)
