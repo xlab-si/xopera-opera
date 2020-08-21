@@ -1,0 +1,82 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  hello_type_1:
+    derived_from: tosca.nodes.SoftwareComponent
+    attributes:
+      attribute1:
+        type: string
+    properties:
+      property1:
+        type: string
+
+  hello_type_2:
+    attributes:
+      attribute2:
+        type: string
+    properties:
+      property2:
+        type: string
+    derived_from: tosca.nodes.SoftwareComponent
+
+topology_template:
+  inputs:
+    input:
+      type: string
+      default: input
+
+  node_templates:
+    my-workstation:
+      type: tosca.nodes.Compute
+      attributes:
+        private_address: localhost
+        public_address: localhost
+
+    hello1:
+      type: hello_type_1
+      attributes:
+        attribute1: "attribute1"
+      properties:
+        property1: "property1"
+      requirements:
+        - host: my-workstation
+
+    hello2:
+      type: hello_type_2
+      attributes:
+        attribute2: "attribute2"
+      properties:
+        property2: "property2"
+      requirements:
+        - host: my-workstation
+
+  outputs:
+    concat_output:
+      # Result: http://attribute1:property1
+      description: Concatenate string values
+      value: { concat: [ 'http://',
+                       get_attribute: [ hello1, attribute1 ],
+                       ':',
+                       get_property: [ hello1, property1 ] ] }
+    join1_output:
+       # Result: tosca
+      description: Join string values without a delimiter (concat)
+      value: { join: [ [ "t", "o", "s", "c", "a" ] ] }
+    join2_output:
+       # Result: t_o_s_c_a
+      description: Join string values with delimiter
+      value: { join: [ [ "t", "o", "s", "c", "a" ], "_" ] }
+    join3_output:
+       # Result: input, attribute2, property2
+      description: Join string values with delimiter
+      value: { join: [ [ { get_input: input },
+                         { get_attribute: [ hello2, attribute2 ] },
+                         { get_property: [ hello2, property2 ] } ], ", " ] }
+    token1_output:
+       # Result: 111
+      description: Tokenize the string and get the zeroth substring
+      value: { token: [ "111 222 333 444", " ", 0 ] }
+    token2_output:
+       # Result: s
+      description: Tokenize the string and get the second substring
+      value: { token: [ "t-*-o-*-s-*-c-*-a", "-*-", 2 ] }

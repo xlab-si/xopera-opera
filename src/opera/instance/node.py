@@ -187,3 +187,12 @@ class Node(Base):
 
     def get_artifact(self, params):
         return self.template.get_artifact(params)
+
+    def concat(self, params):
+        return self.template.concat(params)
+
+    def join(self, params):
+        return self.template.join(params)
+
+    def token(self, params):
+        return self.template.token(params)

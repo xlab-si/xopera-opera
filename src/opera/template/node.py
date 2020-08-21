@@ -188,3 +188,12 @@ class Node:
         if prop in self.artifacts:
             self.artifacts[prop].eval(self)
             return Path(self.artifacts[prop].data).name
+
+    def concat(self, params):
+        return self.topology.concat(params)
+
+    def join(self, params):
+        return self.topology.join(params)
+
+    def token(self, params):
+        return self.topology.token(params)

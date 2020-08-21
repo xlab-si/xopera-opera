@@ -9,6 +9,9 @@ class Value:
         "get_input",
         "get_property",
         "get_artifact",
+        "concat",
+        "join",
+        "token",
     ))
 
     def __init__(self, typ, present, data=None):
