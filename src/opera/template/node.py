@@ -76,10 +76,11 @@ class Node:
 
         return host or "localhost"
 
-    def run_operation(self, host, interface, operation, instance, verbose):
+    def run_operation(self, host, interface, operation, instance, verbose,
+                      workdir):
         operation = self.interfaces[interface].operations.get(operation)
         if operation:
-            return operation.run(host, instance, verbose)
+            return operation.run(host, instance, verbose, workdir)
         return True, {}, {}
 
     #

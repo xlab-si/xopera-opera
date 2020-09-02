@@ -19,7 +19,8 @@ class CloudServiceArchive:
             ZipFile(self._csar_name, 'r').extractall(tempdir)
 
             try:
-                meta_file_path = Path(tempdir) / "TOSCA-Metadata" / "TOSCA.meta"
+                meta_file_path = Path(
+                    tempdir) / "TOSCA-Metadata" / "TOSCA.meta"
                 if meta_file_path.exists():
                     with meta_file_path.open() as meta_file:
                         self._tosca_meta = yaml.safe_load(meta_file)
@@ -30,10 +31,13 @@ class CloudServiceArchive:
                     self._get_created_by()
                     self._get_other_definitions()
 
-                    # check if 'Entry-Definitions' points to an existing template file in the CSAR
+                    # check if 'Entry-Definitions' points to an existing
+                    # template file in the CSAR
                     if not Path(tempdir).joinpath(template_entry).exists():
-                        raise ParseError('The file "{}" defined within "Entry-Definitions" in '
-                                         '"TOSCA-Metadata/TOSCA.meta" does not exist.'.format(template_entry), self)
+                        raise ParseError(
+                            'The file "{}" defined within "Entry-Definitions" '
+                            'in "TOSCA-Metadata/TOSCA.meta" does not exist.'
+                            .format(template_entry), self)
 
                     return template_entry
                 else:
@@ -44,7 +48,8 @@ class CloudServiceArchive:
 
                     if len(root_yaml_files) != 1:
                         raise ParseError("There should be one root level yaml "
-                                         "file in the root of the CSAR: {}.".format(root_yaml_files), self)
+                                         "file in the root of the CSAR: {}."
+                                         .format(root_yaml_files), self)
 
                     with Path(root_yaml_files[0]).open() as root_template:
                         root_yaml_template = yaml.safe_load(root_template)
@@ -62,20 +67,26 @@ class CloudServiceArchive:
         csar_version = self._tosca_meta.get('CSAR-Version')
         if csar_version and csar_version != 1.1:
             raise ParseError('CSAR-Version entry in the CSAR {} is '
-                             'required to denote version 1.1".'.format(self._csar_name), self)
+                             'required to denote version 1.1".'.format(
+                                self._csar_name), self)
         return csar_version
 
     def _validate_tosca_meta_file_version(self):
-        tosca_meta_file_version = self._tosca_meta.get('TOSCA-Meta-File-Version')
+        tosca_meta_file_version = self._tosca_meta.get(
+            'TOSCA-Meta-File-Version')
         if tosca_meta_file_version and tosca_meta_file_version != 1.1:
-            raise ParseError('TOSCA-Meta-File-Version entry in the CSAR {} is '
-                             'required to denote version 1.1".'.format(self._csar_name), self)
+            raise ParseError(
+                'TOSCA-Meta-File-Version entry in the CSAR {} is '
+                'required to denote version 1.1".'.format(
+                    self._csar_name), self)
         return tosca_meta_file_version
 
     def _get_entry_definitions(self):
         if 'Entry-Definitions' not in self._tosca_meta:
-            raise ParseError('The CSAR "{}" is missing the required metadata "Entry-Definitions" in '
-                             '"TOSCA-Metadata/TOSCA.meta".'.format(self._csar_name), self)
+            raise ParseError(
+                'The CSAR "{}" is missing the required metadata '
+                '"Entry-Definitions" in "TOSCA-Metadata/TOSCA.meta".'.format(
+                    self._csar_name), self)
         return self._tosca_meta.get('Entry-Definitions')
 
     def _get_created_by(self):
@@ -86,14 +97,16 @@ class CloudServiceArchive:
 
     def _get_template_version(self):
         if "template_version" not in self._metadata:
-            raise Exception('The CSAR "{}" is missing the required '
-                            'template_version in metadata".'.format(self._csar_name))
+            raise Exception(
+                'The CSAR "{}" is missing the required '
+                'template_version in metadata".'.format(self._csar_name))
         return self._metadata.get('template_version')
 
     def _get_template_name(self):
         if "template_version" not in self._metadata:
-            raise ParseError('The CSAR "{}" is missing the required'
-                             ' template_name in metadata".'.format(self._csar_name), self)
+            raise ParseError(
+                'The CSAR "{}" is missing the required '
+                'template_name in metadata".'.format(self._csar_name), self)
         return self._metadata.get('template_name')
 
     def _get_author(self):

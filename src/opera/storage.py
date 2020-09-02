@@ -11,7 +11,7 @@ class Storage:
         return Storage(pathlib.Path(instance_path or cls.DEFAULT_INSTANCE_PATH))
 
     def __init__(self, path):
-        self.path = path
+        self.path = path.absolute()
 
         path.mkdir(exist_ok=True)
 

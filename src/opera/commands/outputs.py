@@ -65,7 +65,13 @@ def outputs(storage: Storage) -> dict:
     service_template = storage.read("root_file")
     inputs = storage.read_json("inputs")
 
-    ast = tosca.load(Path.cwd(), PurePath(service_template))
+    if storage.exists("csars"):
+        csar_dir = Path(storage.path) / "csars" / "csar"
+        ast = tosca.load(Path(csar_dir),
+                         PurePath(service_template).relative_to(csar_dir))
+    else:
+        ast = tosca.load(Path.cwd(), PurePath(service_template))
+
     template = ast.get_template(inputs)
     # We need to instantiate the template in order
     # to get access to the instance state.
