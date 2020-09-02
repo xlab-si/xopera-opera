@@ -54,11 +54,11 @@ class Node(Base):
         # localhost if nothing suitable is found.
         return self.template.get_host() or "localhost"
 
-    def deploy(self, verbose):
+    def deploy(self, verbose, workdir):
         thread_utils.print_thread("  Deploying {}".format(self.tosca_id))
 
         self.set_state("creating")
-        self.run_operation("HOST", "Standard", "create", verbose)
+        self.run_operation("HOST", "Standard", "create", verbose, workdir)
         self.set_state("created")
 
         self.set_state("configuring")
@@ -66,27 +66,31 @@ class Node(Base):
             for relationship in self.out_edges[requirement].values():
                 relationship.run_operation(
                     "SOURCE", "Configure", "pre_configure_source", verbose,
+                    workdir
                 )
         for requirement_dependants in self.in_edges.values():
             for relationship in requirement_dependants.values():
                 relationship.run_operation(
                     "TARGET", "Configure", "pre_configure_target", verbose,
+                    workdir
                 )
-        self.run_operation("HOST", "Standard", "configure", verbose)
+        self.run_operation("HOST", "Standard", "configure", verbose, workdir)
         for requirement in set([r.name for r in self.template.requirements]):
             for relationship in self.out_edges[requirement].values():
                 relationship.run_operation(
                     "SOURCE", "Configure", "post_configure_source", verbose,
+                    workdir
                 )
         for requirement_dependants in self.in_edges.values():
             for relationship in requirement_dependants.values():
                 relationship.run_operation(
                     "TARGET", "Configure", "post_configure_target", verbose,
+                    workdir
                 )
         self.set_state("configured")
 
         self.set_state("starting")
-        self.run_operation("HOST", "Standard", "start", verbose)
+        self.run_operation("HOST", "Standard", "start", verbose, workdir)
         self.set_state("started")
 
         # TODO(@tadeboro): Execute various add hooks
@@ -94,15 +98,15 @@ class Node(Base):
             "  Deployment of {} complete".format(self.tosca_id)
         )
 
-    def undeploy(self, verbose):
+    def undeploy(self, verbose, workdir):
         thread_utils.print_thread("  Undeploying {}".format(self.tosca_id))
 
         self.set_state("stopping")
-        self.run_operation("HOST", "Standard", "stop", verbose)
+        self.run_operation("HOST", "Standard", "stop", verbose, workdir)
         self.set_state("configured")
 
         self.set_state("deleting")
-        self.run_operation("HOST", "Standard", "delete", verbose)
+        self.run_operation("HOST", "Standard", "delete", verbose, workdir)
         self.set_state("initial")
 
         # TODO(@tadeboro): Execute various remove hooks

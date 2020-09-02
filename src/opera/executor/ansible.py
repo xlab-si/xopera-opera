@@ -27,14 +27,16 @@ def _get_inventory(host):
     return yaml.safe_dump(dict(all=dict(hosts=dict(opera=inventory))))
 
 
-def run(host, primary, dependencies, artifacts, vars, verbose):
+def run(host, primary, dependencies, artifacts, vars, verbose, workdir):
     with tempfile.TemporaryDirectory() as dir_path:
         playbook = os.path.join(dir_path, os.path.basename(primary))
-        utils.copy(primary, playbook)
+        utils.copy(os.path.join(workdir, primary), playbook)
         for d in dependencies:
-            utils.copy(d, os.path.join(dir_path, os.path.basename(d)))
+            utils.copy(os.path.join(workdir, d),
+                       os.path.join(dir_path, os.path.basename(d)))
         for a in artifacts:
-            utils.copy(a, os.path.join(dir_path, os.path.basename(a)))
+            utils.copy(os.path.join(workdir, a),
+                       os.path.join(dir_path, os.path.basename(a)))
         inventory = utils.write(
             dir_path, _get_inventory(host), suffix=".yaml",
         )

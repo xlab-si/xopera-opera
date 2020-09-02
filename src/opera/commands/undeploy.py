@@ -59,14 +59,15 @@ def undeploy(storage: Storage, verbose_mode: bool, num_workers: int):
     service_template = storage.read("root_file")
     inputs = storage.read_json("inputs")
 
+    workdir = str(Path.cwd())
     if storage.exists("csars"):
         csar_dir = Path(storage.path) / "csars" / "csar"
+        workdir = str(csar_dir)
         ast = tosca.load(Path(csar_dir),
                          PurePath(service_template).relative_to(csar_dir))
-        chdir(csar_dir)
     else:
         ast = tosca.load(Path.cwd(), PurePath(service_template))
 
     template = ast.get_template(inputs)
     topology = template.instantiate(storage)
-    topology.undeploy(verbose_mode, num_workers)
+    topology.undeploy(verbose_mode, workdir, num_workers)

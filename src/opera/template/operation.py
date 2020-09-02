@@ -14,7 +14,7 @@ class Operation:
         self.timeout = timeout
         self.host = host
 
-    def run(self, host, instance, verbose):
+    def run(self, host, instance, verbose, workdir):
         thread_utils.print_thread(
             "    Executing {} on {}".format(self.name, instance.tosca_id)
         )
@@ -42,6 +42,7 @@ class Operation:
             actual_host, str(self.primary),
             tuple(str(i) for i in self.dependencies),
             tuple(str(i) for i in self.artifacts), operation_inputs, verbose,
+            workdir
         )
         if not success:
             return False, {}, {}

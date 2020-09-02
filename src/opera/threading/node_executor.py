@@ -16,9 +16,9 @@ class NodeExecutor(ThreadPoolExecutor):
     def not_submitted(self, node_id):
         return node_id not in self.processed_nodes
 
-    def submit_operation(self, operation, node_id, verbose):
+    def submit_operation(self, operation, node_id, verbose, workdir):
         self.processed_nodes.add(node_id)
-        self.futures[self.submit(operation, verbose)] = node_id
+        self.futures[self.submit(operation, verbose, workdir)] = node_id
 
     def wait_results(self):
         proceed = bool(self.futures)

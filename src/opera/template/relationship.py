@@ -17,10 +17,11 @@ class Relationship:
         relationship_id = "{}--{}".format(source.tosca_id, target.tosca_id)
         return Instance(self, relationship_id, source, target)
 
-    def run_operation(self, host, interface, operation, instance, verbose):
+    def run_operation(self, host, interface, operation, instance, verbose,
+                      workdir):
         operation = self.interfaces[interface].operations.get(operation)
         if operation:
-            return operation.run(host, instance, verbose)
+            return operation.run(host, instance, verbose, workdir)
         return True, {}, {}
 
     #
