@@ -88,6 +88,10 @@ topology_template:
             capability_property: capability_property_value
       requirements:
         - host: my-workstation1
+      artifacts:
+        artifact:
+          type: daily_test.artifacts.test
+          file: modules/node_types/test/file.test
 
   relationship_templates:
     test:

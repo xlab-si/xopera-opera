@@ -165,12 +165,6 @@ class CollectorMixin:
         definitions = typ.collect_artifact_definitions(service_ast)
         assignments = self.get("artifacts", {})
 
-        undeclared_artifacts = set(assignments.keys()) - definitions.keys()
-        if undeclared_artifacts:
-            self.abort("Invalid artifacts: {}.".format(
-                ", ".join(undeclared_artifacts),
-            ), self.loc)
-
         return {
             name: (assignments.get(name) or definition).get_value(
                 definition.get_value_type(service_ast),
