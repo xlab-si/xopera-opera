@@ -40,7 +40,7 @@ commands:
       - run: make release
 
   create_and_push_stable_branch:
-    description: Create and push GitHub stable branch which points to the latest relased tag/commit
+    description: Create and push GitHub stable branch which points to the latest released tag/commit
     steps:
       - add_ssh_keys:
           fingerprints:
@@ -50,7 +50,7 @@ commands:
       - run: git push origin stable
 
   build_and_deploy_docs_to_github_pages:
-    description: Build Sphinx documentation and push GitHub stable branch which points to the latest relased tag/commit
+    description: Build Sphinx documentation and push GitHub stable branch which points to the latest released tag/commit
     steps:
       - add_ssh_keys:
           fingerprints:
@@ -111,7 +111,7 @@ jobs:
     executor: python37
     steps:
       - deploy_to_production_pypi
-  push_stable_relase_branch:
+  push_stable_release_branch:
     executor: python37
     steps:
       - create_and_push_stable_branch
@@ -150,9 +150,14 @@ workflows:
               only: /[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: /.*/
-      - push_stable_relase_branch:
+      - push_stable_release_branch:
           requires:
             - pypi_production_deploy
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
       - doc_build_and_push_gh_pages_branch:
           filters:
             branches:
