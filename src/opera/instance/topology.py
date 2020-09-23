@@ -21,7 +21,7 @@ class Topology:
                 for node in self.nodes.values():
                     if (not node.deployed
                             and node.ready_for_deploy
-                            and executor.not_submitted(node.tosca_id)):
+                            and executor.can_submit(node.tosca_id)):
                         executor.submit_operation(node.deploy, node.tosca_id,
                                                   verbose)
                 do_deploy = executor.wait_results()
@@ -36,7 +36,7 @@ class Topology:
                 for node in self.nodes.values():
                     if (not node.undeployed
                             and node.ready_for_undeploy
-                            and executor.not_submitted(node.tosca_id)):
+                            and executor.can_submit(node.tosca_id)):
                         executor.submit_operation(node.undeploy, node.tosca_id,
                                                   verbose)
                 do_undeploy = executor.wait_results()

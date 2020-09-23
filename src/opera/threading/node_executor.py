@@ -12,9 +12,11 @@ class NodeExecutor(ThreadPoolExecutor):
         )
         self.futures = {}
         self.processed_nodes = set()
+        self.num_workers = num_workers
 
-    def not_submitted(self, node_id):
-        return node_id not in self.processed_nodes
+    def can_submit(self, node_id):
+        return (len(self.processed_nodes) < self.num_workers
+                and node_id not in self.processed_nodes)
 
     def submit_operation(self, operation, node_id, verbose):
         self.processed_nodes.add(node_id)
@@ -31,10 +33,15 @@ class NodeExecutor(ThreadPoolExecutor):
 
         if errors:
             # if errors occurred
+            # try cancel pending futures
+            running = []
+            for fut in self.futures.keys():
+                if not fut.cancel():
+                    running.append(fut)
             # wait for all running operations to complete
             # and halt execution
             results = wait(
-                self.futures,
+                running,
                 return_when="ALL_COMPLETED"
             )
             errors.update(self.process_results(results))
