@@ -11,6 +11,15 @@ class Topology:
             node.instantiate_relationships()
             node.read()
 
+    def get_info(self):
+        if all(node.undeployed for node in self.nodes.values()):
+            return "undeployed"
+
+        if all(node.deployed for node in self.nodes.values()):
+            return "deployed"
+
+        return "interrupted"
+
     def deploy(self, verbose, workdir, num_workers=None):
         # Currently, we are running a really stupid O(n^3) algorithm, but
         # unless we get to the templates with millions of node instances, we
