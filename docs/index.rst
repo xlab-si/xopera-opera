@@ -12,6 +12,8 @@ The following documentation explains the usage of xOpera TOSCA orchestrator. Wan
     installation
     examples
     documentation
+    saas
+
 ..
    Indices and tables
    ==================
