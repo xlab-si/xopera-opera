@@ -6,7 +6,7 @@ from opera.template.capability import Capability
 class CollectorMixin:
     def collect_types(self, service_ast):
         typ = self.type.resolve_reference(service_ast)
-        return (self.type.data, ) + typ.collect_types(service_ast)
+        return (self.type.data,) + typ.collect_types(service_ast)
 
     def collect_properties(self, service_ast):
         typ = self.type.resolve_reference(service_ast)
@@ -61,7 +61,7 @@ class CollectorMixin:
             defined_operations = definition.get("operations", {})
             assigned_operations = assignment.get("operations", {})
             undeclared_operations = (
-                set(assigned_operations.keys()) - defined_operations.keys()
+                    set(assigned_operations.keys()) - defined_operations.keys()
             )
             if undeclared_operations:
                 self.abort("Undeclared operations: {}.".format(
@@ -117,8 +117,8 @@ class CollectorMixin:
 
                 # Operation implementation details
                 impl = (
-                    op_assignment.get("implementation") or
-                    op_definition.get("implementation")
+                        op_assignment.get("implementation") or
+                        op_definition.get("implementation")
                 )
                 # TODO(@tadeboro): impl can be None here. Fix this.
                 timeout, operation_host = 0, None
@@ -133,7 +133,8 @@ class CollectorMixin:
                     dependencies=[
                         d.file.data for d in impl.get("dependencies", [])
                     ],
-                    artifacts=[a.data for a in self.collect_artifacts(service_ast).values()],
+                    artifacts=[a.data for a in
+                               self.collect_artifacts(service_ast).values()],
                     inputs=inputs,
                     outputs=outputs,
                     timeout=timeout,
@@ -164,6 +165,14 @@ class CollectorMixin:
         typ = self.type.resolve_reference(service_ast)
         definitions = typ.collect_artifact_definitions(service_ast)
         assignments = self.get("artifacts", {})
+
+        duplicate_interfaces = set(assignments.keys()).intersection(
+            definitions.keys())
+        if duplicate_interfaces:
+            for duplicate in duplicate_interfaces:
+                definitions.pop(duplicate)
+
+        definitions.update(assignments)
 
         return {
             name: (assignments.get(name) or definition).get_value(
