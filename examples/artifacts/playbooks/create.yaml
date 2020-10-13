@@ -1,14 +1,22 @@
 ---
 - hosts: all
   gather_facts: false
-
   tasks:
-    - name: See what's in that linked file
-      command: "cat {{ file }}"
-      register: file_contents
+    - name: See what's in that linked text file
+      command: "cat {{ text_file_artifact }}"
+      register: text_file_contents
 
-    - name: Set attribute
+    - name: Set text file attribute
       set_stats:
         data:
-          my_attribute: "{{ file_contents.stdout }}"
+          my_text_file_attribute: "{{ text_file_contents.stdout }}"
+
+    - name: See what's in that linked JSON file
+      command: "cat {{ json_file_artifact }}"
+      register: json_file_contents
+
+    - name: Set JSON file attribute
+      set_stats:
+        data:
+          my_json_file_attribute: "{{ json_file_contents.stdout }}"
 ...

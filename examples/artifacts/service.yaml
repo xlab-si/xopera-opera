@@ -5,7 +5,15 @@ node_types:
   opera.nodes.file:
     derived_from: tosca.nodes.SoftwareComponent
     attributes:
-      my_attribute:
+      my_text_file_attribute:
+        description: Text file contents
+        type: string
+      my_json_file_attribute:
+        description: JSON file contents
+        type: string
+    properties:
+      json_file:
+        description: JSON file path
         type: string
     interfaces:
       Standard:
@@ -13,10 +21,16 @@ node_types:
           create:
             implementation: playbooks/create.yaml
             inputs:
-              file:
-                default: { get_artifact: [ SELF, file ] }
+              text_file_artifact:
+                description: Text file artifact input
+                type: string
+                default: { get_artifact: [ SELF, text_file ] }
+              json_file_artifact:
+                description: JSON file artifact input
+                type: string
+                default: { get_property: [ SELF, json_file ] }
     artifacts:
-        file:
+        text_file:
           type: tosca.artifacts.File
           file: files/file.txt
 
@@ -24,9 +38,18 @@ topology_template:
   node_templates:
     artifacts_file:
       type: opera.nodes.file
+      properties:
+        json_file: { get_artifact: [ SELF, json_file ] }
+      artifacts:
+          json_file:
+            type: tosca.artifacts.File
+            file: files/file.json
 
   outputs:
-    output_attr:
+    output_attribute_text_file:
       description: Example of attribute output
-      value: { get_attribute: [ artifacts_file, my_attribute ] }
+      value: { get_attribute: [ artifacts_file, my_text_file_attribute ] }
+    output_attribute_json_file:
+      description: Example of attribute output
+      value: { get_attribute: [ artifacts_file, my_json_file_attribute ] }
 ...

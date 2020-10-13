@@ -183,14 +183,18 @@ class Node:
             raise DataError("HOST is not yet supported in opera.")
 
         if location == "LOCAL_FILE":
-            raise DataError("Location get_artifact property is not yet supported in opera.")
+            raise DataError("Location get_artifact property is "
+                            "not yet supported in opera.")
 
         if remove:
-            raise DataError("Remove get_artifact property artifacts is not yet supported in opera.")
+            raise DataError("Remove get_artifact property artifacts is "
+                            "not yet supported in opera.")
 
         if prop in self.artifacts:
-            self.artifacts[prop].eval(self)
+            self.artifacts[prop].eval(self, prop)
             return Path(self.artifacts[prop].data).name
+        else:
+            raise DataError("Cannot find artifact '{}'.".format(prop))
 
     def concat(self, params):
         return self.topology.concat(params)
