@@ -69,14 +69,14 @@ class Topology:
 
         return self.find_node(node_name).get_artifact(["SELF"] + rest)
 
-    def concat(self, params):
+    def concat(self, params, node=None):
         if not isinstance(params, list):
             raise DataError("Concat intrinsic function parameters '{}'"
                             " should be a list".format(params))
 
-        return self.join([params])
+        return self.join([params], node)
 
-    def join(self, params):
+    def join(self, params, node=None):
         if 1 <= len(params) <= 2:
             if not isinstance(params[0], list):
                 raise DataError("Concat or join intrinsic function parameters "
@@ -100,8 +100,9 @@ class Topology:
 
                     value_expression_name = param_dict_keys[0]
                     try:
+                        entity = node if node else self
                         values_to_join.append(
-                            getattr(self, value_expression_name)(
+                            getattr(entity, value_expression_name)(
                                 param[value_expression_name]))
                     except Exception:
                         raise DataError(
