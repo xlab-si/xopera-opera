@@ -197,10 +197,10 @@ class Node:
             raise DataError("Cannot find artifact '{}'.".format(prop))
 
     def concat(self, params):
-        return self.topology.concat(params)
+        return self.topology.concat(params, self)
 
     def join(self, params):
-        return self.topology.join(params)
+        return self.topology.join(params, self)
 
     def token(self, params):
         return self.topology.token(params)

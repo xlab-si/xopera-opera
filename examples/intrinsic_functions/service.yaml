@@ -11,13 +11,30 @@ node_types:
         type: string
 
   hello_type_2:
+    derived_from: tosca.nodes.SoftwareComponent
     attributes:
       attribute2:
         type: string
     properties:
       property2:
         type: string
+
+  hello_type_3:
     derived_from: tosca.nodes.SoftwareComponent
+    attributes:
+      attribute3_1:
+        type: string
+      attribute3_2:
+        type: string
+        default: { join: [ [ "a", "t", "t", "r", "i", "b", "u", "t", "e" ] ] }
+    properties:
+      property3_1:
+        type: string
+      property3_2:
+        type: string
+        default: { concat: [ 'Property: ', get_attribute: [ SELF, attribute3_2 ] ] }
+      property3_3:
+        type: string
 
 topology_template:
   inputs:
@@ -50,6 +67,13 @@ topology_template:
       requirements:
         - host: my-workstation
 
+    hello3:
+      type: hello_type_3
+      attributes:
+        attribute3_1: { concat: [ 'Attribute: ', get_property: [ SELF, property3_1 ] ] }
+      properties:
+        property3_1: { token: [ "my_property", "_", 1 ] }
+
   outputs:
     concat_output:
       # Result: http://attribute1:property1
@@ -80,3 +104,17 @@ topology_template:
        # Result: s
       description: Tokenize the string and get the second substring
       value: { token: [ "t-*-o-*-s-*-c-*-a", "-*-", 2 ] }
+    attribute:
+      # Result: Attribute: property
+      description: Attribute value
+      value: { get_attribute: [ hello3, attribute3_1 ] }
+    property:
+      # Result: Property: attribute
+      description: Property value
+      value: { get_property: [ hello3, property3_2 ] }
+    properties:
+      # Result: Properties: property1 property2 property
+      description: Joined properties
+      value: { join: [[ 'Properties:', { get_property: [ hello1, property1 ] },
+                                        { get_property: [ hello2, property2 ] },
+                                        { get_property: [ hello3, property3_1 ] } ], " " ] }
