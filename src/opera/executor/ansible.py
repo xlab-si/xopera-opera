@@ -47,6 +47,13 @@ def run(host, primary, dependencies, artifacts, vars, verbose, workdir):
             fd.write("[defaults]\n")
             fd.write("retry_files_enabled = False\n")
 
+            opera_ssh_host_key_checking = os.environ.get(
+                "OPERA_SSH_HOST_KEY_CHECKING")
+            if opera_ssh_host_key_checking is not None:
+                check = str(opera_ssh_host_key_checking).lower().strip()
+                if check[:1] == 'f' or check[:1] == "false":
+                    fd.write("host_key_checking = False\n")
+
         if verbose:
             print("***inputs***")
             print(["{}: {}".format(key, vars[key]) for key in vars])
