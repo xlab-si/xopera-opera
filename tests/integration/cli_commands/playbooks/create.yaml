@@ -1,0 +1,11 @@
+---
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: Say hello from node's attribute
+      debug:
+        msg: "{{ my_attribute_input }}"
+
+    - name: Say hello from node's property
+      debug:
+        msg: "{{ my_property_input }}"
