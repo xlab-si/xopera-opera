@@ -1,10 +1,10 @@
 import argparse
 import typing
+import yaml
+
 from os import path
 from pathlib import Path, PurePath
 from zipfile import ZipFile, is_zipfile
-
-import yaml
 
 from opera.error import DataError, ParseError
 from opera.parser import tosca
@@ -27,6 +27,11 @@ def add_parser(subparsers):
         help="YAML file with inputs",
     )
     parser.add_argument(
+        "--clean", "-c", action='store_true',
+        help="Clean storage by removing previously "
+             "initialized service template or CSAR",
+    )
+    parser.add_argument(
         "--verbose", "-v", action='store_true',
         help="Turns on verbose mode",
     )
@@ -38,7 +43,7 @@ def add_parser(subparsers):
 
 def _parser_callback(args):
     if args.instance_path and not path.isdir(args.instance_path):
-        raise argparse.ArgumentTypeError("Directory {0} is not a valid path!"
+        raise argparse.ArgumentTypeError("Directory {} is not a valid path!"
                                          .format(args.instance_path))
 
     storage = Storage.create(args.instance_path)
@@ -51,10 +56,10 @@ def _parser_callback(args):
 
     try:
         if is_zipfile(args.csar.name):
-            initialize_compressed_csar(args.csar.name, inputs, storage)
+            init_compressed_csar(args.csar.name, inputs, storage, args.clean)
             print("CSAR was initialized")
         else:
-            initialize_service_template(args.csar.name, inputs, storage)
+            init_service_template(args.csar.name, inputs, storage, args.clean)
             print("Service template was initialized")
     except ParseError as e:
         print("{}: {}".format(e.loc, e))
@@ -69,9 +74,16 @@ def _parser_callback(args):
     return 0
 
 
-def initialize_compressed_csar(csar_name: str,
-                               inputs: typing.Optional[dict],
-                               storage: Storage):
+def init_compressed_csar(csar_name: str, inputs: typing.Optional[dict],
+                         storage: Storage, clean_storage: bool):
+    if storage.exists("root_file"):
+        if clean_storage:
+            storage.remove_all()
+        else:
+            print("Looks like service template or CSAR has already been "
+                  "initialized. Use --clean/-c flag to clear the storage.")
+            return 1
+
     if inputs is None:
         inputs = {}
     storage.write_json(inputs, "inputs")
@@ -95,9 +107,16 @@ def initialize_compressed_csar(csar_name: str,
     template.instantiate(storage)
 
 
-def initialize_service_template(service_template: str,
-                                inputs: typing.Optional[dict],
-                                storage: Storage):
+def init_service_template(service_template: str, inputs: typing.Optional[dict],
+                          storage: Storage, clean_storage: bool):
+    if storage.exists("root_file"):
+        if clean_storage:
+            storage.remove_all()
+        else:
+            print("Looks like service template or CSAR has already been "
+                  "initialized. Use --clean/-c flag to clear the storage.")
+            return 1
+
     if inputs is None:
         inputs = {}
     storage.write_json(inputs, "inputs")
