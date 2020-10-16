@@ -1,0 +1,14 @@
+---
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+relationship_types:
+  daily_test.relationships.interfaces:
+    derived_from: tosca.relationships.DependsOn
+    interfaces:
+      Configure:
+        operations:
+          pre_configure_source: /modules/relationship_types/interfaces/playbooks/pre_configure_source.yaml
+          pre_configure_target: /modules/relationship_types/interfaces/playbooks/pre_configure_target.yaml
+          post_configure_source: /modules/relationship_types/interfaces/playbooks/post_configure_source.yaml
+          post_configure_target: /modules/relationship_types/interfaces/playbooks/post_configure_target.yaml
+...

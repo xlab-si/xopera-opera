@@ -21,9 +21,9 @@ node_types:
     interfaces:
       Standard:
         inputs:
-          slovenian_greeting: {default: { get_property: [SELF, slovenian_greeting] }, type: string}
-          croatian_greeting: {default: { get_property: [SELF, croatian_greeting] }, type: string}
-          something_to_pass_on: {default: { get_attribute: [SELF, something_to_pass_on] }, type: string}
+          slovenian_greeting: { default: { get_property: [SELF, slovenian_greeting] }, type: string }
+          croatian_greeting: { default: { get_property: [SELF, croatian_greeting] }, type: string }
+          something_to_pass_on: { default: { get_attribute: [SELF, something_to_pass_on] }, type: string }
         operations:
           create:
             implementation:

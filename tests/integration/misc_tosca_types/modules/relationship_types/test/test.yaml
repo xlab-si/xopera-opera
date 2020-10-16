@@ -7,14 +7,15 @@ relationship_types:
     properties:
       relationship_property:
         type: string
+        default: test123
         required: true
     interfaces:
       Configure:
         operations:
-          pre_configure_target:
+          pre_configure_source:
             inputs:
               relationship_property:
-                default: { get_property: relationship_property }
+                default: { get_property: [ SELF, relationship_property ] }
                 type: string
             implementation:
               primary: playbooks/test.yaml

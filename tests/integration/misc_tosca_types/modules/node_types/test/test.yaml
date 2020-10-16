@@ -8,6 +8,7 @@ imports:
   - ../../interface_types/test/test.yaml
   - ../../policy_types/test/test.yaml
   - ../../relationship_types/test/test.yaml
+  - ../../relationship_types/interfaces/interfaces.yaml
 
 node_types:
   daily_test.nodes.test:
@@ -38,7 +39,10 @@ node_types:
       test_capability:
         type: daily_test.capabilities.test
     requirements:
-      - host:
+      - host1:
           capability: tosca.capabilities.Compute
           relationship: daily_test.relationships.test
+      - host2:
+          capability: tosca.capabilities.Compute
+          relationship: daily_test.relationships.interfaces
 ...

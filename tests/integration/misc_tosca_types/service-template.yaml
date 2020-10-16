@@ -9,11 +9,13 @@ imports:
   - modules/interface_types/test/test.yaml
   - modules/node_types/file/file.yaml
   - modules/node_types/hello/hello.yaml
+  - modules/node_types/interfaces/interfaces.yaml
   - modules/node_types/noimpl/noimpl.yaml
   - modules/node_types/setter/setter.yaml
   - modules/node_types/test/test.yaml
   - modules/policy_types/test/test.yaml
   - modules/relationship_types/test/test.yaml
+  - modules/relationship_types/interfaces/interfaces.yaml
 
 metadata:
   targetNamespace: "daily_test.templates"
@@ -65,6 +67,9 @@ topology_template:
       requirements:
         - host: my-workstation1
 
+    interfaces:
+      type: daily_test.nodes.interfaces
+
     noimpl:
       type: daily_test.nodes.noimpl
       requirements:
@@ -87,7 +92,8 @@ topology_template:
           properties:
             capability_property: capability_property_value
       requirements:
-        - host: my-workstation1
+        - host1: my-workstation1
+        - host2: my-workstation2
       artifacts:
         artifact:
           type: daily_test.artifacts.test
@@ -98,6 +104,9 @@ topology_template:
       type: daily_test.relationships.test
       properties:
         relationship_property: test123
+
+    interfaces:
+      type: daily_test.relationships.interfaces
 
   groups:
     workstation_group:
