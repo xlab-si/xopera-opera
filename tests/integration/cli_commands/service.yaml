@@ -1,0 +1,76 @@
+---
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  cli_commands_test.nodes.hello:
+    derived_from: tosca.nodes.SoftwareComponent
+    attributes:
+      attribute:
+        type: integer
+        default: 42
+    properties:
+      property:
+        type: boolean
+        default: false
+    interfaces:
+      Standard:
+        inputs:
+          my_attribute_input: { default: { get_attribute: [SELF, attribute] }, type: string }
+          my_property_input: { default: { get_property: [SELF, property] }, type: string }
+        operations:
+          create: playbooks/create.yaml
+          delete: playbooks/delete.yaml
+
+  cli_commands_test.nodes.bye:
+    derived_from: tosca.nodes.SoftwareComponent
+    interfaces:
+      Standard:
+        operations:
+          start: playbooks/start.yaml
+          stop: playbooks/stop.yaml
+
+  cli_commands_test.nodes.node1:
+    derived_from: tosca.nodes.SoftwareComponent
+
+  cli_commands_test.nodes.node2:
+    derived_from: tosca.nodes.SoftwareComponent
+
+  cli_commands_test.nodes.node3:
+    derived_from: tosca.nodes.SoftwareComponent
+
+topology_template:
+  inputs:
+    test_attribute_input:
+      type: integer
+      default: 42
+    test_property_input:
+      type: boolean
+      default: false
+
+  node_templates:
+    test:
+      type: cli_commands_test.nodes.hello
+      attributes:
+        attribute: { get_input: test_attribute_input }
+      properties:
+        property: { get_input: test_property_input }
+
+    bye:
+      type: cli_commands_test.nodes.bye
+
+    node1:
+      type: cli_commands_test.nodes.node1
+
+    node2:
+      type: cli_commands_test.nodes.node2
+
+    node3:
+      type: cli_commands_test.nodes.node3
+
+  outputs:
+    output_attr:
+      description: Example of attribute output
+      value: { get_attribute: [ test, attribute ] }
+    output_prop:
+      description: Example of property output
+      value: { get_property: [ test, property ] }
