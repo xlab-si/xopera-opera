@@ -1,10 +1,11 @@
 import argparse
 import typing
-from os import chdir, path
-from pathlib import Path, PurePath
-
 import yaml
 
+from os import path
+from pathlib import Path, PurePath
+
+from opera.commands.info import info
 from opera.utils import prompt_yes_no_question
 from opera.error import DataError, ParseError
 from opera.parser import tosca
@@ -58,18 +59,19 @@ def add_parser(subparsers):
 
 def _parser_callback(args):
     if args.instance_path and not path.isdir(args.instance_path):
-        raise argparse.ArgumentTypeError("Directory {0} is not a valid path!"
+        raise argparse.ArgumentTypeError("Directory {} is not a valid path!"
                                          .format(args.instance_path))
 
-    storage = Storage.create(args.instance_path)
-
     if args.workers < 1:
-        print("{0} is not a positive number!".format(args.workers))
+        print("{} is not a positive number!".format(args.workers))
         return 1
 
+    storage = Storage.create(args.instance_path)
+    status = info(storage)["status"]
     delete_existing_state = False
+
     if storage.exists("instances"):
-        if args.resume:
+        if args.resume and status == "interrupted":
             if not args.force:
                 print("The resume deploy option might have unexpected "
                       "consequences on the already deployed blueprint.")
@@ -87,9 +89,12 @@ def _parser_callback(args):
                     delete_existing_state = True
                 else:
                     return 0
-        else:
-            print("The instance model already exists. Use --resume to "
-                  "continue or --clean-state to delete current deployment "
+        elif status == "deployed":
+            print("All instances have already been deployed.")
+            return 0
+        elif status == "interrupted":
+            print("The instance model already exists. Use --resume/-r to "
+                  "continue or --clean-state/-c to delete current deployment "
                   "state and start over the deployment.")
             return 0
 
