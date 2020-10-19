@@ -22,7 +22,6 @@ node_types:
             implementation:
               primary: playbooks/uninstall.yaml
 
-
 relationship_types:
   my.relationships.NginxSiteHosting:
     derived_from: tosca.relationships.HostedOn
@@ -33,5 +32,6 @@ relationship_types:
             inputs:
               marker:
                 default: { get_attribute: [ TARGET, host, id ] }
+                type: string
             implementation:
               primary: playbooks/reload.yaml

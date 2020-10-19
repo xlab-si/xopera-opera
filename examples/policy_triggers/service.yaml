@@ -34,7 +34,7 @@ interface_types:
     operations:
       scale_down:
         inputs:
-          adjustment: { default: { get_property: [ SELF, name ] } }
+          adjustment: { default: 0, type: integer }
         description: Operation for scaling down.
         implementation: playbooks/scale_down.yaml
 
@@ -43,7 +43,7 @@ interface_types:
     operations:
       scale_up:
         inputs:
-          adjustment: { default: { get_property: [ SELF, name ] } }
+          adjustment: { default: 1, type: integer }
         description: Operation for scaling up.
         implementation: playbooks/scale_up.yaml
 
@@ -83,8 +83,8 @@ policy_types:
         condition:
           - not:
             - and:
-              - available_instances: [ { greater: 42 } ]
-              - available_space: [ { greater: 1000 } ]
+              - available_instances: [ { greater_than: 42 } ]
+              - available_space: [ { greater_than: 1000 } ]
         action:
           - call_operation:
               operation: radon.interfaces.scaling.ScaleDown.scale_down
@@ -116,8 +116,8 @@ policy_types:
         condition:
           - not:
             - and:
-              - available_instances: [ { greater: 42 } ]
-              - available_space: [ { greater: 1000 } ]
+              - available_instances: [ { greater_than: 42 } ]
+              - available_space: [ { greater_than: 1000 } ]
         action:
           - call_operation:
               operation: radon.interfaces.scaling.ScaleUp.scale_up
@@ -160,12 +160,6 @@ topology_template:
         key_name: my_key
       requirements:
         - host: workstation
-      capabilities:
-        host_capability:
-         properties:
-           num_cpus: 1
-           disk_size: 10 GB
-           mem_size: 4096 MB
 
   policies:
     scale_down:
@@ -201,8 +195,8 @@ topology_template:
             constraint:
               - not:
                 - and:
-                  - available_instances: [ { greater: 42 } ]
-                  - available_space: [ { greater: 1000 } ]
+                  - available_instances: [ { greater_than: 42 } ]
+                  - available_space: [ { greater_than: 1000 } ]
             period: 60 sec
             evaluations: 2
             method: average
