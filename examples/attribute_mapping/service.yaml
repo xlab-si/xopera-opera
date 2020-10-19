@@ -20,7 +20,7 @@ node_types:
         operations:
           create:
             inputs:
-              id: { default: { get_property: [ SELF, enrolment_number ] } }
+              id: { default: { get_property: [ SELF, enrolment_number ] }, type: integer }
             outputs:
               student_id: [ SELF, student_id ]
             implementation: playbooks/create-student.yaml
@@ -51,8 +51,10 @@ relationship_types:
             inputs:
               student_id:
                 default: { get_attribute: [ TARGET, student_id ] }
+                type: string
               student_ids:
                 default: { get_attribute: [ SOURCE, student_ids ] }
+                type: list
             outputs:
               new_list: [ SOURCE, student_ids ]
             implementation: playbooks/teacher-teaches-student--preconfigure-source.yaml
