@@ -3,6 +3,7 @@ from opera.template.topology import Topology
 
 from ..entity import Entity
 from ..map import Map
+from ..list import List
 from ..string import String
 
 from .group_definition import GroupDefinition
@@ -19,7 +20,7 @@ class TopologyTemplate(Entity):
         node_templates=Map(NodeTemplate),
         relationship_templates=Map(RelationshipTemplate),
         groups=Map(GroupDefinition),
-        policies=Map(PolicyDefinition),
+        policies=List(Map(PolicyDefinition)),
         outputs=Map(ParameterDefinition),
         # TODO(@tadeboro): substitution_mappings and workflows
     )

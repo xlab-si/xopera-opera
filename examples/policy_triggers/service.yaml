@@ -34,7 +34,7 @@ interface_types:
     operations:
       scale_down:
         inputs:
-          adjustment: { default: 0, type: integer }
+          adjustment: { default: 1, type: integer }
         description: Operation for scaling down.
         implementation: playbooks/scale_down.yaml
 
@@ -162,44 +162,44 @@ topology_template:
         - host: workstation
 
   policies:
-    scale_down:
-      type: radon.policies.scaling.ScaleDown
-      properties:
-        cpu_upper_bound: 90
-        adjustment: 1
+    - scale_down:
+        type: radon.policies.scaling.ScaleDown
+        properties:
+          cpu_upper_bound: 90
+          adjustment: 1
 
-    scale_up:
-      type: radon.policies.scaling.ScaleUp
-      properties:
-        cpu_upper_bound: 90
-        adjustment: 1
+    - scale_up:
+        type: radon.policies.scaling.ScaleUp
+        properties:
+          cpu_upper_bound: 90
+          adjustment: 1
 
-    autoscale:
-      type: radon.policies.scaling.AutoScale
-      properties:
-        min_size: 3
-        max_size: 7
-      targets: [ openstack_vm ]
-      triggers:
-        radon.triggers.scaling:
-          description: A trigger for autoscaling
-          event: auto_scale_trigger
-          schedule:
-            start_time: 2020-04-08T21:59:43.10-06:00
-            end_time: 2022-04-08T21:59:43.10-06:00
-          target_filter:
-            node: openstack_vm
-            requirement: workstation
-            capability: host_capability
-          condition:
-            constraint:
-              - not:
-                - and:
-                  - available_instances: [ { greater_than: 42 } ]
-                  - available_space: [ { greater_than: 1000 } ]
-            period: 60 sec
-            evaluations: 2
-            method: average
-          action:
-            - call_operation: radon.interfaces.scaling.AutoScale.retrieve_info
-            - call_operation: radon.interfaces.scaling.AutoScale.autoscale
+    - autoscale:
+        type: radon.policies.scaling.AutoScale
+        properties:
+          min_size: 3
+          max_size: 7
+        targets: [ openstack_vm ]
+        triggers:
+          radon.triggers.scaling:
+            description: A trigger for autoscaling
+            event: auto_scale_trigger
+            schedule:
+              start_time: 2020-04-08T21:59:43.10-06:00
+              end_time: 2022-04-08T21:59:43.10-06:00
+            target_filter:
+              node: openstack_vm
+              requirement: workstation
+              capability: host_capability
+            condition:
+              constraint:
+                - not:
+                  - and:
+                    - available_instances: [ { greater_than: 42 } ]
+                    - available_space: [ { greater_than: 1000 } ]
+              period: 60 sec
+              evaluations: 2
+              method: average
+            action:
+              - call_operation: radon.interfaces.scaling.AutoScale.retrieve_info
+              - call_operation: radon.interfaces.scaling.AutoScale.autoscale
