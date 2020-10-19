@@ -105,11 +105,11 @@ topology_template:
       members: [ my-workstation1, my-workstation2 ]
 
   policies:
-    test:
-      type: daily_test_policies.test
-      properties:
-        test_id: *test
-      targets: [ hello, setter, workstation_group ]
+    - test:
+        type: daily_test_policies.test
+        properties:
+          test_id: *test
+        targets: [ hello, setter, workstation_group ]
 
   outputs:
     output_prop:

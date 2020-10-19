@@ -20,8 +20,8 @@ class TestParse:
               my_group:
                 type: group.type
             policies:
-              my_policy:
-                type: policy.type
+              - my_policy:
+                  type: policy.type
             outputs:
               my_output:
                 type: string
