@@ -33,6 +33,11 @@ integration_test: $(integration_test_scenarios)
 $(integration_test_scenarios):
 	cd $(dir $@) && bash $(notdir $@) $(OPERA)
 
+
+.PHONY: examples_test
+examples_test:
+	cd examples && bash runme.sh $(OPERA)
+
 .PHONY: build
 build:
 	pipenv run python setup.py sdist bdist_wheel
