@@ -14,6 +14,7 @@ commands:
       - common_setup
       - run: make unit_test
       - run: make integration_test
+      - run: make examples_test
 
   run_integration_tests_using_released_opera_version:
     description: Test xOpera CLI commands with testing service template
