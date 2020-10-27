@@ -1,0 +1,12 @@
+- hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Say post_configure_target
+      debug:
+        msg: "post_configure_target"
+
+    - name: Set attribute
+      set_stats:
+        data:
+          post_configure_target_attribute: "This is post configure target attribute"

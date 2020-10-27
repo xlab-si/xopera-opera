@@ -1,0 +1,43 @@
+- hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Say post_configure_source
+      debug:
+        msg: "post_configure_source"
+
+    - name: Print out the value of relationship_attribute
+      debug:
+        msg: "{{ relationship_attribute }}"
+
+    - name: Print out the value of relationship_property
+      debug:
+        msg: "{{ relationship_property }}"
+
+    - name: Print out the value of relationship_input
+      debug:
+        msg: "{{ relationship_input }}"
+
+    - name: Set attribute
+      set_stats:
+        data:
+          post_configure_source_attribute: "{{ relationship_attribute }}"
+
+    - name: Set attribute
+      set_stats:
+        data:
+          post_configure_source_property_attribute: "{{ relationship_property }}"
+
+    - name: Set attribute
+      set_stats:
+        data:
+          post_configure_source_input_attribute: "{{ relationship_input }}"
+
+    - name: See what lies in that dependecy text file
+      command: "cat file.txt"
+      register: text_file_contents
+
+    - name: Set text file attribute
+      set_stats:
+        data:
+          post_configure_source_txt_file_attribute: "{{ text_file_contents.stdout }}"

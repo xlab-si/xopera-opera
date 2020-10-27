@@ -2,9 +2,6 @@ from opera.error import DataError
 from opera.instance.node import Node as Instance
 from pathlib import Path
 
-import tempfile, os
-from ..executor import utils
-
 
 class Node:
     def __init__(
@@ -131,7 +128,7 @@ class Node:
         return requirements[0].target.get_property(["SELF"] + rest)
 
     def get_attribute(self, params):
-        host, prop, *rest = params
+        host, attr, *rest = params
 
         if host != "SELF":
             raise DataError(

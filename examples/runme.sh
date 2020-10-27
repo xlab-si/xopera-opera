@@ -48,6 +48,12 @@ echo "Testing an example from ./policy_triggers ..."
 mkdir policy_triggers/.opera
 $opera_executable deploy -p policy_triggers/.opera policy_triggers/service.yaml
 
+# test an example from ./relationship_outputs
+echo "Testing an example from ./relationship_outputs ..."
+mkdir relationship_outputs/.opera
+$opera_executable deploy -p relationship_outputs/.opera relationship_outputs/service.yaml
+$opera_executable outputs -p relationship_outputs/.opera
+
 echo "All tests have finished successfully."
 
 # an end-to-end example from ./nginx_openstack cannot be deployed directly

@@ -1,0 +1,149 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  radon.nodes.test:
+    derived_from: tosca.nodes.Compute
+    attributes:
+      node_attribute:
+        type: string
+    interfaces:
+      Standard:
+        type: tosca.interfaces.node.lifecycle.Standard
+        operations:
+          create: playbooks/create.yaml
+    requirements:
+      - host:
+          capability: tosca.capabilities.Compute
+          relationship: radon.relationships.test
+
+relationship_types:
+  radon.relationships.test:
+    derived_from: tosca.relationships.HostedOn
+    attributes:
+      relationship_attribute:
+        type: string
+        default: Default relationship attribute
+      pre_configure_source_attribute:
+        description: Attribute set by pre_configure_source interface operation
+        type: string
+      pre_configure_target_attribute:
+        description: Attribute set by pre_configure_target interface operation
+        type: string
+      post_configure_source_attribute:
+        description: >
+          Attribute set by post_configure_source interface operation from the
+          relationship_attribute attribute that enters as an operation input
+        type: string
+      post_configure_source_property_attribute:
+        description: >
+          Attribute set by post_configure_source interface operation from the
+          relationship_property property that enters as an operation input
+        type: string
+      post_configure_source_input_attribute:
+        description: >
+          Attribute set by post_configure_source interface operation from the
+          relationship_input input that enters as an operation input
+        type: string
+      post_configure_source_txt_file_attribute:
+        description: >
+          Attribute set by post_configure_source interface operation that
+          includes the contents of the dependent txt file
+        type: string
+      post_configure_target_attribute:
+        description: Attribute set by post_configure_target interface operation
+        type: string
+    properties:
+      relationship_property:
+        type: string
+        default: Default relationship property
+    interfaces:
+      Configure:
+        operations:
+          pre_configure_source:
+            implementation: playbooks/pre_configure_source.yaml
+          pre_configure_target:
+            implementation: playbooks/pre_configure_target.yaml
+          post_configure_source:
+            inputs:
+              relationship_attribute:
+                type: string
+                default: { get_attribute: [ SELF, relationship_attribute ] }
+              relationship_property:
+                type: string
+                default: { get_property: [ SELF, relationship_property ] }
+              relationship_input:
+                type: string
+                default: { get_input: relationship_input }
+            implementation:
+              primary: playbooks/post_configure_source.yaml
+              dependencies:
+                - files/file.txt
+          post_configure_target:
+            implementation: playbooks/post_configure_target.yaml
+
+topology_template:
+  inputs:
+    host_ip:
+      type: string
+      default: localhost
+    relationship_input:
+      type: string
+      default: Relationship input
+
+  node_templates:
+    my_workstation:
+      type: tosca.nodes.Compute
+      attributes:
+        private_address: { get_input: host_ip }
+        public_address: { get_input: host_ip }
+
+    test_node:
+      type: radon.nodes.test
+      requirements:
+        - host:
+            node: my_workstation
+            relationship: test_relationship
+
+  relationship_templates:
+    test_relationship:
+      type: radon.relationships.test
+      attributes:
+        relationship_attribute: Relationship attribute
+      properties:
+        relationship_property: Relationship property
+
+  outputs:
+    output_node_attribute:
+      description: Node attribute output
+      value: { get_attribute: [ test_node, node_attribute ] }
+    output_relationship_attribute:
+      description: Relationship attribute output
+      value: { get_attribute: [ test_relationship, relationship_attribute ] }
+    output_relationship_property:
+      description: Relationship property output
+      value: { get_property: [ test_relationship, relationship_property ] }
+    output_relationship_input:
+      description: Relationship input output
+      value: { get_input: relationship_input }
+    output_pre_configure_source_attribute:
+      description: Relationship attribute output
+      value: { get_attribute: [ test_relationship, pre_configure_source_attribute ] }
+    output_pre_configure_target_attribute:
+      description: Relationship attribute output
+      value: { get_attribute: [ test_relationship, pre_configure_target_attribute ] }
+    output_post_configure_source_attribute:
+      description: Relationship attribute output
+      value: { get_attribute: [ test_relationship, post_configure_source_attribute ] }
+    output_post_configure_source_property_attribute:
+      description: Relationship attribute output
+      value: { get_attribute: [ test_relationship, post_configure_source_property_attribute ] }
+    output_post_configure_source_input_attribute:
+      description: Relationship attribute output
+      value: { get_attribute: [ test_relationship, post_configure_source_input_attribute ] }
+    output_post_configure_source_txt_file_attribute:
+      description: Relationship attribute output
+      value: { get_attribute: [ test_relationship, post_configure_source_txt_file_attribute ] }
+    output_post_configure_target_attribute:
+      description: Relationship attribute output
+      value: { get_attribute: [ test_relationship, post_configure_target_attribute ] }
+...

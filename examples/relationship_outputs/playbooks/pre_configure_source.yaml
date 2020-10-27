@@ -1,0 +1,12 @@
+- hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Say pre_configure_source
+      debug:
+        msg: "pre_configure_source"
+
+    - name: Set attribute
+      set_stats:
+        data:
+          pre_configure_source_attribute: "This is pre configure source attribute"

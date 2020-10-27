@@ -5,10 +5,11 @@ from opera.instance.topology import Topology as Instance
 
 
 class Topology:
-    def __init__(self, inputs, outputs, nodes):
+    def __init__(self, inputs, outputs, nodes, relationships):
         self.inputs = inputs
         self.outputs = outputs
         self.nodes = nodes
+        self.relationships = relationships
 
         for node in self.nodes.values():
             node.topology = self
@@ -19,6 +20,14 @@ class Topology:
     def resolve_requirements(self):
         for node in self.nodes.values():
             node.resolve_requirements(self)
+        self.resolve_relationships()
+
+    def resolve_relationships(self):
+        for node in self.nodes.values():
+            for req in node.requirements:
+                relationship = req.relationship
+                if relationship.name in self.relationships.keys():
+                    self.relationships[relationship.name] = relationship
 
     def instantiate(self, storage):
         return Instance(storage, itertools.chain.from_iterable(
@@ -33,13 +42,40 @@ class Topology:
             ) for k, v in self.outputs.items()
         }
 
-    def find_node(self, node_name):
-        if node_name not in self.nodes:
+    def find_node_or_relationship(self, entity_name):
+        node = self.find_node(entity_name)
+        relationship = self.find_relationship(entity_name)
+
+        if not node and not relationship:
             raise DataError(
-                "Node template '{}' does not exist.".format(node_name),
+                "Node template or relationship template "
+                "'{}' does not exist.".format(entity_name),
             )
 
+        if node and relationship:
+            if node.name == relationship.name:
+                raise DataError(
+                    "Node template and relationship template "
+                    "'{}' should not have the same name.".format(entity_name),
+                )
+
+        if node:
+            return node
+
+        if relationship:
+            return relationship
+
+    def find_node(self, node_name):
+        if node_name not in self.nodes:
+            return None
+
         return self.nodes[node_name]
+
+    def find_relationship(self, relationship_name):
+        if relationship_name not in self.relationships:
+            return None
+
+        return self.relationships[relationship_name]
 
     #
     # TOSCA functions
@@ -55,19 +91,18 @@ class Topology:
         return self.inputs[params[0]].eval(self, params[0])
 
     def get_property(self, params):
-        node_name, *rest = params
+        entity_name, *rest = params
 
-        return self.find_node(node_name).get_property(["SELF"] + rest)
+        return self.find_node_or_relationship(entity_name).get_property(["SELF"] + rest)
 
     def get_attribute(self, params):
-        node_name, *rest = params
-
-        return self.find_node(node_name).get_attribute(["SELF"] + rest)
+        entity_name, *rest = params
+        return self.find_node_or_relationship(entity_name).get_attribute(["SELF"] + rest)
 
     def get_artifact(self, params):
-        node_name, *rest = params
+        entity_name, *rest = params
 
-        return self.find_node(node_name).get_artifact(["SELF"] + rest)
+        return self.find_node_or_relationship(entity_name).get_artifact(["SELF"] + rest)
 
     def concat(self, params, node=None):
         if not isinstance(params, list):

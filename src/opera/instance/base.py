@@ -70,7 +70,7 @@ class Base:
             raise OperationError("Failed")
 
         for params, value in outputs:
-            self.map_attribute(params, value)
+            self.template.map_attribute(params, value)
         self.update_attributes(attributes)
         self.write()
 

@@ -20,10 +20,13 @@ class Node(Base):
             for target in requirement.target.instances.values():
                 target.in_edges[rname] = target.in_edges.get(rname, {})
 
-                rel = requirement.relationship.instantiate(self, target)
-                rel.topology = self.topology
-                self.out_edges[rname][target.tosca_id] = rel
-                target.in_edges[rname][self.tosca_id] = rel
+                rel_instances = requirement.relationship.instantiate(self, target)
+                for rel in rel_instances:
+                    rel.topology = self.topology
+                    self.out_edges[rname][target.tosca_id] = rel
+                    target.in_edges[rname][self.tosca_id] = rel
+                    target.in_edges[rname][self.tosca_id] = rel
+                    rel.read()
 
     @property
     def deployed(self):
