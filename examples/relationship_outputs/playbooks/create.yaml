@@ -1,0 +1,12 @@
+- hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Say create
+      debug:
+        msg: "create"
+
+    - name: Set node attribute
+      set_stats:
+        data:
+          node_attribute: "Node attribute"

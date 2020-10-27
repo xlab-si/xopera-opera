@@ -31,7 +31,12 @@ class TopologyTemplate(Entity):
             outputs=self.collect_outputs(service_ast),
             nodes={
                 name: node_ast.get_template(name, service_ast)
-                for name, node_ast in self.node_templates.items()
+                for name, node_ast in self.get("node_templates", {}).items()
+            },
+            relationships={
+                name: rel_ast.get_template(name, service_ast)
+                for name, rel_ast in
+                self.get("relationship_templates", {}).items()
             },
         )
         topology.resolve_requirements()
