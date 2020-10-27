@@ -7,3 +7,4 @@ class Requirement:
 
     def resolve(self, topology):
         self.target = topology.get_node(self.target_name)
+        self.relationship.topology = topology

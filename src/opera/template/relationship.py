@@ -10,6 +10,12 @@ class Relationship:
         self.attributes = attributes
         self.interfaces = interfaces
 
+        # This will be set when the relationship is inserted into a topology
+        self.topology = None
+
+        # This will be set at instantiation time.
+        self.instances = None
+
     def is_a(self, typ):
         return typ in self.types
 
