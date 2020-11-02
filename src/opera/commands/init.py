@@ -42,6 +42,9 @@ def add_parser(subparsers):
 
 
 def _parser_callback(args):
+    print("Warning: 'opera init' command is deprecated and will probably be "
+          "removed within one of the next releases. Please use 'opera deploy' "
+          "to initialize and deploy service templates or compressed CSARs.")
     if args.instance_path and not path.isdir(args.instance_path):
         raise argparse.ArgumentTypeError("Directory {} is not a valid path!"
                                          .format(args.instance_path))
