@@ -4,11 +4,13 @@ import yaml
 
 from os import path
 from pathlib import Path, PurePath
+from zipfile import ZipFile, is_zipfile
 
 from opera.commands.info import info
 from opera.utils import prompt_yes_no_question
 from opera.error import DataError, ParseError
 from opera.parser import tosca
+from opera.parser.tosca.csar import CloudServiceArchive
 from opera.storage import Storage
 
 
@@ -118,8 +120,14 @@ def _parser_callback(args):
         return 1
 
     try:
-        deploy(service_template, inputs, storage, args.verbose, args.workers,
-               delete_existing_state)
+        if is_zipfile(service_template):
+            deploy_compressed_csar(service_template, inputs, storage,
+                                   args.verbose, args.workers,
+                                   delete_existing_state)
+        else:
+            deploy_service_template(service_template, inputs, storage,
+                                    args.verbose, args.workers,
+                                    delete_existing_state)
     except ParseError as e:
         print("{}: {}".format(e.loc, e))
         return 1
@@ -130,9 +138,10 @@ def _parser_callback(args):
     return 0
 
 
-def deploy(service_template: str, inputs: typing.Optional[dict],
-           storage: Storage, verbose_mode: bool, num_workers: int,
-           delete_existing_state: bool):
+def deploy_service_template(service_template: str,
+                            inputs: typing.Optional[dict], storage: Storage,
+                            verbose_mode: bool, num_workers: int,
+                            delete_existing_state: bool):
     """
     :raises ParseError:
     :raises DataError:
@@ -148,6 +157,7 @@ def deploy(service_template: str, inputs: typing.Optional[dict],
     storage.write_json(inputs, "inputs")
     storage.write(service_template, "root_file")
 
+    # set workdir and check if service template/CSAR has been initialized
     workdir = str(Path.cwd())
     if storage.exists("csars"):
         csar_dir = Path(storage.path) / "csars" / "csar"
@@ -157,6 +167,42 @@ def deploy(service_template: str, inputs: typing.Optional[dict],
     else:
         ast = tosca.load(Path.cwd(), PurePath(service_template))
 
+    # initialize service template and deploy
+    template = ast.get_template(inputs)
+    topology = template.instantiate(storage)
+    topology.deploy(verbose_mode, workdir, num_workers)
+
+
+def deploy_compressed_csar(csar_name: str, inputs: typing.Optional[dict],
+                           storage: Storage, verbose_mode: bool,
+                           num_workers: int, delete_existing_state: bool):
+    """
+    :raises ParseError:
+    :raises DataError:
+    """
+    if delete_existing_state:
+        storage.remove("instances")
+
+    if inputs is None:
+        inputs = {}
+    storage.write_json(inputs, "inputs")
+
+    csars_dir = Path(storage.path) / "csars"
+    csars_dir.mkdir(exist_ok=True)
+
+    # validate csar
+    csar = CloudServiceArchive(csar_name, csars_dir)
+    tosca_service_template = csar.validate_csar()
+
+    # unzip csar, save the path to storage and set workdir
+    csar_dir = csars_dir / Path("csar")
+    ZipFile(csar_name, 'r').extractall(csar_dir)
+    csar_tosca_service_template_path = csar_dir / tosca_service_template
+    storage.write(str(csar_tosca_service_template_path), "root_file")
+    workdir = str(csar_dir)
+
+    # initialize service template from CSAR and deploy
+    ast = tosca.load(Path(csar_dir), Path(tosca_service_template))
     template = ast.get_template(inputs)
     topology = template.instantiate(storage)
     topology.deploy(verbose_mode, workdir, num_workers)
