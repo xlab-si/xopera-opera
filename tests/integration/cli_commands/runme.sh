@@ -75,10 +75,10 @@ $opera_executable init --clean service.yaml
 info_out="$($opera_executable info --format json)"
 test "$(echo "$info_out" | jq -r .status)" = "initialized"
 
-# deploy service template, but interrupt after 1 second
+# deploy service template, but interrupt after 2 seconds
 $opera_executable deploy &
 DEPLOY_TIMEOUT_PID=$!
-sleep 1s && kill -SIGKILL $DEPLOY_TIMEOUT_PID
+sleep 2s && kill -SIGKILL $DEPLOY_TIMEOUT_PID
 
 # test opera info status after deploy
 info_out="$($opera_executable info --format json)"
@@ -186,10 +186,10 @@ $opera_executable outputs -p ./csar-test-dir
 info_out="$($opera_executable info -p ./csar-test-dir -f json)"
 test "$(echo "$info_out" | jq -r .status)" = "deployed"
 
-# undeploy the CSAR, but interrupt after 1 second
+# undeploy the CSAR, but interrupt after 2 seconds
 $opera_executable undeploy -p ./csar-test-dir &
 UNDEPLOY_TIMEOUT_PID=$!
-sleep 1s && kill -SIGKILL $UNDEPLOY_TIMEOUT_PID
+sleep 2s && kill -SIGKILL $UNDEPLOY_TIMEOUT_PID
 
 # test opera info status after undeploy
 info_out="$($opera_executable info -p ./csar-test-dir -f json)"
