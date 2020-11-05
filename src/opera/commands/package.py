@@ -1,12 +1,10 @@
 import argparse
-from pathlib import Path, PurePath
-import shutil
-import tempfile
-from zipfile import ZipFile
+
+from pathlib import Path
 
 from opera.error import DataError, ParseError
-from opera.parser import tosca
-from opera.storage import Storage
+from opera.parser.tosca.csar import CloudServiceArchive
+from opera.utils import generate_random_pathname
 
 
 def add_parser(subparsers):
@@ -15,46 +13,46 @@ def add_parser(subparsers):
         help="Package service template and all accompanying files into a CSAR"
     )
     parser.add_argument(
-        "--output", "-O", type=argparse.FileType("w"),
-        help="Output file (the CSAR)",
+        "--service-template", "-t",
+        help="Name or path to the TOSCA service template "
+             "file from the root of the input folder",
     )
     parser.add_argument(
-        "--library-source", "-L",
-        help="Path to the library files")
-    parser.add_argument("service_template",
-                        type=argparse.FileType("r"),
-                        help="Path to the root of the service template")
-    parser.set_defaults(func=package)
+        "--output", "-o",
+        help="Output CSAR file path",
+    )
+    parser.add_argument(
+        "--format", "-f", choices=("zip", "tar"),
+        default="zip", help="CSAR compressed file format",
+    )
+    parser.add_argument("service_template_folder",
+                        help="Path to the root of the service template or "
+                             "folder you want to create the TOSCA CSAR from")
+    parser.set_defaults(func=_parser_callback)
 
 
-def copy_libraries(dest_path, missing_imports, library_source):
-    for imp in missing_imports:
-        lib_candidate = library_source / imp.parent
-        csar_prefix = imp.parent
-        print(f"candidate: {lib_candidate} -> {dest_path / csar_prefix}")
-        shutil.copytree(lib_candidate, dest_path / csar_prefix)
+def _parser_callback(args):
+    if not Path(args.service_template_folder).is_dir():
+        raise argparse.ArgumentTypeError("Directory {} is not a valid path!"
+                                         .format(args.service_template_folder))
 
+    # if the output is set use it, if not create a random file name with UUID
+    if args.output:
+        # remove file extension if needed (".zip" or ".tar")
+        # because shutil.make_archive already adds the extension
+        if args.output.endswith("." + args.format):
+            csar_output = str(Path(args.output).with_suffix(''))
+        else:
+            csar_output = str(Path(args.output))
 
-def copy_service(dest_path, service_path):
-    print(f"Service: {service_path} -> {dest_path}")
-    shutil.copytree(service_path, dest_path, symlinks=True)
+    else:
+        # generate a create a unique random file name
+        csar_output = generate_random_pathname("opera-package-")
 
-
-def compress_service(source_path, output):
-    with ZipFile(output.name, "w") as csar:
-        for path in source_path.glob("**/*"):
-            pathname = str(path)
-            rel_pathname = str(path.relative_to(source_path))
-            csar.write(pathname, arcname=rel_pathname)
-
-
-def package(args):
-    service_template_path = PurePath(args.service_template.name)
-    service_path = service_template_path.parent
-    library_path = PurePath(args.library_source)
     try:
-        missing_imports = tosca.load_for_imports_list(Path.cwd(),
-                                                      service_template_path)
+        output_package = package(args.service_template_folder, csar_output,
+                                 args.service_template, args.format)
+        print("CSAR was created and packed to '{}'.".format(output_package))
     except ParseError as e:
         print("{}: {}".format(e.loc, e))
         return 1
@@ -62,10 +60,14 @@ def package(args):
         print(str(e))
         return 1
 
-    with tempfile.TemporaryDirectory(prefix="opera-") as tempdir:
-        dest_path = Path(tempdir) / "service"
-        copy_service(dest_path, service_path)
-        copy_libraries(dest_path, missing_imports, library_path)
-        compress_service(dest_path, args.output)
-
     return 0
+
+
+def package(input_dir: str, csar_output: str, service_template: str,
+            csar_format: str) -> str:
+    """
+    :raises ParseError:
+    :raises DataError:
+    """
+    csar = CloudServiceArchive(input_dir)
+    return csar.package_csar(csar_output, service_template, csar_format)

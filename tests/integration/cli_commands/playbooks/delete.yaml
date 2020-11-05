@@ -5,3 +5,6 @@
     - name: Say helo and bye bye
       debug:
         msg: "Hello again and goodbye my friend!"
+
+    - name: Start a long task (needed for the interruption testing)
+      shell: sleep 10
