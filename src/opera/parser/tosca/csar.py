@@ -16,8 +16,6 @@ class CloudServiceArchive:
         self._metadata = None
 
     def unpackage_csar(self, output_dir, csar_format="zip"):
-        # validate CSAR before unpacking it
-        self.validate_csar()
         # unpack the CSAR to the specified location
         shutil.unpack_archive(self._csar_name, output_dir, csar_format)
 

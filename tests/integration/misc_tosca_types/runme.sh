@@ -24,7 +24,7 @@ rm -rf .opera
 mkdir -p csar-test
 zip -r test.csar service-template.yaml modules TOSCA-Metadata
 mv test.csar csar-test
-mv inputs.yaml csar-test
+cp inputs.yaml csar-test
 cd csar-test
 $opera_executable info -f yaml
 # deploy compressed CSAR (with opera init)
@@ -42,6 +42,13 @@ $opera_executable info -f json
 $opera_executable outputs
 $opera_executable info -f json
 $opera_executable undeploy
+$opera_executable info
+# use opera unpackage and unpack the CSAR and deploy the extracted TOSCA files
+$opera_executable unpackage -d unpacked-csar test.csar
+$opera_executable info
+cp inputs.yaml unpacked-csar
+cd unpacked-csar
+$opera_executable deploy -i inputs.yaml service-template.yaml
 $opera_executable info
 # number of created .opera folders should be 1
 opera_count=$(ls -aR . | grep -c "^\.opera$")
