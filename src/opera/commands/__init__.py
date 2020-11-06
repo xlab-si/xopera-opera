@@ -1,8 +1,9 @@
 from opera.commands import (
-    validate,
-    init,
-    info,
     deploy,
+    info,
+    init,
+    outputs,
     undeploy,
-    outputs
+    unpackage,
+    validate
 )

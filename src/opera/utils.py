@@ -1,3 +1,7 @@
+from zipfile import is_zipfile
+from tarfile import is_tarfile
+from uuid import uuid4
+from os import path
 
 
 def prompt_yes_no_question(yes_responses=("y", "yes"),
@@ -21,10 +25,29 @@ def prompt_yes_no_question(yes_responses=("y", "yes"),
         elif check in no_responses:
             return False
         else:
-            print('Invalid input. Please try again.')
+            print("Invalid input. Please try again.")
             return prompt_yes_no_question(yes_responses, no_responses,
                                           case_sensitive, default_yes_response)
     except Exception as e:
         print("Exception occurred: {}. Please enter valid inputs.".format(e))
         return prompt_yes_no_question(yes_responses, no_responses,
                                       case_sensitive, default_yes_response)
+
+
+def determine_archive_format(filepath):
+    if is_tarfile(filepath):
+        return "tar"
+    elif is_zipfile(filepath):
+        return "zip"
+    else:
+        raise Exception("Unaccepted archive file: '{}'. The compression "
+                        "format should be zip or tar.".format(filepath))
+
+
+def generate_random_pathname(prefix=""):
+    # use uuid4 to create a unique random pathname and select last 6 characters
+    pathname = prefix + str(uuid4().hex)[-6:]
+    if path.exists(pathname):
+        return generate_random_pathname(prefix)
+    else:
+        return pathname
