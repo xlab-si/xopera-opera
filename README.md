@@ -6,6 +6,16 @@ TOSCA](https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=tosca).
 The current compliance is with the [TOSCA Simple Profile in YAML
 v1.3](https://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.3/TOSCA-Simple-Profile-YAML-v1.3.html).
 
+Prerequisites
+-------------
+
+`opera` requires python 3 and a virtual environment. In a typical modern
+Linux environment, we should already be set. In Ubuntu, however, we
+might need to run the following commands:
+
+    $ sudo apt update
+    $ sudo apt install -y python3-venv python3-wheel python-wheel-common
+
 Quickstart
 ----------
 
@@ -31,16 +41,6 @@ To delete the created directory, we can undeploy our stuff by running:
     (.venv) $ opera undeploy
 
 And that is it.
-
-Prerequisites
--------------
-
-`opera` requires python 3 and a virtual environment. In a typical modern
-Linux environment, we should already be set. In Ubuntu, however, we
-might need to run the following commands:
-
-    $ sudo apt update
-    $ sudo apt install -y python3-venv python3-wheel python-wheel-common
 
 OpenStack client setup
 ----------------------
