@@ -11,7 +11,7 @@ relationship_types:
     interfaces:
       Configure:
         operations:
-          configure_target:
+          pre_configure_target:
             inputs:
               relationship_property:
                 default: { get_property: relationship_property }
