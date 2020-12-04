@@ -20,6 +20,7 @@ node_types:
     properties:
       test:
         type: daily_test.datatypes.test
+        required: false
     interfaces:
       Standard:
         operations:

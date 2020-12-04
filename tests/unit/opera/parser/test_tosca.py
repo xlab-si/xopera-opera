@@ -4,6 +4,7 @@ import pytest
 
 from opera.error import ParseError
 from opera.parser import tosca
+from opera.storage import Storage
 
 
 class TestLoad:
@@ -204,4 +205,103 @@ class TestLoad:
             """
         ))
         with pytest.raises(ParseError):        
-            tosca.load(tmp_path, name)      
+            tosca.load(tmp_path, name)
+
+
+class TestExecute:
+    def test_undefined_required_properties1(self, tmp_path, yaml_text):
+        name = pathlib.PurePath("template.yaml")
+        (tmp_path / name).write_text(yaml_text(
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            node_types:
+              my_node_type:
+                derived_from: tosca.nodes.Root
+                attributes:
+                  test_attribute:
+                    type: boolean
+                properties:
+                  test_property1:
+                    type: integer
+                    default: 42
+                    required: false
+                  test_property2:
+                    type: float
+                    default: 42.0
+                    required: true
+                  test_property3:
+                    type: string
+                    required: true
+            topology_template:
+              node_templates:
+                my_node_template:
+                  type: my_node_type             
+            """
+        ))
+        storage = Storage(tmp_path / pathlib.Path(".opera"))
+        storage.write("template.yaml", "root_file")
+        ast = tosca.load(tmp_path, name)
+        with pytest.raises(ParseError, match="Missing a required property: "
+                                             "test_property3"):
+            ast.get_template({})
+
+    def test_undefined_required_properties2(self, tmp_path, yaml_text):
+        name = pathlib.PurePath("template.yaml")
+        (tmp_path / name).write_text(yaml_text(
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            node_types:
+              my_node_type:
+                derived_from: tosca.nodes.Root
+                properties:
+                  test_prop1:
+                    type: integer
+                    required: false
+                  test_prop2:
+                    type: float
+                    default: 42.0
+                  test_prop3:
+                    type: string
+            topology_template:
+              node_templates:
+                my_node_template:
+                  type: my_node_type             
+            """
+        ))
+        storage = Storage(tmp_path / pathlib.Path(".opera"))
+        storage.write("template.yaml", "root_file")
+        ast = tosca.load(tmp_path, name)
+        with pytest.raises(ParseError, match="Missing a required property: "
+                                             "test_prop3"):
+            ast.get_template({})
+
+    def test_undefined_required_properties3(self, tmp_path, yaml_text):
+        name = pathlib.PurePath("template.yaml")
+        (tmp_path / name).write_text(yaml_text(
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            node_types:
+              my_node_type:
+                derived_from: tosca.nodes.Root
+                properties:
+                  property1:
+                    type: integer
+                  property2:
+                    type: float
+                  property3:
+                    type: string
+            topology_template:
+              node_templates:
+                my_node_template:
+                  type: my_node_type  
+                  properties:
+                    property1: 42
+                    property2: 42.0        
+            """
+        ))
+        storage = Storage(tmp_path / pathlib.Path(".opera"))
+        storage.write("template.yaml", "root_file")
+        ast = tosca.load(tmp_path, name)
+        with pytest.raises(ParseError, match="Missing a required property: "
+                                             "property3"):
+            ast.get_template({})

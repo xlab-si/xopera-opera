@@ -19,6 +19,22 @@ class CollectorMixin:
                 ", ".join(undeclared_props),
             ), self.loc)
 
+        for key, prop_definition in definitions.items():
+            prop_required = prop_definition.get("required", None)
+            prop_has_default = prop_definition.get("default", None)
+            prop_assignment = assignments.get(key, None)
+            if prop_required:
+                prop_required = prop_required.data
+            else:
+                prop_required = True
+
+            if prop_required and not prop_has_default and not prop_assignment:
+                self.abort("Missing a required property: {}. If the property "
+                           "is optional please specify this in the definition "
+                           "with 'required: false' or supply its default "
+                           "value using 'default: <value>'.".format(key),
+                           self.loc)
+
         return {
             name: (assignments.get(name) or definition).get_value(
                 definition.get_value_type(service_ast),
