@@ -72,6 +72,8 @@ topology_template:
 
     noimpl:
       type: daily_test.nodes.noimpl
+      properties:
+        test_integer: 42
       requirements:
         - host: my-workstation1
 

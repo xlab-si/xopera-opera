@@ -35,6 +35,7 @@ node_types:
         default: { concat: [ 'Property: ', get_attribute: [ SELF, attribute3_2 ] ] }
       property3_3:
         type: string
+        required: false
 
 topology_template:
   inputs:
