@@ -18,7 +18,7 @@ class Relationship(Base):
 
         if host not in ("SELF", "SOURCE", "TARGET"):
             raise DataError(
-                "Accessing non-local stuff is bad. Fix your service template."
+                "Attribute host should be set to 'SELF', 'SOURCE' or 'TARGET'."
             )
 
         if host == "SOURCE":
@@ -37,7 +37,7 @@ class Relationship(Base):
 
         if host not in ("SELF", "SOURCE", "TARGET"):
             raise DataError(
-                "Accessing non-local stuff is bad. Fix your service template."
+                "Property host should be set to 'SELF', 'SOURCE' or 'TARGET'."
             )
 
         if host == "SOURCE":
@@ -54,7 +54,7 @@ class Relationship(Base):
 
         if host not in ("SELF", "SOURCE", "TARGET"):
             raise DataError(
-                "Accessing non-local stuff is bad. Fix your service template."
+                "Attribute host should be set to 'SELF', 'SOURCE' or 'TARGET'."
             )
 
         if host == "SOURCE":
@@ -69,7 +69,7 @@ class Relationship(Base):
 
         if host not in ("SELF", "SOURCE", "TARGET"):
             raise DataError(
-                "Accessing non-local stuff is bad. Fix your service template."
+                "Artifact host should be set to 'SELF', 'SOURCE' or 'TARGET'."
             )
 
         if host == "SOURCE":

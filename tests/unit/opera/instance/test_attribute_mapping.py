@@ -62,7 +62,8 @@ class TestAttributeMapping:
                               "other"])
     def test_map_attribute_node_bad_host(self, service_template, host):
         node = service_template.find_node("my_node")
-        with pytest.raises(DataError, match="Accessing non-local stuff"):
+        with pytest.raises(DataError, match="Attribute host should be set to "
+                                            "'SELF'"):
           node.map_attribute([host, "colour"], "black")
 
     def test_map_attribute_node_bad_attribute(self, service_template):
@@ -110,7 +111,8 @@ class TestAttributeMapping:
       relationship_instance = next(
         iter(node_source_instance.out_edges["my_target"].values()))
 
-      with pytest.raises(DataError, match="Accessing non-local stuff"):
+      with pytest.raises(DataError, match="Attribute host should be set to "
+                                          "'SELF'"):
         relationship_instance.map_attribute([host, "colour"], "ochre")
 
     @pytest.mark.parametrize("host, pattern", [
