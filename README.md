@@ -54,7 +54,7 @@ might need to run the following commands:
 
 ## Installation and Quickstart
 <p align="center">
-  <img src="https://raw.githubusercontent.com/xlab-si/xopera-opera/refactor-readme/docs/images/opera_cli.svg?sanitize=true" alt="opera in action">
+  <img src="https://raw.githubusercontent.com/xlab-si/xopera-opera/master/docs/images/opera_cli.svg?sanitize=true" alt="opera in action">
 </p>
 
 The orchestration tool is available on PyPI as a package named [`opera`](https://pypi.org/project/opera/).
