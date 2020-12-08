@@ -37,12 +37,14 @@ class Relationship:
     def get_property(self, params):
         host, prop, *rest = params
 
-        if host != "SELF":
-            raise DataError(
-                "Accessing non-local stuff is bad. Fix your service template."
-            )
         if host == "HOST":
             raise DataError("HOST is not yet supported in opera.")
+        if host != "SELF":
+            raise DataError(
+                "Property host should be set to 'SELF' which is the only "
+                "valid value. This is needed to indicate that the property is "
+                "referenced locally from something in the node itself."
+            )
 
         # TODO(@tadeboro): Add support for nested property values once we
         # have data type support.
@@ -58,7 +60,9 @@ class Relationship:
             raise DataError("HOST is not yet supported in opera.")
         if host != "SELF":
             raise DataError(
-                "Accessing non-local stuff is bad. Fix your service template."
+                "Attribute host should be set to 'SELF' which is the only "
+                "valid value. This is needed to indicate that the attribute "
+                "is referenced locally from something in the node itself."
             )
 
         if attr not in self.attributes:

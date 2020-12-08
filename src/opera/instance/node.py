@@ -127,12 +127,14 @@ class Node(Base):
     def get_attribute(self, params):
         host, attr, *rest = params
 
-        if host != "SELF":
-            raise DataError(
-                "Accessing non-local stuff is bad. Fix your service template."
-            )
         if host == "HOST":
             raise DataError("HOST is not yet supported in opera.")
+        if host != "SELF":
+            raise DataError(
+                "Attribute host should be set to 'SELF' which is the only "
+                "valid value. This is needed to indicate that the attribute "
+                "is referenced locally from something in the node itself."
+            )
 
         # TODO(@tadeboro): Add support for nested attribute values once we
         # have data type support.
@@ -178,12 +180,14 @@ class Node(Base):
     def map_attribute(self, params, value):
         host, attr, *rest = params
 
-        if host != "SELF":
-            raise DataError(
-                "Accessing non-local stuff is bad. Fix your service template."
-            )
         if host == "HOST":
             raise DataError("HOST is not yet supported in opera.")
+        if host != "SELF":
+            raise DataError(
+                "Attribute host should be set to 'SELF' which is the only "
+                "valid value. This is needed to indicate that the attribute "
+                "is referenced locally from something in the node itself."
+            )
 
         # TODO(@tadeboro): Add support for nested attribute values once we
         # have data type support.

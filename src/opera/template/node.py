@@ -86,12 +86,14 @@ class Node:
     def get_property(self, params):
         host, prop, *rest = params
 
-        if host != "SELF":
-            raise DataError(
-                "Accessing non-local stuff is bad. Fix your service template."
-            )
         if host == "HOST":
             raise DataError("HOST is not yet supported in opera.")
+        if host != "SELF":
+            raise DataError(
+                "Property host should be set to 'SELF' which is the only "
+                "valid value. This is needed to indicate that the property is "
+                "referenced locally from something in the node itself."
+            )
 
         # TODO(@tadeboro): Add support for nested property values.
         if prop in self.properties:
@@ -130,12 +132,14 @@ class Node:
     def get_attribute(self, params):
         host, attr, *rest = params
 
-        if host != "SELF":
-            raise DataError(
-                "Accessing non-local stuff is bad. Fix your service template."
-            )
         if host == "HOST":
             raise DataError("HOST is not yet supported in opera.")
+        if host != "SELF":
+            raise DataError(
+                "Attribute host should be set to 'SELF' which is the only "
+                "valid value. This is needed to indicate that the attribute "
+                "is referenced locally from something in the node itself."
+            )
         if len(self.instances) != 1:
             raise DataError("Cannot get an attribute from multiple instances")
 
@@ -147,12 +151,14 @@ class Node:
     def map_attribute(self, params, value):
         host, prop, *rest = params
 
-        if host != "SELF":
-            raise DataError(
-                "Accessing non-local stuff is bad. Fix your service template."
-            )
         if host == "HOST":
             raise DataError("HOST is not yet supported in opera.")
+        if host != "SELF":
+            raise DataError(
+                "Attribute host should be set to 'SELF' which is the only "
+                "valid value. This is needed to indicate that the attribute "
+                "is referenced locally from something in the node itself."
+            )
 
         if len(self.instances) != 1:
             raise DataError(
@@ -172,12 +178,14 @@ class Node:
         if len(rest) == 2:
             location, remove = rest
 
-        if host != "SELF":
-            raise DataError(
-                "Accessing non-local stuff is bad. Fix your service template."
-            )
         if host == "HOST":
             raise DataError("HOST is not yet supported in opera.")
+        if host != "SELF":
+            raise DataError(
+                "Artifact host should be set to 'SELF' which is the only "
+                "valid value. This is needed to indicate that the artifact "
+                "is referenced locally from something in the node itself."
+            )
 
         if location == "LOCAL_FILE":
             raise DataError("Location get_artifact property is "
