@@ -19,6 +19,7 @@ $opera_executable undeploy
 $opera_executable info
 
 # integration test with compressed CSAR
+# warning: opera init is deprecated and could be removed in the future
 rm -rf .opera
 mkdir -p csar-test
 zip -r test.csar service-template.yaml modules TOSCA-Metadata
@@ -26,10 +27,18 @@ mv test.csar csar-test
 mv inputs.yaml csar-test
 cd csar-test
 $opera_executable info -f yaml
+# deploy compressed CSAR (with opera init)
 $opera_executable init -i inputs.yaml test.csar
 $opera_executable info -f json
 $opera_executable deploy
 $opera_executable info -f yaml
+$opera_executable outputs
+$opera_executable info -f json
+$opera_executable undeploy
+$opera_executable info
+# deploy compressed CSAR again (without opera init)
+$opera_executable deploy -i inputs.yaml -c -f test.csar
+$opera_executable info -f json
 $opera_executable outputs
 $opera_executable info -f json
 $opera_executable undeploy
