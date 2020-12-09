@@ -18,7 +18,7 @@ def add_parser(subparsers):
     )
     parser.add_argument(
         "--inputs", "-i", type=argparse.FileType("r"),
-        help="YAML file with inputs",
+        help="YAML or JSON file with inputs",
     )
     parser.add_argument(
         "--verbose", "-v", action='store_true',

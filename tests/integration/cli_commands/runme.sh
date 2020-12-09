@@ -12,9 +12,17 @@ zip -r test.csar service.yaml playbooks TOSCA-Metadata
 info_out="$($opera_executable info --format json)"
 test "$(echo "$info_out" | jq -r .status)" = "null"
 
-# validate service template and CSAR
+# validate service template and CSAR (with YAML inputs)
 $opera_executable validate --inputs inputs.yaml service.yaml
 $opera_executable validate --inputs inputs.yaml test.csar
+
+# test opera info status after validate
+info_out="$($opera_executable info --format json)"
+test "$(echo "$info_out" | jq -r .status)" = "null"
+
+# validate service template and CSAR (with JSON inputs)
+$opera_executable validate --inputs inputs.json service.yaml
+$opera_executable validate --inputs inputs.json test.csar
 
 # test opera info status after validate
 info_out="$($opera_executable info --format json)"
@@ -38,6 +46,22 @@ test "$(echo "$info_out" | jq -r .status)" = "deployed"
 
 # deploy service template again (with clean state and without yes/no prompts)
 $opera_executable deploy --clean-state --force
+
+# test opera info status after deploy
+info_out="$($opera_executable info --format json)"
+test "$(echo "$info_out" | jq -r .status)" = "deployed"
+
+# deploy service template again (with clean state and without yes/no prompts)
+# use YAML inputs
+$opera_executable deploy --inputs inputs.yaml -c -f service.yaml
+
+# test opera info status after deploy
+info_out="$($opera_executable info --format json)"
+test "$(echo "$info_out" | jq -r .status)" = "deployed"
+
+# deploy service template again (with clean state and without yes/no prompts)
+# use JSON inputs this time
+$opera_executable deploy --inputs inputs.json -c -f service.yaml
 
 # test opera info status after deploy
 info_out="$($opera_executable info --format json)"
@@ -139,9 +163,17 @@ $opera_executable outputs -p ./csar-test-dir
 info_out="$($opera_executable info -p ./csar-test-dir -f json)"
 test "$(echo "$info_out" | jq -r .status)" = "deployed"
 
-# deploy the compressed CSAR agin, now directly without deprecated opera init
+# deploy the compressed CSAR again, now directly without deprecated opera init
 # use clean state and disable yes/no prompts
 $opera_executable deploy -i inputs.yaml --instance-path ./csar-test-dir --clean --force test.csar
+
+# test opera info status after deploy
+info_out="$($opera_executable info -p ./csar-test-dir -f json)"
+test "$(echo "$info_out" | jq -r .status)" = "deployed"
+
+# deploy the compressed CSAR again, now directly without deprecated opera init
+# use clean state and disable yes/no prompts, use JSON inputs
+$opera_executable deploy -i inputs.json -p ./csar-test-dir -c -f test.csar
 
 # test opera info status after deploy
 info_out="$($opera_executable info -p ./csar-test-dir -f json)"

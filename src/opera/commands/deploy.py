@@ -25,7 +25,7 @@ def add_parser(subparsers):
     )
     parser.add_argument(
         "--inputs", "-i", type=argparse.FileType("r"),
-        help="Optional: YAML file with inputs to "
+        help="YAML or JSON file with inputs to "
              "override the inputs supplied in init",
     )
     parser.add_argument(

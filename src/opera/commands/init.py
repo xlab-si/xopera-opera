@@ -24,7 +24,7 @@ def add_parser(subparsers):
     )
     parser.add_argument(
         "--inputs", "-i", type=argparse.FileType("r"),
-        help="YAML file with inputs",
+        help="YAML or JSON file with inputs",
     )
     parser.add_argument(
         "--clean", "-c", action='store_true',
@@ -50,7 +50,6 @@ def _parser_callback(args):
                                          .format(args.instance_path))
 
     storage = Storage.create(args.instance_path)
-
     try:
         inputs = yaml.safe_load(args.inputs) if args.inputs else {}
     except Exception as e:
