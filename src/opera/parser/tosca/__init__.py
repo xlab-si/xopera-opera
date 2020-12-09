@@ -35,27 +35,8 @@ def load(base_path, template_name):
     return service
 
 
-def load_for_imports_list(base_path, template_name):
-    with (base_path / template_name).open() as input_fd:
-        input_yaml = yaml.load(input_fd, str(template_name))
-    if not isinstance(input_yaml.value, dict):
-        raise ParseError(
-            "Top level structure should be a map.", yaml_node.loc,
-        )
-    tosca_version = _get_tosca_version(input_yaml)
-    parser = _get_parser_for_imports(tosca_version)
-
-    _, _, imports = parser.parse(input_yaml, base_path, template_name, set(),
-                                 set())
-    return imports
-
-
 def _get_parser(tosca_version):
     return importlib.import_module(".v_1_3", __name__).Parser
-
-
-def _get_parser_for_imports(tosca_version):
-    return importlib.import_module(".v_1_3", __name__).Parser_imports
 
 
 def _get_tosca_version(input_yaml):

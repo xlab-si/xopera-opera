@@ -1,8 +1,0 @@
-tosca_definitions_version: tosca_simple_yaml_1_3
-
-imports:
-  - /library/steampunk.valves/main.yaml
-
-node_types:
-  big_valve:
-    derived_from: steampunk.valves.Root
