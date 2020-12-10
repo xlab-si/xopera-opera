@@ -1,21 +1,28 @@
+import shutil
+import yaml
+
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from zipfile import ZipFile
 
-import yaml
 from opera.error import ParseError
 
 
 class CloudServiceArchive:
-    def __init__(self, csar_name, csar_folder_path):
+    def __init__(self, csar_name):
         self._csar_name = csar_name
-        self._csar_folder_path = csar_folder_path
         self._tosca_meta = None
         self._root_yaml_template = None
         self._metadata = None
 
+    def unpackage_csar(self, output_dir, csar_format="zip"):
+        # validate CSAR before unpacking it
+        self.validate_csar()
+        # unpack the CSAR to the specified location
+        shutil.unpack_archive(self._csar_name, output_dir, csar_format)
+
     def validate_csar(self):
-        with TemporaryDirectory(dir=self._csar_folder_path) as tempdir:
+        with TemporaryDirectory() as tempdir:
             ZipFile(self._csar_name, 'r').extractall(tempdir)
 
             try:

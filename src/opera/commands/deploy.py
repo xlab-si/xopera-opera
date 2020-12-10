@@ -191,7 +191,7 @@ def deploy_compressed_csar(csar_name: str, inputs: typing.Optional[dict],
     csars_dir.mkdir(exist_ok=True)
 
     # validate csar
-    csar = CloudServiceArchive(csar_name, csars_dir)
+    csar = CloudServiceArchive(csar_name)
     tosca_service_template = csar.validate_csar()
 
     # unzip csar, save the path to storage and set workdir
