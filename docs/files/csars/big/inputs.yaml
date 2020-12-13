@@ -1,0 +1,6 @@
+---
+# This yaml file contains inputs for service-template.yaml.
+
+host_ip: localhost
+slovenian_greeting: "Hej prijatelj, pojdi z nami!"
+...
