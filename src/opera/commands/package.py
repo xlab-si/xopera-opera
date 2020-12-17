@@ -25,6 +25,10 @@ def add_parser(subparsers):
         "--format", "-f", choices=("zip", "tar"),
         default="zip", help="CSAR compressed file format",
     )
+    parser.add_argument(
+        "--verbose", "-v", action='store_true',
+        help="Turns on verbose mode",
+    )
     parser.add_argument("service_template_folder",
                         help="Path to the root of the service template or "
                              "folder you want to create the TOSCA CSAR from")
