@@ -1,6 +1,7 @@
 import argparse
 import typing
 import yaml
+import shtab
 
 from tempfile import TemporaryDirectory
 from pathlib import Path, PurePath
@@ -19,14 +20,15 @@ def add_parser(subparsers):
     parser.add_argument(
         "--inputs", "-i", type=argparse.FileType("r"),
         help="YAML or JSON file with inputs",
-    )
+    ).complete = shtab.FILE
     parser.add_argument(
         "--verbose", "-v", action='store_true',
         help="Turns on verbose mode",
     )
-    parser.add_argument("csar",
-                        type=argparse.FileType("r"),
-                        help="Cloud service archive or service template file")
+    parser.add_argument(
+        "csar", type=argparse.FileType("r"),
+        help="Cloud service archive or service template file"
+    ).complete = shtab.FILE
     parser.set_defaults(func=_parser_callback)
 
 

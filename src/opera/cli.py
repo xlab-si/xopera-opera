@@ -1,6 +1,7 @@
 import argparse
 import inspect
 import sys
+import shtab
 
 from opera import commands
 
@@ -37,5 +38,10 @@ def create_parser():
 
 def main():
     parser = create_parser()
+    # use shtab magic
+    # add global optional argument for generating shell completion script
+    shtab.add_argument_to(parser, ["-s", "--shell-completion"],
+                          help="Generate tab completion script for your shell"
+                          )
     args = parser.parse_args()
     return args.func(args)

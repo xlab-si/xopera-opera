@@ -1,4 +1,5 @@
 import argparse
+import shtab
 
 from pathlib import Path
 
@@ -29,9 +30,11 @@ def add_parser(subparsers):
         "--verbose", "-v", action='store_true',
         help="Turns on verbose mode",
     )
-    parser.add_argument("service_template_folder",
-                        help="Path to the root of the service template or "
-                             "folder you want to create the TOSCA CSAR from")
+    parser.add_argument(
+        "service_template_folder",
+        help="Path to the root of the service template or "
+             "folder you want to create the TOSCA CSAR from"
+    ).complete = shtab.FILE
     parser.set_defaults(func=_parser_callback)
 
 

@@ -1,4 +1,5 @@
 import argparse
+import shtab
 
 from os import path
 from pathlib import Path, PurePath
@@ -17,7 +18,7 @@ def add_parser(subparsers):
     parser.add_argument(
         "--instance-path", "-p",
         help=".opera storage folder location"
-    )
+    ).complete = shtab.DIR
     parser.add_argument(
         "--format", "-f", choices=("yaml", "json"), type=str,
         default="yaml", help="Output format",
