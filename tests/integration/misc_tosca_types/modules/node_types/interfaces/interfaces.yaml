@@ -7,7 +7,7 @@ node_types:
     interfaces:
       Standard:
         operations:
-          creat: /modules/node_types/interfaces/playbooks/create.yaml
+          create: /modules/node_types/interfaces/playbooks/create.yaml
           configure: /modules/node_types/interfaces/playbooks/create.yaml
           start: /modules/node_types/interfaces/playbooks/start.yaml
           stop: /modules/node_types/interfaces/playbooks/stop.yaml
