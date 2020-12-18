@@ -1,4 +1,6 @@
 import argparse
+import shtab
+
 from pathlib import Path, PurePath
 from os import path
 
@@ -17,7 +19,7 @@ def add_parser(subparsers):
     parser.add_argument(
         "--instance-path", "-p",
         help=".opera storage folder location"
-    )
+    ).complete = shtab.DIR
     parser.add_argument(
         "--workers", "-w",
         help="Maximum number of concurrent undeployment "

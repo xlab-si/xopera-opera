@@ -1,4 +1,5 @@
 import argparse
+import shtab
 
 from pathlib import Path
 
@@ -17,12 +18,14 @@ def add_parser(subparsers):
         help="Path to the location where the CSAR file will be extracted to, "
              "the path will be generated in the current working directory if "
              "it isn't specified",
-    )
+    ).complete = shtab.DIR
     parser.add_argument(
         "--verbose", "-v", action='store_true',
         help="Turns on verbose mode",
     )
-    parser.add_argument("csar", help="Path to the compressed TOSCA CSAR")
+    parser.add_argument(
+        "csar", help="Path to the compressed TOSCA CSAR"
+    ).complete = shtab.FILE
     parser.set_defaults(func=_parser_callback)
 
 

@@ -1,6 +1,7 @@
 import argparse
 import typing
 import yaml
+import shtab
 
 from os import path
 from pathlib import Path, PurePath
@@ -27,7 +28,7 @@ def add_parser(subparsers):
         "--inputs", "-i", type=argparse.FileType("r"),
         help="YAML or JSON file with inputs to "
              "override the inputs supplied in init",
-    )
+    ).complete = shtab.FILE
     parser.add_argument(
         "--workers", "-w",
         help="Maximum number of concurrent deployment "
@@ -52,10 +53,10 @@ def add_parser(subparsers):
         "--verbose", "-v", action='store_true',
         help="Turns on verbose mode",
     )
-    parser.add_argument("template",
-                        type=argparse.FileType("r"), nargs='?',
-                        help="TOSCA YAML service template file",
-                        )
+    parser.add_argument(
+        "template", type=argparse.FileType("r"), nargs='?',
+        help="TOSCA YAML service template file",
+    ).complete = shtab.FILE
     parser.set_defaults(func=_parser_callback)
 
 
