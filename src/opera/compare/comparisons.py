@@ -10,9 +10,9 @@ class Comparison:
 
 
 class ListComparison(Comparison):
-    def __init__(self, id_func, compare_func):
+    def __init__(self, compare_func, id_func):
+        super().__init__(compare_func)
         self.item_id_func = id_func
-        self.item_compare_func = compare_func
 
     def compare(self, list1, list2, context):
         diff = Diff()
@@ -35,6 +35,10 @@ class ListComparison(Comparison):
 
 
 class MapComparison(Comparison):
+    def __init__(self, compare_func, id_func=None):
+        super().__init__(compare_func)
+        self.item_id_func = id_func
+
     def compare(self, dict1, dict2, context):
         if dict1 is None:
             dict1 = {}
@@ -55,7 +59,11 @@ class MapComparison(Comparison):
                                                        dict2[name1],
                                                        context)
                 if not equal:
-                    diff.changed[name1] = change
+                    if self.item_id_func is None:
+                        name = name1
+                    else:
+                        name = self.item_id_func(item1)
+                    diff.changed[name] = change
 
         for name2, item2 in dict2.items():
             if name2 not in dict1:

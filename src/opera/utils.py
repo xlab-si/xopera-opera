@@ -1,3 +1,6 @@
+import yaml
+import json
+
 from zipfile import is_zipfile
 from tarfile import is_tarfile
 from uuid import uuid4
@@ -51,3 +54,22 @@ def generate_random_pathname(prefix=""):
         return generate_random_pathname(prefix)
     else:
         return pathname
+
+        
+def format_outputs(outputs, format):
+    if format == "json":
+        return json.dumps(outputs, indent=2)
+    if format == "yaml":
+        return yaml.safe_dump(outputs, default_flow_style=False)
+
+    assert False, "BUG - invalid format"
+
+
+def save_outputs(outputs, format, filename):
+    with open(filename, 'w+') as outfile:
+        if format == "json":
+            return json.dumps(outputs, outfile, indent=2)
+        if format == "yaml":
+            return yaml.safe_dump(outputs, outfile, default_flow_style=False)
+
+        assert False, "BUG - invalid format"

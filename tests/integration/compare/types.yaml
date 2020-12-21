@@ -1,0 +1,57 @@
+
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+capability_types:
+
+  hello_cap:
+    derived_from: tosca.capabilities.Root
+    properties:
+      test1:
+        default: "1"
+        type: string
+      test2:
+        default: "1"
+        type: string
+      test3:
+        default: "1"
+        type: string
+
+node_types:
+  hello_type:
+    derived_from: tosca.nodes.SoftwareComponent
+    properties:
+      time:
+        default: "1"
+        type: string
+      test_map:
+        default:
+        type: map
+    capabilities:
+      test:
+        type: hello_cap
+    interfaces:
+      Standard:
+        inputs:
+          marker:
+            default: { get_input: marker }
+            type: string
+          time:
+            default: { get_property: [SELF, time] }
+            type: string
+        operations:
+          create: playbooks/create.yaml
+          delete: playbooks/delete.yaml
+
+  hello_type_old:
+    derived_from: hello_type
+    properties:
+      day:
+        default: "1"
+        type: string
+
+  hello_type_new:
+    derived_from: hello_type
+    properties:
+      day:
+        default: "2"
+        type: string

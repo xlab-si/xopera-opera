@@ -1,6 +1,4 @@
 import argparse
-import json
-import yaml
 
 from os import path
 from pathlib import Path, PurePath
@@ -8,6 +6,7 @@ from pathlib import Path, PurePath
 from opera.error import DataError, ParseError
 from opera.parser import tosca
 from opera.storage import Storage
+from opera.utils import format_outputs
 
 
 def add_parser(subparsers):
@@ -28,15 +27,6 @@ def add_parser(subparsers):
         help="Turns on verbose mode",
     )
     parser.set_defaults(func=_parser_callback)
-
-
-def format_outputs(outputs, format):
-    if format == "json":
-        return json.dumps(outputs, indent=2)
-    if format == "yaml":
-        return yaml.safe_dump(outputs, default_flow_style=False)
-
-    assert False, "BUG - invalid format"
 
 
 def _parser_callback(args):
