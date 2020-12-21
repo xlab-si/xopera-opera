@@ -1,7 +1,8 @@
 import argparse
 import typing
 import yaml
-import json
+import tempfile
+
 from pathlib import Path, PurePath
 from os import path
 
@@ -9,12 +10,15 @@ from opera.error import DataError, ParseError
 from opera.parser import tosca
 from opera.storage import Storage
 from opera.compare.template_comparer import TemplateComparer, TemplateContext
+from opera.compare.instance_comparer import InstanceComparer
+from opera.utils import format_outputs, save_outputs
 
 
 def add_parser(subparsers):
     parser = subparsers.add_parser(
         "diff",
-        help="Compare service templates"
+        help="Compare TOSCA service template to the one from "
+             "the opera project storage and print out their differences"
     )
     parser.add_argument(
         "--instance-path", "-p",
@@ -22,12 +26,16 @@ def add_parser(subparsers):
     )
     parser.add_argument(
         "--inputs", "-i", type=argparse.FileType("r"),
-        help="Optional: YAML file with inputs to "
-             "override the inputs supplied in init",
+        help="Optional: YAML or JSON file with inputs "
+             "that will be used along with the comparison",
     )
     parser.add_argument(
         "--verbose", "-v", action='store_true',
         help="Turns on verbose mode",
+    )
+    parser.add_argument(
+        "--template-only", "-t", action='store_true',
+        help="Compare only templates without instances",
     )
     parser.add_argument(
         "--format", "-f", choices=("yaml", "json"), type=str,
@@ -35,7 +43,7 @@ def add_parser(subparsers):
     )
     parser.add_argument(
         "--output", "-o",
-        help="output file location"
+        help="Output file location"
     )
     parser.add_argument("template",
                         type=argparse.FileType("r"), nargs='?',
@@ -49,23 +57,23 @@ def _parser_callback(args):
         raise argparse.ArgumentTypeError("Directory {} is not a valid path!"
                                          .format(args.instance_path))
 
-    storage = Storage.create(args.instance_path)
+    storage_old = Storage.create(args.instance_path)
     comparer = TemplateComparer()
 
     if args.template:
         service_template_new = args.template.name
     else:
-        print("Template file does not exist. ")
+        print("Template file for comparison was not supplied.")
         return 1
 
-    if storage.exists("root_file"):
-        service_template_old = storage.read("root_file")
+    if storage_old.exists("root_file"):
+        service_template_old = storage_old.read("root_file")
     else:
         print("There is no root_file in storage.")
         return 1
 
-    if storage.exists("inputs"):
-        inputs_old = storage.read_json("inputs")
+    if storage_old.exists("inputs"):
+        inputs_old = storage_old.read_json("inputs")
     else:
         inputs_old = {}
 
@@ -73,16 +81,28 @@ def _parser_callback(args):
         if args.inputs:
             inputs_new = yaml.safe_load(args.inputs)
         else:
-            inputs_new = None
+            inputs_new = {}
     except Exception as e:
         print("Invalid inputs: {}".format(e))
         return 1
 
     try:
-        template_diff = diff(service_template_new, Path.cwd(), inputs_new,
-                             service_template_old, Path.cwd(), inputs_old,
-                             comparer, args.verbose)
-        outputs = template_diff.outputs(2)
+        if args.template_only:
+            template_diff = diff_templates(service_template_old,
+                                           str(Path.cwd()), inputs_old,
+                                           service_template_new,
+                                           str(Path.cwd()), inputs_new,
+                                           comparer, args.verbose)
+        else:
+            instance_comparer = InstanceComparer()
+            with tempfile.TemporaryDirectory() as temp_path:
+                storage_new = Storage.create(temp_path)
+                storage_new.write_json(inputs_new, "inputs")
+                storage_new.write(service_template_new, "root_file")
+                template_diff = diff_instances(storage_old, storage_new,
+                                               comparer,
+                                               instance_comparer, args.verbose)
+        outputs = template_diff.outputs()
         if args.output:
             save_outputs(outputs, args.format, args.output)
         else:
@@ -97,30 +117,35 @@ def _parser_callback(args):
     return 0
 
 
-def format_outputs(outputs, format):
-    if format == "json":
-        return json.dumps(outputs, indent=2)
-    if format == "yaml":
-        return yaml.dump(outputs, default_flow_style=False)
+def get_template(storage):
+    if storage.exists("inputs"):
+        inputs = storage.read_json("inputs")
+    else:
+        inputs = {}
 
-    assert False, "BUG - invalid format"
+    if storage.exists("root_file"):
+        service_template = storage.read("root_file")
+        workdir = str(Path.cwd())
+
+        if storage.exists("csars"):
+            csar_dir = Path(storage.path) / "csars" / "csar"
+            workdir = str(csar_dir)
+            ast = tosca.load(Path(csar_dir),
+                             PurePath(service_template).relative_to(csar_dir))
+        else:
+            ast = tosca.load(Path.cwd(), PurePath(service_template))
+
+        template = ast.get_template(inputs)
+        return template, workdir
+    else:
+        return None, None
 
 
-def save_outputs(outputs, format, filename):
-    with open(filename, 'w+') as outfile:
-        if format == "json":
-            return json.dumps(outputs, outfile, indent=2)
-        if format == "yaml":
-            return yaml.dump(outputs, outfile, default_flow_style=False)
-
-        assert False, "BUG - invalid format"
-
-
-def diff(service_template_new: str, workdir_new,
-         inputs_new: typing.Optional[dict],
-         service_template_old: str, workdir_old,
-         inputs_old: typing.Optional[dict],
-         comparer: TemplateComparer, verbose_mode: bool):
+def diff_templates(service_template_old: str, workdir_old: str,
+                   inputs_old: typing.Optional[dict],
+                   service_template_new: str, workdir_new: str,
+                   inputs_new: typing.Optional[dict],
+                   template_comparer: TemplateComparer, verbose_mode: bool):
     """
     :raises ParseError:
     :raises DataError:
@@ -131,8 +156,8 @@ def diff(service_template_new: str, workdir_new,
     if inputs_old is None:
         inputs_old = {}
 
-    ast_old = tosca.load(workdir_old, PurePath(service_template_old))
-    ast_new = tosca.load(workdir_new, PurePath(service_template_new))
+    ast_old = tosca.load(Path(workdir_old), PurePath(service_template_old))
+    ast_new = tosca.load(Path(workdir_new), PurePath(service_template_new))
 
     template_old = ast_old.get_template(inputs_old)
     template_new = ast_new.get_template(inputs_new)
@@ -141,6 +166,37 @@ def diff(service_template_new: str, workdir_new,
                               workdir_old,
                               workdir_new)
 
-    equal, diff = comparer.compare_service_template(template_old,
-                                                    template_new, context)
+    equal, diff = template_comparer.compare_service_template(template_old,
+                                                             template_new,
+                                                             context)
+    return diff
+
+
+def diff_instances(storage_old: Storage, storage_new: Storage,
+                   template_comparer: TemplateComparer,
+                   instance_comparer: InstanceComparer,
+                   verbose_mode: bool):
+    """
+    :raises ParseError:
+    :raises DataError:
+    """
+
+    template_old, workdir_old = get_template(storage_old)
+    template_new, workdir_new = get_template(storage_new)
+    topology_old = template_old.instantiate(storage_old)
+    topology_new = template_new.instantiate(storage_new)
+
+    context = TemplateContext(template_old,
+                              template_new,
+                              workdir_old,
+                              workdir_new)
+
+    equal, diff = template_comparer.compare_service_template(template_old,
+                                                             template_new,
+                                                             context)
+
+    equal, diff = instance_comparer.compare_topology_template(topology_old,
+                                                              topology_new,
+                                                              diff)
+
     return diff
