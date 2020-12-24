@@ -1,23 +1,18 @@
 # xOpera TOSCA orchestrator
 xOpera orchestration tool compliant with TOSCA YAML v1.3 in the making.
 
-![CircleCI](https://img.shields.io/circleci/build/github/xlab-si/xopera-opera?label=circleci)
-![GitHub deployments](https://img.shields.io/github/deployments/xlab-si/xopera-opera/github-pages?label=documentation)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/xlab-si/xopera-opera)
-![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/xlab-si/xopera-opera)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/xlab-si/xopera-opera)
-![GitHub issues](https://img.shields.io/github/issues/xlab-si/xopera-opera)
-![GitHub contributors](https://img.shields.io/github/contributors/xlab-si/xopera-opera)
-![GitHub top language](https://img.shields.io/github/languages/top/xlab-si/xopera-opera)
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/xlab-si/xopera-opera)
-![PyPI](https://img.shields.io/pypi/v/opera)
-![PyPI - Status](https://img.shields.io/pypi/status/opera)
-![PyPI - Implementation](https://img.shields.io/pypi/implementation/opera)
-![PyPI - Format](https://img.shields.io/pypi/format/opera)
-![PyPI - License](https://img.shields.io/pypi/l/opera)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/opera)
-![PyPI - Wheel](https://img.shields.io/pypi/wheel/opera)
-![PyPI - Downloads](https://img.shields.io/pypi/dm/opera)
+[![CircleCI](https://img.shields.io/circleci/build/github/xlab-si/xopera-opera?label=circleci)](https://app.circleci.com/pipelines/github/xlab-si/xopera-opera)
+[![GitHub deployments](https://img.shields.io/github/deployments/xlab-si/xopera-opera/github-pages?label=documentation)](https://xlab-si.github.io/xopera-opera/)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/xlab-si/xopera-opera)](https://github.com/xlab-si/xopera-opera/releases)
+[![GitHub contributors](https://img.shields.io/github/contributors/xlab-si/xopera-opera)](https://github.com/xlab-si/xopera-opera/graphs/contributors)
+[![GitHub top language](https://img.shields.io/github/languages/top/xlab-si/xopera-opera)](https://github.com/xlab-si/xopera-opera)
+[![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/xlab-si/xopera-opera)](https://github.com/xlab-si/xopera-opera)
+[![PyPI](https://img.shields.io/pypi/v/opera)](https://pypi.org/project/opera/)
+[![Test PyPI](https://img.shields.io/badge/test%20pypi-dev%20version-blueviolet)](https://test.pypi.org/project/opera/)
+[![PyPI - License](https://img.shields.io/pypi/l/opera)](https://github.com/xlab-si/xopera-opera/blob/master/LICENSE)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/opera)](https://pypi.org/project/opera/)
+[![PyPI - Wheel](https://img.shields.io/pypi/wheel/opera)](https://pypi.org/project/opera/)
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/opera)](https://pypi.org/project/opera/)
 
 | Aspect                         | Information                            |
 | ------------------------------ |:--------------------------------------:|
