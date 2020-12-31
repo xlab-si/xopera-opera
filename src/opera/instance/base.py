@@ -57,9 +57,10 @@ class Base:
     def state(self):
         return self.attributes["state"].data
 
-    def set_state(self, state):
+    def set_state(self, state, write=True):
         self.set_attribute("state", state)
-        self.write()
+        if write:
+            self.write()
 
     def run_operation(self, host, interface, operation, verbose, workdir):
         success, outputs, attributes = self.template.run_operation(

@@ -53,5 +53,12 @@ class Topology:
     def write(self, data, instance_id):
         self.storage.write_json(data, "instances", instance_id)
 
+    def write_all(self):
+        for node in self.nodes.values():
+            node.write()
+
     def read(self, instance_id):
         return self.storage.read_json("instances", instance_id)
+
+    def set_storage(self, storage):
+        self.storage = storage
