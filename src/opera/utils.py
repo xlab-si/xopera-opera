@@ -46,8 +46,8 @@ def determine_archive_format(filepath):
     elif is_zipfile(filepath):
         return "zip"
     else:
-        raise Exception("Unaccepted archive file: '{}'. The compression "
-                        "format should be zip or tar.".format(filepath))
+        raise Exception("Unsupported archive format: '{}'. The packaging "
+                        "format should be one of: zip, tar.".format(filepath))
 
 
 def generate_random_pathname(prefix=""):
