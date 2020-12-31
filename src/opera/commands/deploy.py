@@ -70,7 +70,7 @@ def _parser_callback(args):
         return 1
 
     storage = Storage.create(args.instance_path)
-    status = info(storage)["status"]
+    status = info(None, storage)["status"]
     delete_existing_state = False
 
     if storage.exists("instances"):
