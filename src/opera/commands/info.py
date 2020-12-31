@@ -1,14 +1,16 @@
 import argparse
-import json
 import yaml
 import shtab
 
 from os import path
 from pathlib import Path, PurePath
+from typing import Optional
 
-from opera.error import DataError, ParseError
+from opera.error import DataError, ParseError, OperaError
 from opera.parser import tosca
+from opera.parser.tosca.csar import CloudServiceArchive
 from opera.storage import Storage
+from opera.utils import format_outputs
 
 
 def add_parser(subparsers):
@@ -28,16 +30,12 @@ def add_parser(subparsers):
         "--verbose", "-v", action='store_true',
         help="Turns on verbose mode",
     )
+    parser.add_argument(
+        "csar_or_rootdir", nargs='?',
+        help="Path to a packed or unpacked CSAR. "
+             "Defaults to the current directory if not specified.",
+    ).complete = shtab.DIR
     parser.set_defaults(func=_parser_callback)
-
-
-def format_outputs(info, format):
-    if format == "json":
-        return json.dumps(info, indent=2)
-    if format == "yaml":
-        return yaml.safe_dump(info, default_flow_style=False)
-
-    assert False, "BUG - an invalid format got past the parser"
 
 
 def _parser_callback(args):
@@ -47,7 +45,7 @@ def _parser_callback(args):
 
     storage = Storage.create(args.instance_path)
     try:
-        outs = info(storage)
+        outs = info(args.csar_or_rootdir, storage)
         print(format_outputs(outs, args.format))
     except ParseError as e:
         print("{}: {}".format(e.loc, e))
@@ -58,7 +56,7 @@ def _parser_callback(args):
     return 0
 
 
-def info(storage: Storage) -> dict:
+def info(csar_or_rootdir: Optional[PurePath], storage: Storage) -> dict:
     """
     :raises ParseError:
     :raises DataError:
@@ -69,6 +67,20 @@ def info(storage: Storage) -> dict:
         inputs=None,
         status=None
     )
+
+    # stateless autodetect first if possible,
+    # which can then be overwritten via state
+    if csar_or_rootdir is not None:
+        csar = CloudServiceArchive.create(csar_or_rootdir)
+        try:
+            csar.validate_csar()
+            info_dict["content_root"] = csar_or_rootdir
+
+            meta = csar.parse_csar_meta()
+            if meta is not None:
+                info_dict["service_template"] = meta.entry_definitions
+        except OperaError:
+            pass
 
     if storage.exists("root_file"):
         service_template = storage.read("root_file")
