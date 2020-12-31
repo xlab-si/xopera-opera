@@ -1,7 +1,7 @@
 import argparse
 import shtab
 
-from pathlib import Path
+from pathlib import Path, PurePath
 
 from opera.error import DataError, ParseError
 from opera.parser.tosca.csar import CloudServiceArchive
@@ -64,8 +64,8 @@ def unpackage(csar_input: str, output_dir: str, csar_format: str):
     :raises ParseError:
     :raises DataError:
     """
-    csar = CloudServiceArchive(csar_input)
+    csar = CloudServiceArchive.create(PurePath(csar_input))
     # validate CSAR before unpacking it
     csar.validate_csar()
     # unpack the CSAR to the specified location
-    csar.unpackage_csar(output_dir, csar_format)
+    csar.unpackage_csar(output_dir)

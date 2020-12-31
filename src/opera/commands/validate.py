@@ -62,9 +62,9 @@ def validate_compressed_csar(csar_name: str, inputs: typing.Optional[dict]):
         inputs = {}
 
     with TemporaryDirectory() as csar_validation_dir:
-        # validate csar structure
-        csar = CloudServiceArchive(csar_name)
-        tosca_service_template = csar.validate_csar()
+        csar = CloudServiceArchive.create(PurePath(csar_name))
+        csar.validate_csar()
+        tosca_service_template = csar.get_entrypoint()
 
         # unzip csar to temporary folder
         ZipFile(csar_name, 'r').extractall(csar_validation_dir)

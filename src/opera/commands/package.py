@@ -1,7 +1,7 @@
 import argparse
 import shtab
 
-from pathlib import Path
+from pathlib import Path, PurePath
 
 from opera.error import DataError, ParseError
 from opera.parser.tosca.csar import CloudServiceArchive
@@ -76,5 +76,5 @@ def package(input_dir: str, csar_output: str, service_template: str,
     :raises ParseError:
     :raises DataError:
     """
-    csar = CloudServiceArchive(input_dir)
+    csar = CloudServiceArchive.create(PurePath(input_dir))
     return csar.package_csar(csar_output, service_template, csar_format)
