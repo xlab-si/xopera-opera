@@ -5,6 +5,9 @@ from zipfile import is_zipfile
 from tarfile import is_tarfile
 from uuid import uuid4
 from os import path
+from pathlib import Path, PurePath
+
+from opera.parser import tosca
 
 
 def prompt_yes_no_question(yes_responses=("y", "yes"),
@@ -55,7 +58,7 @@ def generate_random_pathname(prefix=""):
     else:
         return pathname
 
-        
+
 def format_outputs(outputs, format):
     if format == "json":
         return json.dumps(outputs, indent=2)
@@ -73,3 +76,33 @@ def save_outputs(outputs, format, filename):
             return yaml.safe_dump(outputs, outfile, default_flow_style=False)
 
         assert False, "BUG - invalid format"
+
+
+def get_workdir(storage):
+    if storage.exists("csars"):
+        csar_dir = Path(storage.path) / "csars" / "csar"
+        return str(csar_dir)
+    else:
+        return str(Path.cwd())
+
+
+def get_template(storage):
+    if storage.exists("inputs"):
+        inputs = storage.read_json("inputs")
+    else:
+        inputs = {}
+
+    if storage.exists("root_file"):
+        service_template = storage.read("root_file")
+
+        if storage.exists("csars"):
+            csar_dir = Path(storage.path) / "csars" / "csar"
+            ast = tosca.load(Path(csar_dir),
+                             PurePath(service_template).relative_to(csar_dir))
+        else:
+            ast = tosca.load(Path.cwd(), PurePath(service_template))
+
+        template = ast.get_template(inputs)
+        return template
+    else:
+        return None

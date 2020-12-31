@@ -63,3 +63,23 @@ class TestInstanceCompare:
             .changed["hello-3"].changed
         assert "dependencies" not in diff.changed["nodes"] \
             .changed["my-workstation"].changed
+
+    def test_prepare_update(self, service_template1,
+                            service_template2, template_diff):
+        comparer = InstanceComparer()
+        for node1 in service_template1[1].nodes.values():
+            node1.set_state("started")
+        assert service_template2[1].nodes["my-workstation_0"] \
+            .state == "initial"
+        equal, diff = comparer.compare_topology_template(service_template1[1],
+                                                         service_template2[1],
+                                                         template_diff)
+        assert equal is False
+        comparer.prepare_update(service_template1[1],
+                                service_template2[1],
+                                diff)
+
+        assert service_template1[1].nodes["my-workstation_0"] \
+            .state == "initial"
+        assert service_template2[1].nodes["my-workstation_0"] \
+            .state == "started"

@@ -43,3 +43,6 @@ class Diff:
             if name not in self.changed:
                 self.changed[name] = Diff()
             self.changed[name].changed[change_name] = change
+
+    def find_key(self, key):
+        return key in self.added or key in self.changed or key in self.deleted

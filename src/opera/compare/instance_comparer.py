@@ -3,8 +3,8 @@ from .comparisons import MapComparison
 
 
 class InstanceComparer:
-    def compare_topology_template(self, topology_template1,
-                                  topology_template2, template_diff):
+    def compare_topology_template(self, topology_template1, topology_template2,
+                                  template_diff):
         diff_copy = template_diff.copy()
         nodes_diff = diff_copy.changed.get("nodes", Diff())
         # we can just process model from second topology
@@ -23,6 +23,21 @@ class InstanceComparer:
             nodes_diff.combine_changes("state", diff.changed)
 
         return equal, diff_copy
+
+    def prepare_update(self, topology_template1, topology_template2,
+                       template_diff):
+        # no need to take relationships into account
+        # as they are always in "initial" state
+        nodes_diff = template_diff.changed.get("nodes", Diff())
+        for node1 in topology_template1.nodes.values():
+            node_name = self._get_template_name(node1)
+            if not nodes_diff.find_key(node_name):
+                node1.set_state("initial", write=False)
+
+        for node2 in topology_template2.nodes.values():
+            node_name = self._get_template_name(node2)
+            if not nodes_diff.find_key(node_name):
+                node2.set_state("started", write=False)
 
     def _check_dependencies(self, nodes, changed_nodes,
                             parent_name, parent_changed):

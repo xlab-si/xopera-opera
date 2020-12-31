@@ -11,7 +11,7 @@ from opera.parser import tosca
 from opera.storage import Storage
 from opera.compare.template_comparer import TemplateComparer, TemplateContext
 from opera.compare.instance_comparer import InstanceComparer
-from opera.utils import format_outputs, save_outputs
+from opera.utils import format_outputs, save_outputs, get_template, get_workdir
 
 
 def add_parser(subparsers):
@@ -86,12 +86,15 @@ def _parser_callback(args):
         print("Invalid inputs: {}".format(e))
         return 1
 
+    workdir_old = get_workdir(storage_old)
+    workdir_new = str(Path.cwd())
+
     try:
         if args.template_only:
             template_diff = diff_templates(service_template_old,
-                                           str(Path.cwd()), inputs_old,
+                                           workdir_old, inputs_old,
                                            service_template_new,
-                                           str(Path.cwd()), inputs_new,
+                                           workdir_new, inputs_new,
                                            comparer, args.verbose)
         else:
             instance_comparer = InstanceComparer()
@@ -99,7 +102,8 @@ def _parser_callback(args):
                 storage_new = Storage.create(temp_path)
                 storage_new.write_json(inputs_new, "inputs")
                 storage_new.write(service_template_new, "root_file")
-                template_diff = diff_instances(storage_old, storage_new,
+                template_diff = diff_instances(storage_old, workdir_old,
+                                               storage_new, workdir_new,
                                                comparer,
                                                instance_comparer, args.verbose)
         outputs = template_diff.outputs()
@@ -115,30 +119,6 @@ def _parser_callback(args):
         return 1
 
     return 0
-
-
-def get_template(storage):
-    if storage.exists("inputs"):
-        inputs = storage.read_json("inputs")
-    else:
-        inputs = {}
-
-    if storage.exists("root_file"):
-        service_template = storage.read("root_file")
-        workdir = str(Path.cwd())
-
-        if storage.exists("csars"):
-            csar_dir = Path(storage.path) / "csars" / "csar"
-            workdir = str(csar_dir)
-            ast = tosca.load(Path(csar_dir),
-                             PurePath(service_template).relative_to(csar_dir))
-        else:
-            ast = tosca.load(Path.cwd(), PurePath(service_template))
-
-        template = ast.get_template(inputs)
-        return template, workdir
-    else:
-        return None, None
 
 
 def diff_templates(service_template_old: str, workdir_old: str,
@@ -172,7 +152,8 @@ def diff_templates(service_template_old: str, workdir_old: str,
     return diff
 
 
-def diff_instances(storage_old: Storage, storage_new: Storage,
+def diff_instances(storage_old: Storage, workdir_old: str,
+                   storage_new: Storage, workdir_new: str,
                    template_comparer: TemplateComparer,
                    instance_comparer: InstanceComparer,
                    verbose_mode: bool):
@@ -181,8 +162,8 @@ def diff_instances(storage_old: Storage, storage_new: Storage,
     :raises DataError:
     """
 
-    template_old, workdir_old = get_template(storage_old)
-    template_new, workdir_new = get_template(storage_new)
+    template_old = get_template(storage_old)
+    template_new = get_template(storage_new)
     topology_old = template_old.instantiate(storage_old)
     topology_new = template_new.instantiate(storage_new)
 

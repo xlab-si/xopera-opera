@@ -7,5 +7,6 @@ from opera.commands import (
     package,
     undeploy,
     unpackage,
+    update,
     validate
 )
