@@ -105,13 +105,11 @@ The commands can be executed in a random order and the orchestrator will warn  a
 deploy
 ######
 
-Name
-+++++
+**Name**
 
 ``deploy`` - used to deploy and control deployment of the application described in YAML or CSAR.
 
-Usage
-+++++
+**Usage**
 
       .. argparse::
          :filename: src/opera/cli.py
@@ -211,14 +209,12 @@ Usage
 undeploy
 #########
 
-Name
-++++
+**Name**
 
 
 ``undeploy`` - undeploys application; removes all application instances and components.
 
-Usage
-+++++
+**Usage**
 
       .. argparse::
          :filename: src/opera/cli.py
@@ -296,13 +292,11 @@ Usage
 validate
 ########
 
-Name
-++++
+**Name**
 
 Validates the structure of TOSCA template or CSAR
 
-Usage
-+++++
+**Usage**
       .. argparse::
          :filename: src/opera/cli.py
          :func: create_parser
@@ -365,13 +359,11 @@ outputs
 #######
 
 
-Name
-++++
+**Name**
 
 ``outputs`` Print the outputs of the deploy/undeploy.
 
-Usage
-+++++
+**Usage**
 
 
       .. argparse::
@@ -422,13 +414,11 @@ Usage
 info
 #######
 
-Name
-++++
+**Name**
 
 ``info`` - print the details of current deployment project
 
-Usage
-+++++
+**Usage**
 
       .. argparse::
          :filename: src/opera/cli.py
@@ -499,13 +489,11 @@ package
 #######
 
 
-Name
-++++
+**Name**
 
 ``package`` create compressed CSAR from the service template represeted with YAML-s.
 
-Usage
-+++++
+**Usage**
 
       .. argparse::
          :filename: src/opera/cli.py
@@ -579,13 +567,11 @@ Usage
 unpackage
 ##########
 
-Name
-++++
+**Name**
 
 ``unpackage`` uncompress CSAR.
 
-Usage
-+++++
+**Usage**
       .. argparse::
          :filename: src/opera/cli.py
          :func: create_parser
