@@ -8,12 +8,15 @@ The following documentation explains the usage of xOpera TOSCA orchestrator. Wan
     :caption: Table of Contents
 
     introduction
-    business-value
-    installation
-    examples
-    documentation
+    quickstart
+    opera_cli
     saas
-
+    opera_api
+    template_library
+    examples
+    
+     
+     
 ..
    Indices and tables
    ==================
@@ -27,6 +30,8 @@ References
 ##########
 
 - Carbonell, Maria: xOpera: an agile orchestrator: https://www.sodalite.eu/content/xopera-agile-orchestrator
+- Cankar, Matija et. al.: Auto-scaling Using TOSCA Infrastructure as Code: https://link.springer.com/chapter/10.1007/978-3-030-59155-7_20
+- Luzar, Anže et. al.: Examination and Comparison of TOSCA Orchestration Tools: https://link.springer.com/chapter/10.1007/978-3-030-59155-7_19
 
 Contact
 #######

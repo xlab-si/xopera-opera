@@ -105,7 +105,17 @@ To undeploy or delete the project, press the corresponding button.
 The API
 =======
 
-The API reference is located at https://xopera-radon.xlab.si/apibrowser/.
+A preview of the API reference is presented in :numref:`xopera_saas_api_excerpt` and the whole reference is located at the
+`API page <https://xopera-radon.xlab.si/apibrowser/>`_.
+
+.. _xopera_saas_api_excerpt:
+
+.. figure:: /images/xopera-saas-api.png
+    :target: _images/xopera-saas-api.png
+    :width: 95%
+    :align: center
+
+    An excerpt of the xOpera SaaS API.
 
 The following is a complete example of using the xOpera SaaS API through ``curl``::
 
