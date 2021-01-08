@@ -3,7 +3,7 @@
 import setuptools
 
 
-# configures that the local component of the version is constructed without commit hash
+# constructs the local component of the version without the commit hash
 def local_scheme(version):
     return ""
 
