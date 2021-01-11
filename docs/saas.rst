@@ -101,6 +101,12 @@ so you can attempt to reproduce (and hopefully, fix) the error locally.
 
 To undeploy or delete the project, press the corresponding button.
 
+===================================
+Eclipse Che plugin for xOpera SaaS
+===================================
+
+*TBD*
+
 =======
 The API
 =======

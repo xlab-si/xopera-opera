@@ -1,5 +1,6 @@
+**********************************
 Welcome to xOpera's documentation!
-==================================
+**********************************
 
 The following documentation explains the usage of xOpera TOSCA orchestrator. Want to try it right away? Just go to
 :ref:`Examples` or follow the Table of Contents below.
@@ -25,16 +26,17 @@ The following documentation explains the usage of xOpera TOSCA orchestrator. Wan
     * :ref:`modindex`
     * :ref:`search`
 
-
+===========
 References
-##########
+===========
 
 - Carbonell, Maria: xOpera: an agile orchestrator: https://www.sodalite.eu/content/xopera-agile-orchestrator
 - Cankar, Matija et. al.: Auto-scaling Using TOSCA Infrastructure as Code: https://link.springer.com/chapter/10.1007/978-3-030-59155-7_20
 - Luzar, Anže et. al.: Examination and Comparison of TOSCA Orchestration Tools: https://link.springer.com/chapter/10.1007/978-3-030-59155-7_19
 
+===========
 Contact
-#######
+===========
 
 The list of contributors:
 
@@ -49,8 +51,9 @@ The list of contributors:
     - Matija Cankar (https://github.com/cankarm/): `RADON Horizon 2020 project <https://radon-h2020.eu/>`_
     - Dragan Radolović (https://github.com/dradX/): `SODALITE Horizon 2020 project <https://sodalite.eu/>`_
 
+================
 Acknowledgments
-###############
+================
 
 - This work is being supported by the European Union’s Horizon 2020 research and innovation programme (grant no. 825040,
   RADON).

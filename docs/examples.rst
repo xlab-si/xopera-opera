@@ -6,24 +6,9 @@ Examples
 
 In this section we show some simple examples of orchestrating with xOpera.
 
-Screencast video
-################
-
-This video will help you to get started with xOpera. It also shows an example of deploying a simple image resize
-solution to AWS:
-
-.. raw:: html
-
-    <div style="text-align: center; margin-bottom: 2em;">
-    <iframe width="100%" height="350" src="https://www.youtube.com/embed/cb1efi3wnpw" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-    </div>
-
-
-Eclipse Che plugin for xOpera SaaS
-###################################
-
-TBD
-
+===========================
+Private cloud 
+===========================
 
 OpenStack client setup
 ######################
@@ -53,8 +38,45 @@ in playbooks that implement life cycle operations.
     to connect.
 
 
+============================
+Public cloud 
+============================
+
+TBD
+
+
+============================
+Serverless
+============================
+
+
+Screencast video
+################
+
+This video will help you to get started with xOpera. It also shows an example of deploying a simple image resize
+solution to AWS Lambda:
+
+.. raw:: html
+
+    <div style="text-align: center; margin-bottom: 2em;">
+    <iframe width="100%" height="350" src="https://www.youtube.com/embed/cb1efi3wnpw" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+
+
+============================
+HPC
+============================
+
+
+=============================
+More tempaltes and blueprints
+=============================
+
+
 TOSCA CSAR
 ##########
+
+TBD.
 
 This example shows a deployment of the compressed TOSCA CSAR (available here: :download:`big.csar </files/csars/big/big.csar>`).
 The result of the example consisting of deploy, outputs and undeploy operations

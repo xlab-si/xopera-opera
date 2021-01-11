@@ -1,8 +1,8 @@
 .. _Opera CLI:
 
-***********
-xOpera CLI
-***********
+******************
+xOpera CLI (opera)
+******************
 
 .. _Opera CLI install:
 
