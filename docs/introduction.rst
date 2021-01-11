@@ -38,9 +38,9 @@ Currently a set of components is presented in figure :numref:`xopera_architectur
   
 Each component is covered by corresponding This documentation will cover all xOpera components.
 
-
+================
 Background
-##########
+================
 
 xOpera is a TOSCA standard compliant orchestrator that is following the paradigm of having a minimal set of
 features and is currently focusing on Ansible. xOpera is following the traditional UNIX philosophy of having a tool that
@@ -69,8 +69,9 @@ coordination, state of the deployment and so on.
 
 .. _Parser:
 
+================
 Parser
-######
+================
 
 .. note::
 

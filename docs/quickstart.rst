@@ -4,8 +4,9 @@
 Quickstart
 *******************
 
+======================
 Opera CLI Quickstart 
-*********************
+======================
 
 
 After you `installed xOpera CLI <Opera CLI install>`_ into virtual environment you can test if everything is working as expected. We can now try to
@@ -113,6 +114,7 @@ and then also ``opera undeploy`` to un-deploy the solution (see image below :ref
     xOpera CLI deployment
 
 
+======================
 xOpera SaaS Quickstart 
-***********************
+======================
 
