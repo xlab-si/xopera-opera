@@ -18,9 +18,9 @@
 
 # -- Project information -----------------------------------------------------
 
-project = u'RADON'
-copyright = u'2020, RADON team'
-author = u'RADON team'
+project = u'xOpera'
+copyright = u'2020, XLAB d.o.o., xOpera team'
+author = u'XLAB d.o.o.'
 
 # The short X.Y version
 version = u''
