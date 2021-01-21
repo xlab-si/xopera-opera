@@ -7,11 +7,13 @@ commands:
       - checkout
       - run: sudo pip install pipenv
       - run: make init
+      - run: sudo apt-get install -y shellcheck
 
   run_tests:
     description: Run test suite
     steps:
       - common_setup
+      - run: pipenv run ./dev.sh sanity
       - run: make unit_test
       - run: make integration_test
       - run: make examples_test

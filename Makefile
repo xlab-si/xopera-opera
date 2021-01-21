@@ -16,7 +16,7 @@ export PIPENV_PIPFILE := $(realpath Pipfile)
 
 .PHONY: init
 init:
-	pipenv install -d
+	pipenv install --dev
 
 .PHONY: unit_test
 unit_test:
