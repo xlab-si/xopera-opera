@@ -1,13 +1,10 @@
 from opera.parser.yaml.node import Node
-
+from .constraint_clause import ConstraintClause
+from .property_definition import PropertyDefinition
 from ..entity import TypeEntity
 from ..list import List
 from ..map import Map
 from ..reference import DataTypeReference
-from ..string import String
-
-from .constraint_clause import ConstraintClause
-from .property_definition import PropertyDefinition
 
 
 class DataType(TypeEntity):

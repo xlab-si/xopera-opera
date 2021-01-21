@@ -28,7 +28,8 @@ class Value:
 
     @property
     def data(self):
-        assert self.present, "Accessing an unset value. Bug-fixing ahead ;)"
+        if not self.present:
+            raise AssertionError("Accessing an unset value. Bug-fixing ahead ;)")
         return self._data
 
     def copy(self):
@@ -52,11 +53,7 @@ class Value:
 
     @property
     def is_function(self):
-        return (
-            isinstance(self.data, dict) and
-            len(self.data) == 1 and
-            tuple(self.data.keys())[0] in self.FUNCTIONS
-        )
+        return isinstance(self.data, dict) and len(self.data) == 1 and tuple(self.data.keys())[0] in self.FUNCTIONS
 
     def eval_function(self, instance):
         (function_name, params), = self.data.items()

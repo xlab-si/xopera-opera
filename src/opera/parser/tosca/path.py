@@ -63,6 +63,4 @@ class Path(String):
         if abs_path.is_symlink():
             self.abort("Path {} is a symlink.".format(abs_path), self.loc)
         if not abs_path.is_dir() and not abs_path.is_file():
-            self.abort(
-                "Path {} is not file or folder.".format(abs_path), self.loc,
-            )
+            self.abort("Path {} is not file or folder.".format(abs_path), self.loc)

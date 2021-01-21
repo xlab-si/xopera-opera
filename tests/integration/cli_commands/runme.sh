@@ -117,17 +117,17 @@ test "$(echo "$info_out" | jq -r .status)" = "undeployed"
 
 # move to the root of the extracted CSAR and
 # deploy the extracted service template with inputs
-cd unpacked-csar
-$opera_executable deploy --inputs ../inputs.yaml service.yaml
+(
+    cd unpacked-csar
+    set -euo pipefail
+    $opera_executable deploy --inputs ../inputs.yaml service.yaml
 
-# test opera info status after deploy
-info_out="$($opera_executable info --format json)"
-test "$(echo "$info_out" | jq -r .status)" = "deployed"
+    # test opera info status after deploy
+    info_out="$($opera_executable info --format json)"
+    test "$(echo "$info_out" | jq -r .status)" = "deployed"
+)
 
-# move one level up and remove the extracted folder
-cd ..
 rm -rf unpacked-csar
-
 
 # test opera commands on CSAR
 # prepare new opera storage folder

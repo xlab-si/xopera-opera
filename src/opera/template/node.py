@@ -1,8 +1,10 @@
 from collections import Counter
+from pathlib import Path
+from typing import Dict
 
 from opera.error import DataError
 from opera.instance.node import Node as Instance
-from pathlib import Path
+from opera.template.topology import Topology
 
 
 class Node:
@@ -27,10 +29,10 @@ class Node:
         self.artifacts = artifacts
 
         # This will be set when the node is inserted into a topology
-        self.topology = None
+        self.topology: Topology = None
 
         # This will be set at instantiation time.
-        self.instances = None
+        self.instances: Dict = None  # type: ignore
 
     def resolve_requirements(self, topology):
         requirement_occurrences = Counter([r.name for r in self.requirements])
@@ -40,17 +42,11 @@ class Node:
             max_occurrences = occurrences_range[1] if occurrences_range else 1
 
             if requirement_occurrences[r.name] < min_occurrences:
-                raise DataError(
-                    "Not enough occurrences found for requirement '{}'. "
-                    "Minimum is: {}".format(
-                        r.name, min_occurrences
-                    ))
+                raise DataError("Not enough occurrences found for requirement '{}'. Minimum is: {}"
+                                .format(r.name, min_occurrences))
             if requirement_occurrences[r.name] > max_occurrences:
-                raise DataError(
-                    "Too many occurrences found for requirement '{}'. "
-                    "Maximum is: {}".format(
-                        r.name, max_occurrences
-                    ))
+                raise DataError("Too many occurrences found for requirement '{}'. Maximum is: {}"
+                                .format(r.name, max_occurrences))
             r.resolve(topology)
 
     def is_a(self, typ):
@@ -75,8 +71,7 @@ class Node:
         host = next((
             r.target
             for r in self.requirements
-            if r.relationship.is_a("tosca.relationships.HostedOn")
-               and r.target.is_a("tosca.nodes.Compute")
+            if r.relationship.is_a("tosca.relationships.HostedOn") and r.target.is_a("tosca.nodes.Compute")
         ), None)
         if host:
             instance = next(iter(host.instances.values()))
@@ -109,9 +104,8 @@ class Node:
             raise DataError("HOST is not yet supported in opera.")
         if host != "SELF":
             raise DataError(
-                "Property host should be set to 'SELF' which is the only "
-                "valid value. This is needed to indicate that the property is "
-                "referenced locally from something in the node itself."
+                "Property host should be set to 'SELF' which is the only valid value. This is needed to indicate that "
+                "the property is referenced locally from something in the node itself."
             )
 
         # TODO(@tadeboro): Add support for nested property values.
@@ -119,45 +113,35 @@ class Node:
             return self.properties[prop].eval(self, prop)
 
         # Check if there are capability and requirement with the same name.
-        if prop in [r.name for r in self.requirements] and prop \
-                in [c.name for c in self.capabilities]:
-            raise DataError("There are capability and requirement with the "
-                            "same name: '{}'.".format(prop, ))
+        if prop in [r.name for r in self.requirements] \
+                and prop in [c.name for c in self.capabilities]:
+            raise DataError("There are capability and requirement with the same name: '{}'.".format(prop, ))
 
         # If we have no property, try searching for capability.
-        capabilities = tuple(
-            c for c in self.capabilities if c.name == prop
-        )
+        capabilities = tuple(c for c in self.capabilities if c.name == prop)
         if len(capabilities) > 1:
-            raise DataError("More than one capability is named '{}'.".format(
-                prop,
-            ))
+            raise DataError("More than one capability is named '{}'.".format(prop))
 
         if len(capabilities) == 1 and capabilities[0].properties:
             return capabilities[0].properties[0].get(rest[0]).data
 
         # If we have no property, try searching for requirement.
-        requirements = tuple(
-            r for r in self.requirements if r.name == prop
-        )
+        requirements = tuple(r for r in self.requirements if r.name == prop)
         if len(requirements) == 0:
             raise DataError("Cannot find property '{}'.".format(prop))
         if len(requirements) > 1:
-            raise DataError("More than one requirement is named '{}'.".format(
-                prop,
-            ))
+            raise DataError("More than one requirement is named '{}'.".format(prop))
         return requirements[0].target.get_property(["SELF"] + rest)
 
     def get_attribute(self, params):
-        host, attr, *rest = params
+        host, *_ = params
 
         if host == "HOST":
             raise DataError("HOST is not yet supported in opera.")
         if host != "SELF":
             raise DataError(
-                "Attribute host should be set to 'SELF' which is the only "
-                "valid value. This is needed to indicate that the attribute "
-                "is referenced locally from something in the node itself."
+                "Attribute host should be set to 'SELF' which is the only valid value. This is needed to indicate that "
+                "the attribute is referenced locally from something in the node itself."
             )
         if len(self.instances) != 1:
             raise DataError("Cannot get an attribute from multiple instances")
@@ -168,20 +152,18 @@ class Node:
         return self.topology.get_input(params)
 
     def map_attribute(self, params, value):
-        host, prop, *rest = params
+        host, *_ = params
 
         if host == "HOST":
             raise DataError("HOST is not yet supported in opera.")
         if host != "SELF":
             raise DataError(
-                "Attribute host should be set to 'SELF' which is the only "
-                "valid value. This is needed to indicate that the attribute "
-                "is referenced locally from something in the node itself."
+                "Attribute host should be set to 'SELF' which is the only valid value. This is needed to indicate that "
+                "the attribute is referenced locally from something in the node itself."
             )
 
         if len(self.instances) != 1:
-            raise DataError(
-                "Mapping an attribute for multiple instances not supported")
+            raise DataError("Mapping an attribute for multiple instances not supported")
 
         next(iter(self.instances.values())).map_attribute(params, value)
 
@@ -201,18 +183,15 @@ class Node:
             raise DataError("HOST is not yet supported in opera.")
         if host != "SELF":
             raise DataError(
-                "Artifact host should be set to 'SELF' which is the only "
-                "valid value. This is needed to indicate that the artifact "
-                "is referenced locally from something in the node itself."
+                "Artifact host should be set to 'SELF' which is the only valid value. This is needed to indicate that "
+                "the artifact is referenced locally from something in the node itself."
             )
 
         if location == "LOCAL_FILE":
-            raise DataError("Location get_artifact property is "
-                            "not yet supported in opera.")
+            raise DataError("Location get_artifact property is not yet supported in opera.")
 
         if remove:
-            raise DataError("Remove get_artifact property artifacts is "
-                            "not yet supported in opera.")
+            raise DataError("Remove get_artifact property artifacts is not yet supported in opera.")
 
         if prop in self.artifacts:
             self.artifacts[prop].eval(self, prop)

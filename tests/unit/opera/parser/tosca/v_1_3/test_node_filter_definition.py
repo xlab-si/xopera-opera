@@ -1,11 +1,10 @@
-from opera.parser.tosca.v_1_3.node_filter_definition import (
-    NodeFilterDefinition,
-)
+from opera.parser.tosca.v_1_3.node_filter_definition import NodeFilterDefinition
 
 
 class TestParse:
     def test_full(self, yaml_ast):
         NodeFilterDefinition.parse(yaml_ast(
+            # language=yaml
             """
             properties:
               - num_cpus: { in_range: [ 3, 6 ] }

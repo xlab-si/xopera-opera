@@ -30,7 +30,7 @@ repositories:
     url: https://github.com/xlab-si/xopera-opera
 
 dsl_definitions:
-    test: &test test123
+  test: &test test123
 
 topology_template:
   inputs:

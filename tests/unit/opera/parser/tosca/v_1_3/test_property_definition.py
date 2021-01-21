@@ -1,11 +1,10 @@
-import pytest
-
 from opera.parser.tosca.v_1_3.property_definition import PropertyDefinition
 
 
 class TestParse:
     def test_full(self, yaml_ast):
         PropertyDefinition.parse(yaml_ast(
+            # language=yaml
             """
             type: map
             description: My description
@@ -24,6 +23,7 @@ class TestParse:
 
     def test_minimal(self, yaml_ast):
         PropertyDefinition.parse(yaml_ast(
+            # language=yaml
             """
             type: map
             """

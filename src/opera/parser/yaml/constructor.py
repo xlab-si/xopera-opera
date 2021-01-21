@@ -1,8 +1,8 @@
-from yaml.constructor import BaseConstructor, ConstructorError
 from collections import Counter
 
-from opera.parser.utils.location import Location
+from yaml.constructor import BaseConstructor, ConstructorError
 
+from opera.parser.utils.location import Location
 from .node import Node
 
 
@@ -62,11 +62,12 @@ class Constructor(BaseConstructor):
         if duplicates:
             raise ConstructorError(
                 None, None,
-                "Duplicate map names: {}".format(', '.join(duplicates)),
+                "Duplicate map names: {}".format(", ".join(duplicates)),
                 node.start_mark,
             )
 
-    def construct_undefined(self, node):
+    @staticmethod
+    def construct_undefined(node):
         raise ConstructorError(
             None, None,
             "could not determine a constructor for {}".format(node.tag),

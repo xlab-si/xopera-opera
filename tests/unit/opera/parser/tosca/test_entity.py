@@ -141,6 +141,7 @@ class Baddie(TypeEntity):
 class TestTypeEntityValidate:
     def test_valid_data(self, yaml_ast):
         Goodie.validate(yaml_ast(
+            # language=yaml
             """
             derived_from: my_parent_type
             description: My type description
@@ -152,6 +153,7 @@ class TestTypeEntityValidate:
     def test_missing_derived_from(self, yaml_ast):
         with pytest.raises(ParseError):
             Goodie.validate(yaml_ast(
+                # language=yaml
                 """
                 description: My type description
                 metadata: {}

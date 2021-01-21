@@ -1,16 +1,13 @@
-from opera.value import Value
-
-from ..entity import Entity
-from ..string import String
-from ..integer import Integer
-from ..void import Void
-from ..list import List
-from ..type import Type
-
-from .time_interval import TimeInterval
-from .event_filter_definition import EventFilterDefinition
 from .activity_definition import ActivityDefinition
 from .condition_clause_definition import ConditionClauseDefinition
+from .event_filter_definition import EventFilterDefinition
+from .time_interval import TimeInterval
+from ..entity import Entity
+from ..integer import Integer
+from ..list import List
+from ..string import String
+from ..type import Type
+from ..void import Void
 
 
 class TriggerDefinition(Entity):

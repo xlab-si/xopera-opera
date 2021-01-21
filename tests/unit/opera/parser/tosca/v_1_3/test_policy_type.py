@@ -4,6 +4,7 @@ from opera.parser.tosca.v_1_3.policy_type import PolicyType
 class TestParse:
     def test_full(self, yaml_ast):
         PolicyType.parse(yaml_ast(
+            # language=yaml
             """
             derived_from: policy_type
             description: My desc
@@ -46,6 +47,7 @@ class TestParse:
 
     def test_minimal(self, yaml_ast):
         PolicyType.parse(yaml_ast(
+            # language=yaml
             """
             derived_from: policy_type
             """

@@ -1,10 +1,15 @@
+from typing import Dict, Type, Union
+
 from .constraint_clause import ConstraintClause
+from ..base import Base
 from ..entity import Entity
 from ..list import List
+from ..map import Map
+from ..reference import Reference, ReferenceXOR
 
 
 class ConditionClauseDefinition(Entity):
-    ATTRS = dict()
+    ATTRS: Dict[str, Union[Type[Base], Base, Map, List, Reference, ReferenceXOR]] = dict()
     KEYNAMES = {"and", "or", "not"}
 
     @classmethod

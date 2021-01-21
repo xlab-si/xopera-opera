@@ -22,6 +22,7 @@ class TestNormalizeDefinition:
 class TestParse:
     def test_full(self, yaml_ast):
         ImportDefinition.parse(yaml_ast(
+            # language=yaml
             """
             file: my/file
             repository: my_repo
@@ -32,6 +33,7 @@ class TestParse:
 
     def test_minimal(self, yaml_ast):
         ImportDefinition.parse(yaml_ast(
+            # language=yaml
             """
             file: my/file
             """

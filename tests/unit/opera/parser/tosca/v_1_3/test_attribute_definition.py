@@ -4,6 +4,7 @@ from opera.parser.tosca.v_1_3.attribute_definition import AttributeDefinition
 class TestParse:
     def test_full(self, yaml_ast):
         AttributeDefinition.parse(yaml_ast(
+            # language=yaml
             """
             type: my_type
             description: Some desc

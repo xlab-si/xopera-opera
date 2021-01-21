@@ -23,6 +23,7 @@ class TestNormalize:
 class TestParse:
     def test_full(self, yaml_ast):
         DataType.parse(yaml_ast(
+            # language=yaml
             """
             derived_from: data_type
             description: My desc

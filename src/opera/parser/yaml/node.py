@@ -8,9 +8,9 @@ class Node:
 
     @property
     def bare(self):
-        if type(self.value) is list:
+        if isinstance(self.value, list):
             return [v.bare for v in self.value]
-        if type(self.value) is dict:
+        if isinstance(self.value, dict):
             return {k.bare: v.bare for k, v in self.value.items()}
         return self.value
 

@@ -4,6 +4,7 @@ from opera.parser.tosca.v_1_3.credential import Credential
 class TestParse:
     def test_full(self, yaml_ast):
         Credential.parse(yaml_ast(
+            # language=yaml
             """
             protocol: tcp
             token_type: password
@@ -17,6 +18,7 @@ class TestParse:
 
     def test_minimal(self, yaml_ast):
         Credential.parse(yaml_ast(
+            # language=yaml
             """
             token: my_password
             """

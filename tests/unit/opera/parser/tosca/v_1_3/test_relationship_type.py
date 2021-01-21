@@ -4,6 +4,7 @@ from opera.parser.tosca.v_1_3.relationship_type import RelationshipType
 class TestParse:
     def test_full(self, yaml_ast):
         RelationshipType.parse(yaml_ast(
+            # language=yaml
             """
             derived_from: relationship_type
             description: My desc
@@ -19,6 +20,7 @@ class TestParse:
 
     def test_minimal(self, yaml_ast):
         RelationshipType.parse(yaml_ast(
+            # language=yaml
             """
             derived_from: relationship_type
             """

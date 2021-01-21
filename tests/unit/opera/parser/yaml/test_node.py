@@ -31,9 +31,7 @@ class TestBare:
         assert Node({Node(1): Node("a")}).bare == {1: "a"}
 
     def test_base_nested(self):
-        node = Node({
-            Node(1): Node([Node(1), Node("a")]),
-        })
+        node = Node({Node(1): Node([Node(1), Node("a")])})
 
         assert node.bare == {1: [1, "a"]}
 

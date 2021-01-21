@@ -4,6 +4,7 @@ from opera.parser.tosca.v_1_3.artifact_type import ArtifactType
 class TestParse:
     def test_full(self, yaml_ast):
         ArtifactType.parse(yaml_ast(
+            # language=yaml
             """
             derived_from: artifact_type
             description: My desc
@@ -20,6 +21,7 @@ class TestParse:
 
     def test_minimal(self, yaml_ast):
         ArtifactType.parse(yaml_ast(
+            # language=yaml
             """
             derived_from: artifact_type
             """

@@ -1,6 +1,5 @@
 from opera.error import ParseError
-
-from .base import Base
+from opera.parser.tosca.base import Base
 
 
 class ListWrapper(Base):
@@ -30,6 +29,4 @@ class List:
         if not isinstance(yaml_node.value, list):
             raise ParseError("Expected list.", yaml_node.loc)
 
-        return ListWrapper([
-            self.value_class.parse(v) for v in yaml_node.value
-        ], yaml_node.loc)
+        return ListWrapper([self.value_class.parse(v) for v in yaml_node.value], yaml_node.loc)

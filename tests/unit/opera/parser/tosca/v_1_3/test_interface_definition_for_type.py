@@ -1,11 +1,10 @@
-from opera.parser.tosca.v_1_3.interface_definition_for_type import (
-    InterfaceDefinitionForType,
-)
+from opera.parser.tosca.v_1_3.interface_definition_for_type import InterfaceDefinitionForType
 
 
 class TestParse:
     def test_full(self, yaml_ast):
         InterfaceDefinitionForType.parse(yaml_ast(
+            # language=yaml
             """
             inputs: {}
             operations: {}

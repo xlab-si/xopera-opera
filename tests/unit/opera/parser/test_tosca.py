@@ -10,9 +10,7 @@ from opera.storage import Storage
 class TestLoad:
     def test_load_minimal_document(self, tmp_path):
         name = pathlib.PurePath("root.yaml")
-        (tmp_path / name).write_text(
-            "tosca_definitions_version: tosca_simple_yaml_1_3",
-        )
+        (tmp_path / name).write_text("tosca_definitions_version: tosca_simple_yaml_1_3")
 
         doc = tosca.load(tmp_path, name)
         assert doc.tosca_definitions_version.data == "tosca_simple_yaml_1_3"
@@ -55,6 +53,7 @@ class TestLoad:
     def test_custom_type_is_present(self, tmp_path, yaml_text, typ):
         name = pathlib.PurePath("custom.yaml")
         (tmp_path / name).write_text(yaml_text(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             {}:
@@ -69,6 +68,7 @@ class TestLoad:
     def test_loads_template_part(self, tmp_path, yaml_text):
         name = pathlib.PurePath("template.yaml")
         (tmp_path / name).write_text(yaml_text(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             topology_template:
@@ -85,6 +85,7 @@ class TestLoad:
         name = pathlib.PurePath("sub/folder/file.yaml")
         (tmp_path / name).parent.mkdir(parents=True)
         (tmp_path / name).write_text(yaml_text(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             imports:
@@ -92,6 +93,7 @@ class TestLoad:
             """
         ))
         (tmp_path / "sub/folder/imp.yaml").write_text(yaml_text(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             data_types:
@@ -106,6 +108,7 @@ class TestLoad:
     def test_duplicate_import(self, tmp_path, yaml_text):
         name = pathlib.PurePath("template.yaml")
         (tmp_path / name).write_text(yaml_text(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             imports: [ template.yaml ]
@@ -116,6 +119,7 @@ class TestLoad:
     def test_imports_from_multiple_levels(self, tmp_path, yaml_text):
         name = pathlib.PurePath("template.yaml")
         (tmp_path / name).write_text(yaml_text(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             imports:
@@ -125,6 +129,7 @@ class TestLoad:
         ))
         (tmp_path / "subfolder").mkdir()
         (tmp_path / "subfolder/a.yaml").write_text(yaml_text(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             imports:
@@ -132,6 +137,7 @@ class TestLoad:
             """
         ))
         (tmp_path / "subfolder/b.yaml").write_text(yaml_text(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             data_types:
@@ -145,6 +151,7 @@ class TestLoad:
     def test_merge_topology_template(self, tmp_path, yaml_text):
         name = pathlib.PurePath("template.yaml")
         (tmp_path / name).write_text(yaml_text(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             imports:
@@ -155,10 +162,11 @@ class TestLoad:
                   type: string
               node_templates:
                 my_node:
-                  type: tosca.nodes.SoftwareComponent              
+                  type: tosca.nodes.SoftwareComponent
             """
         ))
         (tmp_path / "merge.yaml").write_text(yaml_text(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             topology_template:
@@ -167,7 +175,7 @@ class TestLoad:
                   type: string
               node_templates:
                 other_node:
-                  type: tosca.nodes.SoftwareComponent 
+                  type: tosca.nodes.SoftwareComponent
             """
         ))
         tosca.load(tmp_path, name)
@@ -175,6 +183,7 @@ class TestLoad:
     def test_merge_duplicate_node_templates_invalid(self, tmp_path, yaml_text):
         name = pathlib.PurePath("template.yaml")
         (tmp_path / name).write_text(yaml_text(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             imports:
@@ -183,28 +192,30 @@ class TestLoad:
             topology_template:
               node_templates:
                 my_node:
-                  type: tosca.nodes.SoftwareComponent              
+                  type: tosca.nodes.SoftwareComponent
             """
         ))
         (tmp_path / "merge1.yaml").write_text(yaml_text(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             topology_template:
               node_templates:
                 other_node:
-                  type: tosca.nodes.SoftwareComponent 
+                  type: tosca.nodes.SoftwareComponent
             """
         ))
         (tmp_path / "merge2.yaml").write_text(yaml_text(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             topology_template:
               node_templates:
                 other_node:
-                  type: tosca.nodes.SoftwareComponent 
+                  type: tosca.nodes.SoftwareComponent
             """
         ))
-        with pytest.raises(ParseError):        
+        with pytest.raises(ParseError):
             tosca.load(tmp_path, name)
 
 
@@ -212,6 +223,7 @@ class TestExecute:
     def test_undefined_required_properties1(self, tmp_path, yaml_text):
         name = pathlib.PurePath("template.yaml")
         (tmp_path / name).write_text(yaml_text(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             node_types:
@@ -235,19 +247,19 @@ class TestExecute:
             topology_template:
               node_templates:
                 my_node_template:
-                  type: my_node_type             
+                  type: my_node_type
             """
         ))
         storage = Storage(tmp_path / pathlib.Path(".opera"))
         storage.write("template.yaml", "root_file")
         ast = tosca.load(tmp_path, name)
-        with pytest.raises(ParseError, match="Missing a required property: "
-                                             "test_property3"):
+        with pytest.raises(ParseError, match="Missing a required property: test_property3"):
             ast.get_template({})
 
     def test_undefined_required_properties2(self, tmp_path, yaml_text):
         name = pathlib.PurePath("template.yaml")
         (tmp_path / name).write_text(yaml_text(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             node_types:
@@ -265,19 +277,19 @@ class TestExecute:
             topology_template:
               node_templates:
                 my_node_template:
-                  type: my_node_type             
+                  type: my_node_type
             """
         ))
         storage = Storage(tmp_path / pathlib.Path(".opera"))
         storage.write("template.yaml", "root_file")
         ast = tosca.load(tmp_path, name)
-        with pytest.raises(ParseError, match="Missing a required property: "
-                                             "test_prop3"):
+        with pytest.raises(ParseError, match="Missing a required property: test_prop3"):
             ast.get_template({})
 
     def test_undefined_required_properties3(self, tmp_path, yaml_text):
         name = pathlib.PurePath("template.yaml")
         (tmp_path / name).write_text(yaml_text(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             node_types:
@@ -293,15 +305,14 @@ class TestExecute:
             topology_template:
               node_templates:
                 my_node_template:
-                  type: my_node_type  
+                  type: my_node_type
                   properties:
                     property1: 42
-                    property2: 42.0        
+                    property2: 42.0
             """
         ))
         storage = Storage(tmp_path / pathlib.Path(".opera"))
         storage.write("template.yaml", "root_file")
         ast = tosca.load(tmp_path, name)
-        with pytest.raises(ParseError, match="Missing a required property: "
-                                             "property3"):
+        with pytest.raises(ParseError, match="Missing a required property: property3"):
             ast.get_template({})

@@ -1,9 +1,7 @@
 from opera.parser.yaml.node import Node
-
+from .artifact_definition import ArtifactDefinition
 from ..entity import Entity
 from ..list import List
-
-from .artifact_definition import ArtifactDefinition
 
 
 class NotificationImplementationDefinition(Entity):

@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from .string import String
 from .type import Type
 
@@ -5,10 +7,11 @@ from .type import Type
 class ReferenceWrapper(String):
     def __init__(self, data, loc):
         super().__init__(data, loc)
-        self.section_path = ()
+        self.section_path: Tuple = ()
 
     def resolve_reference(self, service_template):
-        assert self.section_path, "Missing section path"
+        if len(self.section_path) == 0:
+            raise AssertionError("Missing section path")
 
         # Special case for root types that should have no parent
         if self.data == "tosca.entity.Root":
@@ -16,9 +19,7 @@ class ReferenceWrapper(String):
 
         target = service_template.dig(*self.section_path, self.data)
         if not target:
-            self.abort("Invalid reference {}".format(
-                "/".join(self.section_path + (self.data,)),
-            ), self.loc)
+            self.abort("Invalid reference {}".format("/".join(self.section_path + (self.data,))), self.loc)
 
         return target
 
@@ -33,10 +34,11 @@ class DataTypeReferenceWrapper(ReferenceWrapper):
 class MultipleReferenceWrapper(String):
     def __init__(self, data, loc):
         super().__init__(data, loc)
-        self.section_paths = ()
+        self.section_paths: Tuple = ()
 
     def resolve_reference(self, service_template):
-        assert self.section_paths, "Missing section path"
+        if len(self.section_paths) == 0:
+            raise AssertionError("Missing section path")
 
         # Special case for root types that should have no parent
         if self.data == "tosca.entity.Root":
@@ -58,14 +60,15 @@ class MultipleReferenceWrapper(String):
         if len(targets) > 1:
             self.abort(
                 "Duplicate policy targets names were found: {}. Try to use unique names.".format(
-                    str(['/'.join(path_tuple) + "/" + str(self.data) for path_tuple in self.section_paths])
+                    str(["/".join(path_tuple) + "/" + str(self.data) for path_tuple in self.section_paths])
                 ), self.loc)
 
         if not path_exists:
             self.abort("Invalid reference, {} is not in {}".format(
-                str(self.data), str(
-                    ['/'.join(path_tuple) if isinstance(path_tuple, tuple) else path_tuple for path_tuple in
-                     self.section_paths])), self.loc)
+                str(self.data),
+                str(["/".join(path_tuple) if isinstance(path_tuple, tuple) else path_tuple
+                     for path_tuple in self.section_paths])
+            ), self.loc)
         return target_result
 
 
@@ -73,10 +76,12 @@ class Reference:
     WRAPPER_CLASS = ReferenceWrapper
 
     def __init__(self, *section_path):
-        assert section_path, "Section path should not be empty"
+        if not section_path:
+            raise AssertionError("Section path should not be empty")
+
         for part in section_path:
-            assert isinstance(part, str), \
-                "Section path parts should be strings."
+            if not isinstance(part, str):
+                raise AssertionError("Section path parts should be strings.")
 
         self.section_path = section_path
 
@@ -90,7 +95,8 @@ class ReferenceXOR:
     WRAPPER_CLASS = MultipleReferenceWrapper
 
     def __init__(self, *references):
-        assert references, "References should not be empty"
+        if not references:
+            raise AssertionError("References should not be empty")
         self.references = references
 
     def parse(self, yaml_node):

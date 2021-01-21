@@ -1,12 +1,19 @@
+from typing import Dict, Union, Type
+
 from .parameter_definition import ParameterDefinition
+from ..base import Base
 from ..entity import Entity
+from ..list import List
 from ..map import Map
+from ..reference import Reference, ReferenceXOR
 from ..string import String
 from ..void import Void
 
+T_ATTR = Dict[str, Union[Type[Base], Base, Map, List, Reference, ReferenceXOR]]
+
 
 class ActivityDefinition(Entity):
-    ATTRS = dict()
+    ATTRS: T_ATTR = dict()
 
     @classmethod
     def validate(cls, yaml_node):
@@ -25,7 +32,7 @@ class ActivityDefinition(Entity):
 
 
 class DelegateWorkflowActivityDefinition(Entity):
-    ATTRS = dict(
+    ATTRS: T_ATTR = dict(
         delegate=Void,
         workflow=String,
         inputs=Map(ParameterDefinition),
@@ -34,14 +41,14 @@ class DelegateWorkflowActivityDefinition(Entity):
 
 
 class SetStateActivityDefinition(Entity):
-    ATTRS = dict(
+    ATTRS: T_ATTR = dict(
         set_state=Void,
     )
     REQUIRED = {"set_state"}
 
 
 class CallOperationActivityDefinition(Entity):
-    ATTRS = dict(
+    ATTRS: T_ATTR = dict(
         call_operation=Void,
         operation=String,
         inputs=Map(ParameterDefinition),
@@ -50,7 +57,7 @@ class CallOperationActivityDefinition(Entity):
 
 
 class InlineWorkflowActivityDefinition(Entity):
-    ATTRS = dict(
+    ATTRS: T_ATTR = dict(
         inline=Void,
         workflow=String,
         inputs=Map(ParameterDefinition),

@@ -6,9 +6,9 @@ Examples
 
 In this section we show some simple examples of orchestrating with xOpera.
 
-===========================
-Private cloud 
-===========================
+=============
+Private cloud
+=============
 
 OpenStack client setup
 ######################
@@ -38,16 +38,16 @@ in playbooks that implement life cycle operations.
     to connect.
 
 
-============================
-Public cloud 
-============================
+============
+Public cloud
+============
 
 TBD
 
 
-============================
+==========
 Serverless
-============================
+==========
 
 
 Screencast video
@@ -63,9 +63,9 @@ solution to AWS Lambda:
     </div>
 
 
-============================
+===
 HPC
-============================
+===
 
 
 =============================
@@ -78,9 +78,9 @@ TOSCA CSAR
 
 TBD.
 
-This example shows a deployment of the compressed TOSCA CSAR (available here: :download:`big.csar </files/csars/big/big.csar>`).
-The result of the example consisting of deploy, outputs and undeploy operations
-is shown below.
+This example shows a deployment of the compressed TOSCA CSAR
+(available here: :download:`big.csar </files/csars/big/big.csar>`).
+The result of the example consisting of deploy, outputs and undeploy operations is shown below.
 
 .. code-block:: console
 

@@ -1,20 +1,21 @@
-import yaml
 import json
-
-from zipfile import is_zipfile
-from tarfile import is_tarfile
-from uuid import uuid4
 from os import path
 from pathlib import Path, PurePath
+from tarfile import is_tarfile
+from uuid import uuid4
+from zipfile import is_zipfile
+
+import yaml
 
 from opera.parser import tosca
 
 
-def prompt_yes_no_question(yes_responses=("y", "yes"),
-                           no_responses=("n", "no"),
-                           case_sensitive=False,
-                           default_yes_response=True):
-
+def prompt_yes_no_question(
+        yes_responses=("y", "yes"),
+        no_responses=("n", "no"),
+        case_sensitive=False,
+        default_yes_response=True
+):
     prompt_message = "Do you want to continue? (Y/n): "
     if not default_yes_response:
         prompt_message = "Do you want to continue? (y/N): "
@@ -32,12 +33,10 @@ def prompt_yes_no_question(yes_responses=("y", "yes"),
             return False
         else:
             print("Invalid input. Please try again.")
-            return prompt_yes_no_question(yes_responses, no_responses,
-                                          case_sensitive, default_yes_response)
-    except Exception as e:
+            return prompt_yes_no_question(yes_responses, no_responses, case_sensitive, default_yes_response)
+    except EOFError as e:
         print("Exception occurred: {}. Please enter valid inputs.".format(e))
-        return prompt_yes_no_question(yes_responses, no_responses,
-                                      case_sensitive, default_yes_response)
+        return prompt_yes_no_question(yes_responses, no_responses, case_sensitive, default_yes_response)
 
 
 def determine_archive_format(filepath):
@@ -46,8 +45,9 @@ def determine_archive_format(filepath):
     elif is_zipfile(filepath):
         return "zip"
     else:
-        raise Exception("Unsupported archive format: '{}'. The packaging "
-                        "format should be one of: zip, tar.".format(filepath))
+        raise Exception(
+            "Unsupported archive format: '{}'. The packaging format should be one of: zip, tar.".format(filepath)
+        )
 
 
 def generate_random_pathname(prefix=""):
@@ -59,23 +59,23 @@ def generate_random_pathname(prefix=""):
         return pathname
 
 
-def format_outputs(outputs, format):
-    if format == "json":
+def format_outputs(outputs, outputs_format):
+    if outputs_format == "json":
         return json.dumps(outputs, indent=2)
-    if format == "yaml":
+    if outputs_format == "yaml":
         return yaml.safe_dump(outputs, default_flow_style=False)
 
-    assert False, "BUG - invalid format"
+    raise AssertionError("BUG - invalid format")
 
 
-def save_outputs(outputs, format, filename):
-    with open(filename, 'w+') as outfile:
-        if format == "json":
-            return json.dumps(outputs, outfile, indent=2)
-        if format == "yaml":
+def save_outputs(outputs, outputs_format, filename):
+    with open(filename, "w+") as outfile:
+        if outputs_format == "json":
+            return json.dump(outputs, outfile, indent=2)
+        if outputs_format == "yaml":
             return yaml.safe_dump(outputs, outfile, default_flow_style=False)
 
-        assert False, "BUG - invalid format"
+        raise AssertionError("BUG - invalid format")
 
 
 def get_workdir(storage):
@@ -97,8 +97,7 @@ def get_template(storage):
 
         if storage.exists("csars"):
             csar_dir = Path(storage.path) / "csars" / "csar"
-            ast = tosca.load(Path(csar_dir),
-                             PurePath(service_template).relative_to(csar_dir))
+            ast = tosca.load(Path(csar_dir), PurePath(service_template).relative_to(csar_dir))
         else:
             ast = tosca.load(Path.cwd(), PurePath(service_template))
 

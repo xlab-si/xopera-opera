@@ -1,11 +1,10 @@
-from opera.parser.tosca.v_1_3.interface_definition_for_template import (
-    InterfaceDefinitionForTemplate,
-)
+from opera.parser.tosca.v_1_3.interface_definition_for_template import InterfaceDefinitionForTemplate
 
 
 class TestParse:
     def test_full(self, yaml_ast):
         InterfaceDefinitionForTemplate.parse(yaml_ast(
+            # language=yaml
             """
             inputs:
               in: put

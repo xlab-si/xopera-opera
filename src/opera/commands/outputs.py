@@ -1,8 +1,9 @@
 import argparse
-import shtab
-
 from os import path
 from pathlib import Path, PurePath
+from typing import Dict
+
+import shtab
 
 from opera.error import DataError, ParseError
 from opera.parser import tosca
@@ -20,11 +21,11 @@ def add_parser(subparsers):
         help=".opera storage folder location"
     ).complete = shtab.DIR
     parser.add_argument(
-        "--format", "-f", choices=("yaml", "json"), type=str,
-        default="yaml", help="Output format",
+        "--format", "-f", choices=("yaml", "json"), type=str, default="yaml",
+        help="Output format",
     )
     parser.add_argument(
-        "--verbose", "-v", action='store_true',
+        "--verbose", "-v", action="store_true",
         help="Turns on verbose mode",
     )
     parser.set_defaults(func=_parser_callback)
@@ -32,8 +33,7 @@ def add_parser(subparsers):
 
 def _parser_callback(args):
     if args.instance_path and not path.isdir(args.instance_path):
-        raise argparse.ArgumentTypeError("Directory {} is not a valid path!"
-                                         .format(args.instance_path))
+        raise argparse.ArgumentTypeError("Directory {} is not a valid path!".format(args.instance_path))
 
     storage = Storage.create(args.instance_path)
 
@@ -51,6 +51,8 @@ def _parser_callback(args):
 
 def outputs(storage: Storage) -> dict:
     """
+    Get deployment outputs.
+
     :raises ParseError:
     :raises DataError:
     """
@@ -64,8 +66,7 @@ def outputs(storage: Storage) -> dict:
 
         if storage.exists("csars"):
             csar_dir = Path(storage.path) / "csars" / "csar"
-            ast = tosca.load(Path(csar_dir),
-                             PurePath(service_template).relative_to(csar_dir))
+            ast = tosca.load(Path(csar_dir), PurePath(service_template).relative_to(csar_dir))
         else:
             ast = tosca.load(Path.cwd(), PurePath(service_template))
 
@@ -73,7 +74,8 @@ def outputs(storage: Storage) -> dict:
         # We need to instantiate the template in order
         # to get access to the instance state.
         template.instantiate(storage)
-        return template.get_outputs()
+        result: Dict = template.get_outputs()
+        return result
     else:
         print("There is no root_file in storage.")
         return {}

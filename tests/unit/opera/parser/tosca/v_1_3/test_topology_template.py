@@ -4,6 +4,7 @@ from opera.parser.tosca.v_1_3.topology_template import TopologyTemplate
 class TestParse:
     def test_full(self, yaml_ast):
         TopologyTemplate.parse(yaml_ast(
+            # language=yaml
             """
             description: Topology description
             inputs:

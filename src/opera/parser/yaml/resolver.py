@@ -1,4 +1,5 @@
 import re
+from typing import Dict, List, Tuple, Pattern
 
 from yaml.nodes import MappingNode, ScalarNode, SequenceNode
 
@@ -9,12 +10,12 @@ class Resolver:
         SequenceNode: "tag:yaml.org,2002:seq",
         MappingNode: "tag:yaml.org,2002:map",
     }
-    resolvers = {}
+    resolvers: Dict[str, List[Tuple[str, Pattern]]] = {}
 
     @classmethod
     def add_implicit_resolver(cls, tag, regex, first):
-        for ch in first:
-            cls.resolvers.setdefault(ch, []).append((tag, regex))
+        for character in first:
+            cls.resolvers.setdefault(character, []).append((tag, regex))
 
     def resolve(self, kind, value, implicit):
         if kind is ScalarNode and implicit[0]:
@@ -24,10 +25,10 @@ class Resolver:
                     return tag
         return self.defaults[kind]
 
-    def descend_resolver(_self, _current_node, _current_index):
+    def descend_resolver(self, _current_node, _current_index):
         pass
 
-    def ascend_resolver(_self):
+    def ascend_resolver(self):
         pass
 
 

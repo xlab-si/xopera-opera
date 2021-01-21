@@ -300,7 +300,7 @@ data_types:
         type: tosca.datatypes.network.PortDef
         required: false
 
-  
+
 group_types:
   tosca.groups.Root:
     derived_from: tosca.entity.Root

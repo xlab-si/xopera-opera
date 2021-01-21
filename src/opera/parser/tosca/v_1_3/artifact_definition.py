@@ -1,8 +1,7 @@
-from opera.parser.yaml.node import Node
-from opera.value import Value
-
 import yaml
 
+from opera.parser.yaml.node import Node
+from opera.value import Value
 from ..entity import Entity
 from ..map import Map
 from ..path import Path
@@ -43,7 +42,6 @@ class ArtifactDefinition(Entity):
             return Value(typ, True, yaml_data)
         return Value(typ, False)
 
-    def get_value_type(self, service_ast):
+    def get_value_type(self, service_ast):  # pylint: disable=no-self-use
         # TODO(@tadeboro): Implement types later.
         return None
-

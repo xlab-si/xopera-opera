@@ -1,7 +1,9 @@
 from concurrent.futures import ThreadPoolExecutor, wait
+from concurrent.futures._base import CancelledError
+
 from opera.error import OperationError
 
-WORKER_PREFIX = 'Worker'
+WORKER_PREFIX = "Worker"
 
 
 class NodeExecutor(ThreadPoolExecutor):
@@ -15,8 +17,7 @@ class NodeExecutor(ThreadPoolExecutor):
         self.num_workers = num_workers
 
     def can_submit(self, node_id):
-        return (len(self.processed_nodes) < self.num_workers
-                and node_id not in self.processed_nodes)
+        return len(self.processed_nodes) < self.num_workers and node_id not in self.processed_nodes
 
     def submit_operation(self, operation, node_id, verbose, workdir):
         self.processed_nodes.add(node_id)
@@ -35,20 +36,15 @@ class NodeExecutor(ThreadPoolExecutor):
             # if errors occurred
             # try cancel pending futures
             running = []
-            for fut in self.futures.keys():
+            for fut in self.futures:
                 if not fut.cancel():
                     running.append(fut)
             # wait for all running operations to complete
             # and halt execution
-            results = wait(
-                running,
-                return_when="ALL_COMPLETED"
-            )
+            results = wait(running, return_when="ALL_COMPLETED")
             errors.update(self.process_results(results))
             for node_id in errors:
-                print("Error processing node {0}: {1}".format(
-                    node_id, errors[node_id])
-                )
+                print("Error processing node {0}: {1}".format(node_id, errors[node_id]))
             raise OperationError("Failed")
 
         return proceed
@@ -60,7 +56,7 @@ class NodeExecutor(ThreadPoolExecutor):
             try:
                 future.result()
                 self.processed_nodes.remove(node_id)
-            except Exception as e:
+            except (CancelledError, TimeoutError) as e:
                 errors[node_id] = e
 
         return errors

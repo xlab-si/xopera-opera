@@ -1,7 +1,7 @@
 import argparse
-import shtab
-
 from pathlib import Path, PurePath
+
+import shtab
 
 from opera.error import DataError, ParseError
 from opera.parser.tosca.csar import CloudServiceArchive
@@ -15,16 +15,16 @@ def add_parser(subparsers):
     )
     parser.add_argument(
         "--destination", "-d",
-        help="Path to the location where the CSAR file will be extracted to, "
-             "the path will be generated in the current working directory if "
-             "it isn't specified",
+        help="Path to the location where the CSAR file will be extracted to, the path will be generated in the "
+             "current working directory if it isn't specified",
     ).complete = shtab.DIR
     parser.add_argument(
-        "--verbose", "-v", action='store_true',
+        "--verbose", "-v", action="store_true",
         help="Turns on verbose mode",
     )
     parser.add_argument(
-        "csar", help="Path to the compressed TOSCA CSAR"
+        "csar",
+        help="Path to the compressed TOSCA CSAR"
     ).complete = shtab.FILE
     parser.set_defaults(func=_parser_callback)
 
@@ -32,8 +32,7 @@ def add_parser(subparsers):
 def _parser_callback(args):
     csar_path = Path(args.csar)
     if not csar_path.is_file():
-        raise argparse.ArgumentTypeError("CSAR file {} is not a valid path!"
-                                         .format(args.csar))
+        raise argparse.ArgumentTypeError("CSAR file {} is not a valid path!".format(args.csar))
 
     # if the output is set use it, if not create a random file name with UUID
     if args.destination:
@@ -60,10 +59,6 @@ def _parser_callback(args):
 
 
 def unpackage(csar_input: str, output_dir: str, csar_format: str):
-    """
-    :raises ParseError:
-    :raises DataError:
-    """
     csar = CloudServiceArchive.create(PurePath(csar_input))
     # validate CSAR before unpacking it
     csar.validate_csar()

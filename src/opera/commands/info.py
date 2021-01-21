@@ -1,10 +1,11 @@
 import argparse
-import yaml
-import shtab
-
 from os import path
 from pathlib import Path, PurePath
+from typing import Dict
 from typing import Optional
+
+import shtab
+import yaml
 
 from opera.error import DataError, ParseError, OperaError
 from opera.parser import tosca
@@ -23,25 +24,23 @@ def add_parser(subparsers):
         help=".opera storage folder location"
     ).complete = shtab.DIR
     parser.add_argument(
-        "--format", "-f", choices=("yaml", "json"), type=str,
-        default="yaml", help="Output format",
+        "--format", "-f", choices=("yaml", "json"), type=str, default="yaml",
+        help="Output format",
     )
     parser.add_argument(
-        "--verbose", "-v", action='store_true',
+        "--verbose", "-v", action="store_true",
         help="Turns on verbose mode",
     )
     parser.add_argument(
-        "csar_or_rootdir", nargs='?',
-        help="Path to a packed or unpacked CSAR. "
-             "Defaults to the current directory if not specified.",
+        "csar_or_rootdir", nargs="?",
+        help="Path to a packed or unpacked CSAR. Defaults to the current directory if not specified.",
     ).complete = shtab.DIR
     parser.set_defaults(func=_parser_callback)
 
 
 def _parser_callback(args):
     if args.instance_path and not path.isdir(args.instance_path):
-        raise argparse.ArgumentTypeError("Directory {0} is not a valid path!"
-                                         .format(args.instance_path))
+        raise argparse.ArgumentTypeError("Directory {0} is not a valid path!".format(args.instance_path))
 
     storage = Storage.create(args.instance_path)
     try:
@@ -57,11 +56,7 @@ def _parser_callback(args):
 
 
 def info(csar_or_rootdir: Optional[PurePath], storage: Storage) -> dict:
-    """
-    :raises ParseError:
-    :raises DataError:
-    """
-    info_dict = dict(
+    info_dict: Dict[str, Optional[str]] = dict(
         service_template=None,
         content_root=None,
         inputs=None,
@@ -74,7 +69,7 @@ def info(csar_or_rootdir: Optional[PurePath], storage: Storage) -> dict:
         csar = CloudServiceArchive.create(csar_or_rootdir)
         try:
             csar.validate_csar()
-            info_dict["content_root"] = csar_or_rootdir
+            info_dict["content_root"] = str(csar_or_rootdir)
 
             meta = csar.parse_csar_meta()
             if meta is not None:
@@ -95,8 +90,7 @@ def info(csar_or_rootdir: Optional[PurePath], storage: Storage) -> dict:
         if storage.exists("csars/csar"):
             csar_dir = Path(storage.path) / "csars" / "csar"
             info_dict["content_root"] = str(csar_dir)
-            ast = tosca.load(Path(csar_dir),
-                             PurePath(service_template).relative_to(csar_dir))
+            ast = tosca.load(Path(csar_dir), PurePath(service_template).relative_to(csar_dir))
         else:
             ast = tosca.load(Path.cwd(), PurePath(service_template))
 

@@ -82,9 +82,9 @@ policy_types:
           node: radon.nodes.OpenStack.VM
         condition:
           - not:
-            - and:
-              - available_instances: [ { greater_than: 42 } ]
-              - available_space: [ { greater_than: 1000 } ]
+              - and:
+                  - available_instances: [ { greater_than: 42 } ]
+                  - available_space: [ { greater_than: 1000 } ]
         action:
           - call_operation:
               operation: radon.interfaces.scaling.ScaleDown.scale_down
@@ -115,9 +115,9 @@ policy_types:
           node: radon.nodes.OpenStack.VM
         condition:
           - not:
-            - and:
-              - available_instances: [ { greater_than: 42 } ]
-              - available_space: [ { greater_than: 1000 } ]
+              - and:
+                  - available_instances: [ { greater_than: 42 } ]
+                  - available_space: [ { greater_than: 1000 } ]
         action:
           - call_operation:
               operation: radon.interfaces.scaling.ScaleUp.scale_up
@@ -194,9 +194,9 @@ topology_template:
             condition:
               constraint:
                 - not:
-                  - and:
-                    - available_instances: [ { greater_than: 42 } ]
-                    - available_space: [ { greater_than: 1000 } ]
+                    - and:
+                        - available_instances: [ { greater_than: 42 } ]
+                        - available_space: [ { greater_than: 1000 } ]
               period: 60 sec
               evaluations: 2
               method: average

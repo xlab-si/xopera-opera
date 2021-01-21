@@ -4,6 +4,7 @@ from opera.parser.tosca.v_1_3.group_definition import GroupDefinition
 class TestParse:
     def test_full(self, yaml_ast):
         GroupDefinition.parse(yaml_ast(
+            # language=yaml
             """
             type: node.type
             description: Text
@@ -18,6 +19,7 @@ class TestParse:
 
     def test_minimal(self, yaml_ast):
         GroupDefinition.parse(yaml_ast(
+            # language=yaml
             """
             type: group.type
             """

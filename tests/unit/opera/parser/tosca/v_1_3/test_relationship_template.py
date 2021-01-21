@@ -4,6 +4,7 @@ from opera.parser.tosca.v_1_3.relationship_template import RelationshipTemplate
 class TestParse:
     def test_full(self, yaml_ast):
         RelationshipTemplate.parse(yaml_ast(
+            # language=yaml
             """
             type: rel.type
             description: Some muttering
@@ -22,6 +23,7 @@ class TestParse:
 
     def test_minimal(self, yaml_ast):
         RelationshipTemplate.parse(yaml_ast(
+            # language=yaml
             """
             type: rel.type
             """

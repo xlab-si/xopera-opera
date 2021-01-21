@@ -2,7 +2,6 @@ import collections
 
 from opera.error import ParseError
 from opera.parser.yaml.node import Node
-
 from .base import Base
 
 
@@ -35,11 +34,8 @@ class MapWrapper(Base):
     def merge(self, other):
         duplicates = set(self.keys()) & set(other.keys())
         if duplicates:
-            self.abort(
-                "Duplicate keys '{}' found in {} and {}".format(
-                    ", ".join(duplicates), self.loc, other.loc,
-                ), self.loc,
-            )
+            self.abort("Duplicate keys '{}' found in {} and {}".format(", ".join(duplicates), self.loc, other.loc),
+                       self.loc)
         self.data.update(other.data)
 
     def visit(self, method, *args, **kwargs):
@@ -57,7 +53,7 @@ class Map:
 
         for k in yaml_node.value:
             if not isinstance(k.value, str):
-                cls.abort("Expected string key.", k.loc)
+                ParseError("Expected string key.", k.loc)
 
         return MapWrapper(collections.OrderedDict(
             (k.value, self.value_class.parse(v))
@@ -68,9 +64,7 @@ class Map:
 class OrderedMap(Map):
     def parse(self, yaml_node):
         if not isinstance(yaml_node.value, list):
-            raise ParseError(
-                "Expected list of single-key maps.", yaml_node.loc,
-            )
+            raise ParseError("Expected list of single-key maps.", yaml_node.loc)
 
         data = collections.OrderedDict()
         for item in yaml_node.value:

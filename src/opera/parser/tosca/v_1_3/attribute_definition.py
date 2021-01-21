@@ -1,12 +1,10 @@
 from opera.value import Value
-
+from .schema_definition import SchemaDefinition
+from .status import Status
 from ..entity import Entity
 from ..reference import DataTypeReference
 from ..string import String
 from ..void import Void
-
-from .schema_definition import SchemaDefinition
-from .status import Status
 
 
 class AttributeDefinition(Entity):
@@ -25,6 +23,6 @@ class AttributeDefinition(Entity):
             return self.default.get_value(typ)
         return Value(typ, False)
 
-    def get_value_type(self, service_ast):
+    def get_value_type(self, service_ast):  # pylint: disable=no-self-use
         # TODO(@tadeboro): Implement type checks later.
         return None

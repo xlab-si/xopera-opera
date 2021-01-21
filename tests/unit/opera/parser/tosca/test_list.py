@@ -3,8 +3,8 @@ from unittest.mock import Mock
 import pytest
 
 from opera.error import ParseError
-from opera.parser.tosca.list import List, ListWrapper
 from opera.parser.tosca.base import Base
+from opera.parser.tosca.list import List, ListWrapper
 from opera.parser.yaml.node import Node
 
 
@@ -41,6 +41,7 @@ class TestListWrapperGetitem:
 class TestListWrapperIteration:
     def test_iteration(self):
         assert tuple(ListWrapper(["a", "b"], None)) == ("a", "b")
+
 
 class TestListWrapperDig:
     def test_single_level(self):

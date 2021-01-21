@@ -1,11 +1,10 @@
+from .trigger_definition import TriggerDefinition
 from ..entity import Entity
 from ..list import List
 from ..map import Map
 from ..reference import Reference, ReferenceXOR
 from ..string import String
 from ..void import Void
-
-from .trigger_definition import TriggerDefinition
 
 
 class PolicyDefinition(Entity):

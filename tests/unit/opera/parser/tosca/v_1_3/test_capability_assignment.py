@@ -4,6 +4,7 @@ from opera.parser.tosca.v_1_3.capability_assignment import CapabilityAssignment
 class TestParse:
     def test_full(self, yaml_ast):
         CapabilityAssignment.parse(yaml_ast(
+            # language=yaml
             """
             properties:
               prop: value

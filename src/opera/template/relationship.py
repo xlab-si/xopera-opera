@@ -1,5 +1,8 @@
+from typing import Dict
+
 from opera.error import DataError
 from opera.instance.relationship import Relationship as Instance
+from opera.template.topology import Topology
 
 
 class Relationship:
@@ -11,10 +14,10 @@ class Relationship:
         self.interfaces = interfaces
 
         # This will be set when the relationship is inserted into a topology
-        self.topology = None
+        self.topology: Topology = None
 
         # This will be set at instantiation time.
-        self.instances = None
+        self.instances: Dict = None  # type: ignore
 
     def is_a(self, typ):
         return typ in self.types
@@ -24,8 +27,7 @@ class Relationship:
         self.instances = {relationship_id: Instance(self, relationship_id, source, target)}
         return self.instances.values()
 
-    def run_operation(self, host, interface, operation, instance, verbose,
-                      workdir):
+    def run_operation(self, host, interface, operation, instance, verbose, workdir):
         operation = self.interfaces[interface].operations.get(operation)
         if operation:
             return operation.run(host, instance, verbose, workdir)
@@ -35,15 +37,14 @@ class Relationship:
     # TOSCA functions
     #
     def get_property(self, params):
-        host, prop, *rest = params
+        host, prop, *_ = params
 
         if host == "HOST":
             raise DataError("HOST is not yet supported in opera.")
         if host != "SELF":
             raise DataError(
-                "Property host should be set to 'SELF' which is the only "
-                "valid value. This is needed to indicate that the property is "
-                "referenced locally from something in the node itself."
+                "Property host should be set to 'SELF' which is the only valid value. This is needed to indicate that "
+                "the property is referenced locally from something in the node itself."
             )
 
         # TODO(@tadeboro): Add support for nested property values once we
@@ -54,15 +55,14 @@ class Relationship:
         return self.properties[prop].eval(self, prop)
 
     def get_attribute(self, params):
-        host, attr, *rest = params
+        host, attr, *_ = params
 
         if host == "HOST":
             raise DataError("HOST is not yet supported in opera.")
         if host != "SELF":
             raise DataError(
-                "Attribute host should be set to 'SELF' which is the only "
-                "valid value. This is needed to indicate that the attribute "
-                "is referenced locally from something in the node itself."
+                "Attribute host should be set to 'SELF' which is the only valid value. This is needed to indicate that "
+                "the attribute is referenced locally from something in the node itself."
             )
 
         if attr not in self.attributes:
@@ -82,15 +82,12 @@ class Relationship:
         return self.topology.get_input(params)
 
     def map_attribute(self, params, value):
-        host, prop, *rest = params
+        host, *_ = params
 
         if host not in ("SELF", "SOURCE", "TARGET"):
-            raise DataError(
-                "Attribute host should be set to 'SELF', 'SOURCE' or 'TARGET'."
-            )
+            raise DataError("Attribute host should be set to 'SELF', 'SOURCE' or 'TARGET'.")
 
         if len(self.instances) != 1:
-            raise DataError(
-                "Mapping an attribute for multiple instances not supported")
+            raise DataError("Mapping an attribute for multiple instances not supported")
 
         next(iter(self.instances.values())).map_attribute(params, value)

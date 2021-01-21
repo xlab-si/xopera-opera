@@ -1,12 +1,12 @@
 .. _Quickstart:
 
-*******************
+**********
 Quickstart
-*******************
+**********
 
-======================
-Opera CLI Quickstart 
-======================
+====================
+Opera CLI Quickstart
+====================
 
 
 After you `installed xOpera CLI <Opera CLI install>`_ into virtual environment you can test if everything is working as expected. We can now try to
@@ -63,9 +63,11 @@ If you want to try out one fast and easy xOpera example you can copy the hello w
             - host: my-workstation
     ...
 
-As you can see it is has only one node type defined. This `hello_type` here has two linked implementations that are actually
-two TOSCA operations (create and delete) that are implemented in a form of Ansible playbooks. The Ansible playbook for
-creation is shown below and it is used to create a new folder and hello world file in `/tmp` directory.
+As you can see it is has only one node type defined.
+This `hello_type` here has two linked implementations that are actually two TOSCA operations (create and delete) that
+are implemented in a form of Ansible playbooks.
+The Ansible playbook for creation is shown below and it is used to create a new folder and hello world file
+in `/tmp` directory.
 
 .. code-block:: yaml
 
@@ -115,6 +117,6 @@ and then also ``opera undeploy`` to un-deploy the solution (see image below :ref
 
 
 ======================
-xOpera SaaS Quickstart 
+xOpera SaaS Quickstart
 ======================
 

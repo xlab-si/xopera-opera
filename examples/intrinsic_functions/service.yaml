@@ -80,29 +80,29 @@ topology_template:
       # Result: http://attribute1:property1
       description: Concatenate string values
       value: { concat: [ 'http://',
-                       get_attribute: [ hello1, attribute1 ],
-                       ':',
-                       get_property: [ hello1, property1 ] ] }
+                         get_attribute: [ hello1, attribute1 ],
+                         ':',
+                         get_property: [ hello1, property1 ] ] }
     join1_output:
-       # Result: tosca
+      # Result: tosca
       description: Join string values without a delimiter (concat)
       value: { join: [ [ "t", "o", "s", "c", "a" ] ] }
     join2_output:
-       # Result: t_o_s_c_a
+      # Result: t_o_s_c_a
       description: Join string values with delimiter
       value: { join: [ [ "t", "o", "s", "c", "a" ], "_" ] }
     join3_output:
-       # Result: input, attribute2, property2
+      # Result: input, attribute2, property2
       description: Join string values with delimiter
       value: { join: [ [ { get_input: input },
                          { get_attribute: [ hello2, attribute2 ] },
                          { get_property: [ hello2, property2 ] } ], ", " ] }
     token1_output:
-       # Result: 111
+      # Result: 111
       description: Tokenize the string and get the zeroth substring
       value: { token: [ "111 222 333 444", " ", 0 ] }
     token2_output:
-       # Result: s
+      # Result: s
       description: Tokenize the string and get the second substring
       value: { token: [ "t-*-o-*-s-*-c-*-a", "-*-", 2 ] }
     attribute:
@@ -117,5 +117,5 @@ topology_template:
       # Result: Properties: property1 property2 property
       description: Joined properties
       value: { join: [[ 'Properties:', { get_property: [ hello1, property1 ] },
-                                        { get_property: [ hello2, property2 ] },
-                                        { get_property: [ hello3, property3_1 ] } ], " " ] }
+                        { get_property: [ hello2, property2 ] },
+                        { get_property: [ hello3, property3_1 ] } ], " " ] }
