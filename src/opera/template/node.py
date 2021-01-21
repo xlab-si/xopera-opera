@@ -123,7 +123,7 @@ class Node:
             raise DataError("More than one capability is named '{}'.".format(prop))
 
         if len(capabilities) == 1 and capabilities[0].properties:
-            return capabilities[0].properties[0].get(rest[0]).data
+            return capabilities[0].properties.get(rest[0]).data
 
         # If we have no property, try searching for requirement.
         requirements = tuple(r for r in self.requirements if r.name == prop)
