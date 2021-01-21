@@ -4,6 +4,13 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+bandit = "*"
+doc8 = "*"
+flake8 = "*"
+flake8-import-order = "*"
+mypy = "*"
+pydocstyle = "*"
+pylint = "*"
 pytest = "*"
 selinux = "*"
 setuptools = "*"
