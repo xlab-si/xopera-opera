@@ -1,9 +1,8 @@
+from .constraint_clause import ConstraintClause
 from ..entity import Entity
 from ..list import List
 from ..reference import DataTypeReference
 from ..string import String
-
-from .constraint_clause import ConstraintClause
 
 
 class SchemaDefinition(Entity):

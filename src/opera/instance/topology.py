@@ -21,9 +21,8 @@ class Topology:
         return "interrupted"
 
     def deploy(self, verbose, workdir, num_workers=None):
-        # Currently, we are running a really stupid O(n^3) algorithm, but
-        # unless we get to the templates with millions of node instances, we
-        # should be fine.
+        # Currently, we are running a really stupid O(n^3) algorithm, but unless we get to the templates with
+        # millions of node instances, we should be fine.
         with NodeExecutor(num_workers) as executor:
             do_deploy = True
             while do_deploy:
@@ -31,14 +30,12 @@ class Topology:
                     if (not node.deployed
                             and node.ready_for_deploy
                             and executor.can_submit(node.tosca_id)):
-                        executor.submit_operation(node.deploy, node.tosca_id,
-                                                  verbose, workdir)
+                        executor.submit_operation(node.deploy, node.tosca_id, verbose, workdir)
                 do_deploy = executor.wait_results()
 
     def undeploy(self, verbose, workdir, num_workers=None):
-        # Currently, we are running a really stupid O(n^3) algorithm, but
-        # unless we get to the templates with millions of node instances, we
-        # should be fine.
+        # Currently, we are running a really stupid O(n^3) algorithm, but  unless we get to the templates with
+        # millions of node instances, we should be fine.
         with NodeExecutor(num_workers) as executor:
             do_undeploy = True
             while do_undeploy:
@@ -46,8 +43,7 @@ class Topology:
                     if (not node.undeployed
                             and node.ready_for_undeploy
                             and executor.can_submit(node.tosca_id)):
-                        executor.submit_operation(node.undeploy, node.tosca_id,
-                                                  verbose, workdir)
+                        executor.submit_operation(node.undeploy, node.tosca_id, verbose, workdir)
                 do_undeploy = executor.wait_results()
 
     def write(self, data, instance_id):

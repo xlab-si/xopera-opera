@@ -1,9 +1,9 @@
 import math
 
 import pytest
+from yaml.constructor import ConstructorError
 from yaml.error import Mark
 from yaml.nodes import MappingNode, ScalarNode, SequenceNode
-from yaml.constructor import ConstructorError
 
 from opera.parser.yaml.constructor import Constructor
 
@@ -154,4 +154,5 @@ class TestNull:
         ]
         node = MappingNode("tag:yaml.org,2002:map", children, start_mark=mark)
         with pytest.raises(ConstructorError):
-            res, = Constructor("map").construct_yaml_map(node)
+            generator = Constructor("map").construct_yaml_map(node)
+            list(generator)

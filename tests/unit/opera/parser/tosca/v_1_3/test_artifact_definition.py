@@ -29,6 +29,7 @@ class TestNormalize:
 class TestParse:
     def test_full(self, yaml_ast):
         ArtifactDefinition.parse(yaml_ast(
+            # language=yaml
             """
             description: My arty desc
             type: my.type
@@ -44,6 +45,7 @@ class TestParse:
 
     def test_minimal(self, yaml_ast):
         ArtifactDefinition.parse(yaml_ast(
+            # language=yaml
             """
             type: my.type
             file: some/file

@@ -1,9 +1,8 @@
 import pytest
 
-from opera.parser.yaml.node import Node
-
 from opera.error import ParseError
 from opera.parser.tosca.v_1_3.repository_definition import RepositoryDefinition
+from opera.parser.yaml.node import Node
 
 
 class TestNormalize:
@@ -23,6 +22,7 @@ class TestNormalize:
 class TestParse:
     def test_full(self, yaml_ast):
         RepositoryDefinition.parse(yaml_ast(
+            # language=yaml
             """
             description: My description
             url: https://repo.name
@@ -33,6 +33,7 @@ class TestParse:
 
     def test_minimal(self, yaml_ast):
         RepositoryDefinition.parse(yaml_ast(
+            # language=yaml
             """
             url: https://repo.name
             """

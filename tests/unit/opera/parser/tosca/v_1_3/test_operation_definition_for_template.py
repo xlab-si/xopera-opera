@@ -1,9 +1,7 @@
 import pytest
 
 from opera.error import ParseError
-from opera.parser.tosca.v_1_3.operation_definition_for_template import (
-    OperationDefinitionForTemplate,
-)
+from opera.parser.tosca.v_1_3.operation_definition_for_template import OperationDefinitionForTemplate
 from opera.parser.yaml.node import Node
 
 
@@ -28,6 +26,7 @@ class TestNormalize:
 class TestParse:
     def test_full(self, yaml_ast):
         OperationDefinitionForTemplate.parse(yaml_ast(
+            # language=yaml
             """
             description: Even more text
             implementation: path/to/artifact

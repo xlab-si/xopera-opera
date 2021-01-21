@@ -1,3 +1,5 @@
+# type: ignore
+
 import collections
 
 
@@ -6,7 +8,7 @@ class DefinitionCollectorMixin:
         parent = self.derived_from.resolve_reference(service_ast)
         if not parent:
             return ()
-        return (self.derived_from.data, ) + parent.collect_types(service_ast)
+        return (self.derived_from.data,) + parent.collect_types(service_ast)
 
     def collect_property_definitions(self, service_ast):
         return self._collect_definitions("properties", service_ast)
@@ -24,7 +26,7 @@ class DefinitionCollectorMixin:
         defs = {}
         parent = self.derived_from.resolve_reference(service_ast)
         if parent:
-            defs.update(parent._collect_definitions(section, service_ast))
+            defs.update(parent._collect_definitions(section, service_ast))  # pylint: disable=protected-access
         defs.update(self.get(section, {}))
         return defs
 

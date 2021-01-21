@@ -1,5 +1,7 @@
 from opera.value import Value
-
+from .constraint_clause import ConstraintClause
+from .schema_definition import SchemaDefinition
+from .status import Status
 from ..bool import Bool
 from ..entity import Entity
 from ..list import List
@@ -7,10 +9,6 @@ from ..map import Map
 from ..reference import DataTypeReference
 from ..string import String
 from ..void import Void
-
-from .constraint_clause import ConstraintClause
-from .schema_definition import SchemaDefinition
-from .status import Status
 
 
 class PropertyDefinition(Entity):
@@ -35,6 +33,6 @@ class PropertyDefinition(Entity):
             return self.default.get_value(typ)
         return Value(typ, False)
 
-    def get_value_type(self, service_ast):
+    def get_value_type(self, service_ast):  # pylint: disable=no-self-use
         # TODO(@tadeboro): Implement types later.
         return None

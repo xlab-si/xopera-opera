@@ -2,7 +2,7 @@ import shutil
 import traceback
 from abc import ABC, abstractmethod
 from pathlib import Path, PurePath
-from tempfile import mktemp
+from tempfile import TemporaryDirectory
 from typing import List, IO, Optional
 from zipfile import ZipFile
 
@@ -27,9 +27,8 @@ class CsarMeta:
     REQUIRED_KEYS = {KEY_TOSCA_META_FILE_VERSION, KEY_CSAR_VERSION,
                      KEY_CREATED_BY}
 
-    def __init__(self, name: str, content_type: str,
-                 tosca_meta_file_version: str,
-                 csar_version: str, created_by: str, entry_definitions: str):
+    def __init__(self, name: Optional[str], content_type: Optional[str], tosca_meta_file_version: str,
+                 csar_version: str, created_by: str, entry_definitions: Optional[str]):
         self.name = name
         self.content_type = content_type
         self.tosca_meta_file_version = tosca_meta_file_version
@@ -39,14 +38,12 @@ class CsarMeta:
 
     @classmethod
     def parse(cls, contents: str) -> "CsarMeta":
-        # FIXME: the meta format is not yaml, but it's close enough to parse a
-        #        simple file
+        # FIXME: the meta format is not yaml, but it"s close enough to parse a simple file
         parsed = yaml.safe_load(contents)
 
         for req in CsarMeta.REQUIRED_KEYS:
             if req not in parsed:
-                raise ParseError("Missing required meta entry: {}".format(req),
-                                 CsarMeta.METADATA_PATH)
+                raise ParseError("Missing required meta entry: {}".format(req), CsarMeta.METADATA_PATH)
 
         csar_version = str(parsed[CsarMeta.KEY_CSAR_VERSION])
         if csar_version not in CsarMeta.SUPPORTED_CSAR_VERSIONS:
@@ -81,16 +78,13 @@ class CsarMeta:
         ordered_fields = [
             (CsarMeta.KEY_NAME, self.name),
             (CsarMeta.KEY_CONTENT_TYPE, self.content_type),
-            (
-                CsarMeta.KEY_TOSCA_META_FILE_VERSION,
-                self.tosca_meta_file_version),
+            (CsarMeta.KEY_TOSCA_META_FILE_VERSION, self.tosca_meta_file_version),
             (CsarMeta.KEY_CSAR_VERSION, self.csar_version),
             (CsarMeta.KEY_CREATED_BY, self.created_by),
             (CsarMeta.KEY_ENTRY_DEFINITIONS, self.entry_definitions)
         ]
 
-        return "\n".join(
-            "{}: {}".format(k, v) for k, v in ordered_fields if v is not None)
+        return "\n".join("{}: {}".format(k, v) for k, v in ordered_fields if v is not None)
 
 
 class ServiceTemplateMeta:
@@ -114,9 +108,7 @@ class ServiceTemplateMeta:
 
         for req in ServiceTemplateMeta.REQUIRED_KEYS:
             if req not in parsed["metadata"]:
-                raise ParseError(
-                    "Missing required service template meta entry: "
-                    "metadata. {}".format(req), "")
+                raise ParseError("Missing required service template meta entry: metadata. {}".format(req), "")
 
         return ServiceTemplateMeta(
             name=parsed["metadata"][ServiceTemplateMeta.KEY_NAME],
@@ -144,49 +136,44 @@ class CloudServiceArchive(ABC):
             raise OperaError("CSARs are either regular files or directories.")
 
     @abstractmethod
-    def package_csar(self, output, service_template=None, csar_format="zip"):
+    def package_csar(self, output_file, service_template=None, csar_format="zip") -> str:
         pass
 
     @abstractmethod
-    def unpackage_csar(self, output):
+    def unpackage_csar(self, output_dir):
         pass
 
     @abstractmethod
     def members(self) -> List[PurePath]:
         """
-        Get a list of files and directories with paths relative to the root of
-        the CSAR. Absolute paths not allowed.
+        Get a list of files and directories with paths relative to the root of the CSAR.
+
+        Absolute paths not allowed.
         """
-        pass
 
     @abstractmethod
     def open_member(self, path: PurePath) -> IO:
-        """
-        Opens a read-only stream for the file at the specified path.
-        """
-        pass
+        """Open a read-only stream for the file at the specified path."""
 
     @abstractmethod
     def _member_exists(self, member: PurePath) -> bool:
-        """
-        Verifies whether the member file exists.
-        """
-        pass
+        """Verify whether the member file exists."""
 
     @abstractmethod
     def _member_is_dir(self, member: PurePath) -> bool:
         """
-        Assumes the path, relative to the CSAR root, exists, and returns
-         whether it is a directory.
+        Check whether the member is a directory.
+
+        Assumes the path, relative to the CSAR root, exists, and returns whether it is a directory.
         Symlinks are resolved.
         """
-        pass
 
     @abstractmethod
     def _member_is_file(self, member: PurePath) -> bool:
         """
-        Assumes the path, relative to the CSAR root, exists, and returns
-         whether it is a regular file.
+        Check whether the member is a file.
+
+        Assumes the path, relative to the CSAR root, exists, and returns whether it is a regular file.
         Symlinks are resolved.
         """
 
@@ -197,28 +184,22 @@ class CloudServiceArchive(ABC):
 
         if not contains_meta:
             if not contains_single_root_yaml:
-                raise OperaError(
-                    "When metadata is not present, there should be exactly "
-                    "one root level YAML file "
-                    "in the root of the CSAR. Files found: {}.".format(
-                        str(root_yaml_files)))
+                raise OperaError("When metadata is not present, there should be exactly one root level YAML file in "
+                                 "the root of the CSAR. Files found: {}.".format(str(root_yaml_files)))
 
             try:
                 self.parse_service_template_meta(root_yaml_files[0])
             except ParseError as e:
-                raise OperaError(
-                    "When metadata is not present, the single root level YAML"
-                    "file "
-                    "must contain metadata: {}".format(str(e)))
+                raise OperaError("When metadata is not present, the single root level YAML file must contain "
+                                 "metadata: {}".format(str(e))) from e
 
         meta = self.parse_csar_meta()
-        if meta.entry_definitions is not None:
-            # check if 'Entry-Definitions' points to an existing
+        if meta is not None and meta.entry_definitions is not None:
+            # check if "Entry-Definitions" points to an existing
             # template file in the CSAR
             if not self._member_exists(PurePath(meta.entry_definitions)):
                 raise OperaError("{} defined with Entry-Definitions in {} "
-                                 "does not exist.".format(
-                    meta.entry_definitions, CsarMeta.METADATA_PATH))
+                                 "does not exist.".format(meta.entry_definitions, CsarMeta.METADATA_PATH))
 
     def parse_csar_meta(self) -> Optional[CsarMeta]:
         path = PurePath(CsarMeta.METADATA_PATH)
@@ -230,8 +211,7 @@ class CloudServiceArchive(ABC):
 
         return CsarMeta.parse(contents)
 
-    def parse_service_template_meta(self, service_template_path: PurePath) -> \
-            Optional[ServiceTemplateMeta]:
+    def parse_service_template_meta(self, service_template_path: PurePath) -> Optional[ServiceTemplateMeta]:
         if not self._member_exists(service_template_path):
             return None
 
@@ -242,14 +222,12 @@ class CloudServiceArchive(ABC):
 
     def get_root_yaml_files(self) -> List[PurePath]:
         all_files = self.members()
-        result = [f for f in all_files if
-                  len(f.parts) == 1 and (
-                          f.match("*.yaml") or f.match("*.yml"))]
+        result = [f for f in all_files if len(f.parts) == 1 and (f.match("*.yaml") or f.match("*.yml"))]
         return result
 
     def get_entrypoint(self) -> Optional[PurePath]:
         meta = self.parse_csar_meta()
-        if meta.entry_definitions is not None:
+        if meta is not None and meta.entry_definitions is not None:
             return PurePath(meta.entry_definitions)
 
         root_yamls = self.get_root_yaml_files()
@@ -259,13 +237,12 @@ class CloudServiceArchive(ABC):
 class FileCloudServiceArchive(CloudServiceArchive):
     def __init__(self, csar_file: Path):
         """csar_file is guaranteed to exist, be absolute, and be a file."""
-        super(FileCloudServiceArchive, self).__init__(str(csar_file.name))
+        super().__init__(str(csar_file.name))
         self.csar_file = csar_file
         self.backing_zip = ZipFile(csar_file, mode="r")
 
-    def package_csar(self, output, service_template=None, csar_format="zip"):
-        raise NotImplementedError(
-            "Repackaging a packaged CSAR is not implemented.")
+    def package_csar(self, output_file, service_template=None, csar_format="zip") -> str:
+        raise NotImplementedError("Repackaging a packaged CSAR is not implemented.")
 
     def unpackage_csar(self, output_dir):
         csar_format = determine_archive_format(str(self.csar_file))
@@ -286,8 +263,9 @@ class FileCloudServiceArchive(CloudServiceArchive):
 
     def _member_is_dir(self, member: PurePath) -> bool:
         return next(
-            zi for zi in self.backing_zip.infolist() if
-            zi.filename.rstrip("/") == member.name.rstrip("/")).is_dir()
+            zi for zi in self.backing_zip.infolist()
+            if zi.filename.rstrip("/") == member.name.rstrip("/")
+        ).is_dir()
 
     def _member_is_file(self, member: PurePath) -> bool:
         return not self._member_is_dir(member)
@@ -296,11 +274,10 @@ class FileCloudServiceArchive(CloudServiceArchive):
 class DirCloudServiceArchive(CloudServiceArchive):
     def __init__(self, csar_dir: Path):
         """csar_dir is guaranteed to exist and be a file."""
-        super(DirCloudServiceArchive, self).__init__(str(csar_dir.name))
+        super().__init__(str(csar_dir.name))
         self.csar_dir = csar_dir
 
-    def package_csar(self, output_file: str, service_template: str = None,
-                     csar_format: str = "zip"):
+    def package_csar(self, output_file: str, service_template: str = None, csar_format: str = "zip") -> str:
         meta = self.parse_csar_meta()
 
         try:
@@ -308,76 +285,57 @@ class DirCloudServiceArchive(CloudServiceArchive):
                 root_yaml_files = self.get_root_yaml_files()
 
                 if meta is None and len(root_yaml_files) != 1:
-                    raise ParseError(
-                        "You didn't specify the CSAR TOSCA entrypoint with "
-                        "'-t/--service-template' option. Therefore there "
-                        "should be one YAML file in the root of the CSAR to "
-                        "select it as the entrypoint. More than one YAML has "
-                        "been found: {}. Please select one of the files as "
-                        "the CSAR entrypoint using '-t/--service-template' "
-                        "flag or remove all the excessive YAML files.".format(
-                            list(map(str, root_yaml_files))), self)
+                    raise ParseError("You didn't specify the CSAR TOSCA entrypoint with '-t/--service-template' "
+                                     "option. Therefore there should be one YAML file in the root of the CSAR to "
+                                     "select it as the entrypoint. More than one YAML has been found: {}. Please "
+                                     "select one of the files as the CSAR entrypoint using '-t/--service-template' "
+                                     "flag or remove all the excessive YAML files."
+                                     .format(list(map(str, root_yaml_files))), self)
                 service_template = root_yaml_files[0].name
             else:
                 if not self._member_exists(PurePath(service_template)):
-                    raise ParseError('The supplied TOSCA service template '
-                                     'file "{}" does not exist in folder '
-                                     '"{}".'.format(service_template,
-                                                    self.csar_dir), self)
+                    raise ParseError("The supplied TOSCA service template file '{}' does not exist in folder '{}'."
+                                     .format(service_template, self.csar_dir), self)
 
             meta = self.parse_csar_meta()
             if meta is not None:
 
                 template_entry = meta.entry_definitions
                 if service_template and template_entry != service_template:
-                    raise ParseError('The file entry "{}" defined within '
-                                     '"Entry-Definitions" in '
-                                     '"TOSCA-Metadata/TOSCA.meta" does not '
-                                     'match with the file name "{}" supplied '
-                                     'in service_template CLI argument.'.
-                                     format(template_entry, service_template),
-                                     self)
+                    raise ParseError("The file entry '{}' defined within 'Entry-Definitions' in "
+                                     "'TOSCA-Metadata/TOSCA.meta' does not match with the file name '{}' supplied "
+                                     "in service_template CLI argument.".format(template_entry, service_template), self)
 
-                # check if 'Entry-Definitions' points to an existing
+                # check if "Entry-Definitions" points to an existing
                 # template file in the CSAR
-                if not self._member_exists(PurePath(template_entry)):
-                    raise ParseError('The file "{}" defined within '
-                                     '"Entry-Definitions" in '
-                                     '"TOSCA-Metadata/TOSCA.meta" does '
-                                     'not exist.'.format(template_entry), self)
-                return shutil.make_archive(output_file, csar_format,
-                                           self.csar_dir)
+                if template_entry is not None and not self._member_exists(PurePath(template_entry)):
+                    raise ParseError("The file '{}' defined within 'Entry-Definitions' in 'TOSCA-Metadata/TOSCA.meta' "
+                                     "does not exist.".format(template_entry), self)
+                return shutil.make_archive(output_file, csar_format, self.csar_dir)
             else:
-                # use tempdir because we don't want to modify user's folder
-                # with TemporaryDirectory(prefix="opera-package-") as tempdir
-                # cannot be used because shutil.copytree would fail due to the
-                # existing temporary folder (this happens only when running
-                # with python version lower than 3.8)
-                tempdir = mktemp(prefix="opera-package-")
-                # create tempdir and copy in all the needed CSAR files
-                shutil.copytree(self.csar_dir, tempdir)
+                with TemporaryDirectory(prefix="opera-package-") as tempdir:
+                    extract_path = Path(tempdir) / "extract"
+                    shutil.copytree(self.csar_dir, extract_path)
 
-                # create TOSCA-Metadata/TOSCA.meta file using the specified
-                # TOSCA service template or directory root YAML file
-                content = ("TOSCA-Meta-File-Version: 1.1\n"
-                           "CSAR-Version: 1.1\n"
-                           "Created-By: xOpera TOSCA orchestrator\n"
-                           "Entry-Definitions: {}\n").format(service_template)
+                    # create TOSCA-Metadata/TOSCA.meta file using the specified
+                    # TOSCA service template or directory root YAML file
+                    content = ("TOSCA-Meta-File-Version: 1.1\n"
+                               "CSAR-Version: 1.1\n"
+                               "Created-By: xOpera TOSCA orchestrator\n"
+                               "Entry-Definitions: {}\n").format(service_template)
 
-                meta_file_folder = Path(tempdir) / "TOSCA-Metadata"
-                meta_file = (meta_file_folder / "TOSCA.meta")
+                    meta_file_folder = extract_path / "TOSCA-Metadata"
+                    meta_file = (meta_file_folder / "TOSCA.meta")
 
-                meta_file_folder.mkdir()
-                meta_file.touch()
-                meta_file.write_text(content)
+                    meta_file_folder.mkdir()
+                    meta_file.touch()
+                    meta_file.write_text(content)
 
-                return shutil.make_archive(output_file, csar_format, tempdir)
-        except Exception:
-            raise ParseError(
-                "Error creating CSAR:\n{}".format(traceback.format_exc()),
-                self)
+                    return shutil.make_archive(output_file, csar_format, extract_path)
+        except Exception as e:  # noqa: W0703
+            raise ParseError("Error creating CSAR:\n{}".format(traceback.format_exc()), self) from e
 
-    def unpackage_csar(self, output_dir, csar_format="zip"):
+    def unpackage_csar(self, output_dir):
         raise OperaError("Cannot unpackage a directory-based CSAR.")
 
     def members(self) -> List[PurePath]:

@@ -4,6 +4,7 @@ from opera.parser.tosca.v_1_3.capability_type import CapabilityType
 class TestParse:
     def test_full(self, yaml_ast):
         CapabilityType.parse(yaml_ast(
+            # language=yaml
             """
             derived_from: cap_type
             description: My desc
@@ -23,6 +24,7 @@ class TestParse:
 
     def test_minimal(self, yaml_ast):
         CapabilityType.parse(yaml_ast(
+            # language=yaml
             """
             derived_from: cap_type
             """

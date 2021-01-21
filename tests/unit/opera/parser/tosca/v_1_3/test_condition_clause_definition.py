@@ -7,6 +7,7 @@ from opera.parser.tosca.v_1_3.condition_clause_definition import ConditionClause
 class TestParseValidate:
     def test_valid_clause_direct_assertion(self, yaml_ast):
         test_yaml = yaml_ast(
+            # language=yaml
             """
             my_attribute: [ { equal: 42 } ]
             """
@@ -16,6 +17,7 @@ class TestParseValidate:
 
     def test_valid_clause_direct_assertion_list(self, yaml_ast):
         test_yaml = yaml_ast(
+            # language=yaml
             """
             my_attribute: [ { min_length: 1 }, { min_length: 11 } ]
             """
@@ -25,6 +27,7 @@ class TestParseValidate:
 
     def test_valid_clause_not(self, yaml_ast):
         test_yaml = yaml_ast(
+            # language=yaml
             """
             not:
               - my_attribute: [{equal: my_value}]
@@ -36,6 +39,7 @@ class TestParseValidate:
 
     def test_valid_clause_and(self, yaml_ast):
         test_yaml = yaml_ast(
+            # language=yaml
             """
             and:
               - my_attribute: [{equal: my_value}]
@@ -47,6 +51,7 @@ class TestParseValidate:
 
     def test_valid_clause_not_and(self, yaml_ast):
         test_yaml = yaml_ast(
+            # language=yaml
             """
             not:
               - and:
@@ -59,6 +64,7 @@ class TestParseValidate:
 
     def test_valid_clause_or(self, yaml_ast):
         test_yaml = yaml_ast(
+            # language=yaml
             """
             or:
               - my_attribute: [{equal: my_value}]
@@ -70,6 +76,7 @@ class TestParseValidate:
 
     def test_valid_clause_or_not(self, yaml_ast):
         test_yaml = yaml_ast(
+            # language=yaml
             """
             or:
               - not:
@@ -83,6 +90,7 @@ class TestParseValidate:
 
     def test_valid_clause_or_and_not(self, yaml_ast):
         test_yaml = yaml_ast(
+            # language=yaml
             """
             or:
               - and:
@@ -98,6 +106,7 @@ class TestParseValidate:
 
     def test_valid_clause_nested(self, yaml_ast):
         test_yaml = yaml_ast(
+            # language=yaml
             """
             or:
               - not:
@@ -131,6 +140,7 @@ class TestParseValidate:
 
     def test_invalid_clause_not(self, yaml_ast):
         test_yaml = yaml_ast(
+            # language=yaml
             """
             nott:
               - my_attribute: [{equal: my_value}]
@@ -143,6 +153,7 @@ class TestParseValidate:
 
     def test_invalid_clause_nested(self, yaml_ast):
         test_yaml = yaml_ast(
+            # language=yaml
             """
             or:
               - not:
@@ -176,6 +187,7 @@ class TestParseValidate:
 
     def test_invalid_clause_assert(self, yaml_ast):
         test_yaml = yaml_ast(
+            # language=yaml
             """
             assert:
               - my_attribute: [{equal: my_value}]

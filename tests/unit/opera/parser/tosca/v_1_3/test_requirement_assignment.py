@@ -7,7 +7,6 @@ from opera.parser.tosca.v_1_3.requirement_assignment import (
 from opera.parser.yaml.node import Node
 
 
-
 class TestNormalize:
     @pytest.mark.parametrize("data", [1, 2.3, True, (), []])
     def test_invalid_data(self, data):
@@ -29,6 +28,7 @@ class TestNormalize:
 class TestParse:
     def test_full(self, yaml_ast):
         RequirementAssignment.parse(yaml_ast(
+            # language=yaml
             """
             capability: my_cap
             node: some_node_template
@@ -40,6 +40,7 @@ class TestParse:
 
     def test_minimal(self, yaml_ast):
         RequirementAssignment.parse(yaml_ast(
+            # language=yaml
             """
             some_node_template
             """

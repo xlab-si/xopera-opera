@@ -1,11 +1,12 @@
 import argparse
 import typing
-import yaml
-import shtab
-
-from tempfile import TemporaryDirectory
 from pathlib import Path, PurePath
+from tempfile import TemporaryDirectory
 from zipfile import ZipFile, is_zipfile
+
+import shtab
+import yaml
+from yaml import YAMLError
 
 from opera.error import DataError, ParseError
 from opera.parser import tosca
@@ -22,7 +23,7 @@ def add_parser(subparsers):
         help="YAML or JSON file with inputs",
     ).complete = shtab.FILE
     parser.add_argument(
-        "--verbose", "-v", action='store_true',
+        "--verbose", "-v", action="store_true",
         help="Turns on verbose mode",
     )
     parser.add_argument(
@@ -35,7 +36,7 @@ def add_parser(subparsers):
 def _parser_callback(args):
     try:
         inputs = yaml.safe_load(args.inputs) if args.inputs else {}
-    except Exception as e:
+    except YAMLError as e:
         print("Invalid inputs: {}".format(e))
         return 1
 
@@ -67,15 +68,14 @@ def validate_compressed_csar(csar_name: str, inputs: typing.Optional[dict]):
         tosca_service_template = csar.get_entrypoint()
 
         # unzip csar to temporary folder
-        ZipFile(csar_name, 'r').extractall(csar_validation_dir)
+        ZipFile(csar_name, "r").extractall(csar_validation_dir)
 
         # try to initiate service template from csar
         ast = tosca.load(Path(csar_validation_dir), Path(tosca_service_template))
         ast.get_template(inputs)
 
 
-def validate_service_template(service_template: str,
-                              inputs: typing.Optional[dict]):
+def validate_service_template(service_template: str, inputs: typing.Optional[dict]):
     if inputs is None:
         inputs = {}
     ast = tosca.load(Path.cwd(), PurePath(service_template))

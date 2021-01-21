@@ -1,5 +1,6 @@
-import pytest
 import pathlib
+
+import pytest
 
 from opera.parser import tosca
 from opera.storage import Storage
@@ -8,6 +9,7 @@ from opera.storage import Storage
 def setupdir(path, yaml_text):
     pathlib.Path.mkdir(path)
     pathlib.Path.mkdir(path / "files")
+    # language=yaml
     imports = \
         """
         tosca_definitions_version: tosca_simple_yaml_1_3
@@ -67,6 +69,7 @@ def setupdir(path, yaml_text):
                         default: "2"
                         type: string
         """
+    # language=yaml
     playbook = \
         """
         ---
@@ -76,10 +79,12 @@ def setupdir(path, yaml_text):
             - command:
                 cmd: sleep "{{ time }}"
         """
+    # language=yaml
     artefact1 = \
         """
         test: 1
         """
+    # language=yaml
     artefact2 = \
         """
         test: 2
@@ -103,10 +108,12 @@ def prepare_template(path, yaml_text, template):
     topology = template.instantiate(storage)
     return template, topology, path
 
+
 @pytest.fixture
 def service_template1(tmp_path, yaml_text):
     path = tmp_path / pathlib.Path("t1")
     setupdir(path, yaml_text)
+    # language=yaml
     template = \
         """
         tosca_definitions_version: tosca_simple_yaml_1_3
@@ -192,6 +199,7 @@ def service_template1(tmp_path, yaml_text):
 def service_template2(tmp_path, yaml_text):
     path = tmp_path / pathlib.Path("t2")
     setupdir(path, yaml_text)
+    # language=yaml
     template = \
         """
         tosca_definitions_version: tosca_simple_yaml_1_3

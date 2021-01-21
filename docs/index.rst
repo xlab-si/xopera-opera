@@ -15,9 +15,9 @@ The following documentation explains the usage of xOpera TOSCA orchestrator. Wan
     opera_api
     template_library
     examples
-    
-     
-     
+
+
+
 ..
    Indices and tables
    ==================

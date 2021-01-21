@@ -1,76 +1,75 @@
-
 tosca_definitions_version: tosca_simple_yaml_1_3
 
 imports:
-- types.yaml
+  - types.yaml
 
 topology_template:
-    inputs:
-        marker:
-            type: string
-            default: default-marker
+  inputs:
+    marker:
+      type: string
+      default: default-marker
 
-    node_templates:
-        my-workstation:
-            type: tosca.nodes.Compute
-            attributes:
-                private_address: localhost
-                public_address: localhost
+  node_templates:
+    my-workstation:
+      type: tosca.nodes.Compute
+      attributes:
+        private_address: localhost
+        public_address: localhost
 
-        hello-1:
-            type: hello_type
-            properties:
-                time: "0"
-            artifacts:
-                def_file:
-                    type: tosca.artifacts.File
-                    file: files/file1_1.yaml
-            capabilities:
-                test:
-                    properties:
-                        test1: "2"
-                        test2: "2"
-            requirements:
-                - host: my-workstation
+    hello-1:
+      type: hello_type
+      properties:
+        time: "0"
+      artifacts:
+        def_file:
+          type: tosca.artifacts.File
+          file: files/file1_1.yaml
+      capabilities:
+        test:
+          properties:
+            test1: "2"
+            test2: "2"
+      requirements:
+        - host: my-workstation
 
-        hello-2:
-            type: hello_type_old
-            properties:
-                time: "0"
-            artifacts:
-                def_file:
-                    type: tosca.artifacts.File
-                    file: files/file1_1.yaml
-            capabilities:
-                test:
-                    properties:
-                        test1: "2"
-                        test2: "2"
-            requirements:
-                - host: my-workstation
+    hello-2:
+      type: hello_type_old
+      properties:
+        time: "0"
+      artifacts:
+        def_file:
+          type: tosca.artifacts.File
+          file: files/file1_1.yaml
+      capabilities:
+        test:
+          properties:
+            test1: "2"
+            test2: "2"
+      requirements:
+        - host: my-workstation
 
-        hello-3:
-            type: hello_type
-            properties:
-                time: "0"
-            requirements:
-                - host: my-workstation
+    hello-3:
+      type: hello_type
+      properties:
+        time: "0"
+      requirements:
+        - host: my-workstation
 
-        hello-4:
-            type: hello_type
-            properties:
-                time: "0"
-            requirements:
-                - host: my-workstation
+    hello-4:
+      type: hello_type
+      properties:
+        time: "0"
+      requirements:
+        - host: my-workstation
 
-        hello-6:
-            type: hello_type
-            properties:
-                time: "0"
-            artifacts:
-                def_file:
-                    type: tosca.artifacts.File
-                    file: files/file2.yaml
-            requirements:
-                - dependency: hello-1
-                - host: my-workstation
+    hello-6:
+      type: hello_type
+      properties:
+        time: "0"
+      artifacts:
+        def_file:
+          type: tosca.artifacts.File
+          file: files/file2.yaml
+      requirements:
+        - dependency: hello-1
+        - host: my-workstation

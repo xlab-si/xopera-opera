@@ -1,6 +1,8 @@
+# type: ignore
+
+from opera.template.capability import Capability
 from opera.template.interface import Interface
 from opera.template.operation import Operation
-from opera.template.capability import Capability
 
 
 class CollectorMixin:
@@ -15,9 +17,7 @@ class CollectorMixin:
 
         undeclared_props = set(assignments.keys()) - definitions.keys()
         if undeclared_props:
-            self.abort("Invalid properties: {}.".format(
-                ", ".join(undeclared_props),
-            ), self.loc)
+            self.abort("Invalid properties: {}.".format(", ".join(undeclared_props)), self.loc)
 
         for key, prop_definition in definitions.items():
             prop_required = prop_definition.get("required", None)
@@ -29,16 +29,15 @@ class CollectorMixin:
                 prop_required = True
 
             if prop_required and not prop_has_default and not prop_assignment:
-                self.abort("Missing a required property: {}. If the property "
-                           "is optional please specify this in the definition "
-                           "with 'required: false' or supply its default "
-                           "value using 'default: <value>'.".format(key),
-                           self.loc)
+                self.abort(
+                    "Missing a required property: {}. If the property is optional please specify "
+                    "this in the definition with 'required: false' or supply its default value using "
+                    "'default: <value>'.".format(key), self.loc
+                )
 
         return {
-            name: (assignments.get(name) or definition).get_value(
-                definition.get_value_type(service_ast),
-            ) for name, definition in definitions.items()
+            name: (assignments.get(name) or definition).get_value(definition.get_value_type(service_ast))
+            for name, definition in definitions.items()
         }
 
     def collect_attributes(self, service_ast):
@@ -48,26 +47,21 @@ class CollectorMixin:
 
         undeclared_attrs = set(assignments.keys()) - definitions.keys()
         if undeclared_attrs:
-            self.abort("Invalid attributes: {}.".format(
-                ", ".join(undeclared_attrs),
-            ), self.loc)
-
+            self.abort("Invalid attributes: {}.".format(", ".join(undeclared_attrs)), self.loc)
         return {
             name: (assignments.get(name) or definition).get_value(
                 definition.get_value_type(service_ast),
             ) for name, definition in definitions.items()
         }
 
-    def collect_interfaces(self, service_ast):
+    def collect_interfaces(self, service_ast):  # pylint: disable=too-many-locals
         typ = self.type.resolve_reference(service_ast)
         definitions = typ.collect_interface_definitions(service_ast)
         assignments = self.get("interfaces", {})
 
         undeclared_interfaces = set(assignments.keys()) - definitions.keys()
         if undeclared_interfaces:
-            self.abort("Invalid interfaces: {}.".format(
-                ", ".join(undeclared_interfaces),
-            ), self.loc)
+            self.abort("Invalid interfaces: {}.".format(", ".join(undeclared_interfaces)), self.loc)
 
         # Next section is nasty. You have been warned.
         interfaces = {}
@@ -76,13 +70,9 @@ class CollectorMixin:
 
             defined_operations = definition.get("operations", {})
             assigned_operations = assignment.get("operations", {})
-            undeclared_operations = (
-                    set(assigned_operations.keys()) - defined_operations.keys()
-            )
+            undeclared_operations = set(assigned_operations.keys()) - defined_operations.keys()
             if undeclared_operations:
-                self.abort("Undeclared operations: {}.".format(
-                    ", ".join(undeclared_operations),
-                ), self.loc)
+                self.abort("Undeclared operations: {}.".format(", ".join(undeclared_operations)), self.loc)
 
             operations = {}
             for op_name, op_definition in defined_operations.items():
@@ -132,10 +122,7 @@ class CollectorMixin:
                 })
 
                 # Operation implementation details
-                impl = (
-                        op_assignment.get("implementation") or
-                        op_definition.get("implementation")
-                )
+                impl = op_assignment.get("implementation") or op_definition.get("implementation")
                 # TODO(@tadeboro): impl can be None here. Fix this.
                 timeout, operation_host = 0, None
                 if "timeout" in impl:
@@ -146,11 +133,8 @@ class CollectorMixin:
                 operations[op_name] = Operation(
                     op_name,
                     primary=impl.primary.file.data,
-                    dependencies=[
-                        d.file.data for d in impl.get("dependencies", [])
-                    ],
-                    artifacts=[a.data for a in
-                               self.collect_artifacts(service_ast).values()],
+                    dependencies=[d.file.data for d in impl.get("dependencies", [])],
+                    artifacts=[a.data for a in self.collect_artifacts(service_ast).values()],
                     inputs=inputs,
                     outputs=outputs,
                     timeout=timeout,
@@ -168,14 +152,12 @@ class CollectorMixin:
 
         undeclared_caps = set(assignments.keys()) - definitions.keys()
         if undeclared_caps:
-            self.abort("Invalid capabilities: {}.".format(
-                ", ".join(undeclared_caps),
-            ), self.loc)
+            self.abort("Invalid capabilities: {}.".format(", ".join(undeclared_caps)), self.loc)
 
-        return [Capability(name,
-                           assignment.get("properties", None),
-                           assignment.get("attributes", None))
-                for name, assignment in assignments.items()]
+        return [
+            Capability(name, assignment.get("properties", None), assignment.get("attributes", None))
+            for name, assignment in assignments.items()
+        ]
 
     def collect_artifacts(self, service_ast):
         typ = self.type.resolve_reference(service_ast)

@@ -1,9 +1,7 @@
 import pytest
 
 from opera.error import ParseError
-from opera.parser.tosca.v_1_3.tosca_definitions_version import (
-    ToscaDefinitionsVersion,
-)
+from opera.parser.tosca.v_1_3.tosca_definitions_version import ToscaDefinitionsVersion
 from opera.parser.yaml.node import Node
 
 

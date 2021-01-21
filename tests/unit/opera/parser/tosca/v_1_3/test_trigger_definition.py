@@ -4,6 +4,7 @@ from opera.parser.tosca.v_1_3.trigger_definition import TriggerDefinition
 class TestParse:
     def test_full(self, yaml_ast):
         TriggerDefinition.parse(yaml_ast(
+            # language=yaml
             """
             description: A trigger
             event: trigger
@@ -31,6 +32,7 @@ class TestParse:
 
     def test_minimal(self, yaml_ast):
         TriggerDefinition.parse(yaml_ast(
+            # language=yaml
             """
             event: trigger
             action:

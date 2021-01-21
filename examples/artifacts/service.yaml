@@ -30,9 +30,9 @@ node_types:
                 type: string
                 default: { get_property: [ SELF, json_file ] }
     artifacts:
-        text_file:
-          type: tosca.artifacts.File
-          file: files/file.txt
+      text_file:
+        type: tosca.artifacts.File
+        file: files/file.txt
 
 topology_template:
   node_templates:
@@ -41,9 +41,9 @@ topology_template:
       properties:
         json_file: { get_artifact: [ SELF, json_file ] }
       artifacts:
-          json_file:
-            type: tosca.artifacts.File
-            file: files/file.json
+        json_file:
+          type: tosca.artifacts.File
+          file: files/file.json
 
   outputs:
     output_attribute_text_file:

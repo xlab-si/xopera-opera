@@ -1,13 +1,14 @@
 import argparse
 import typing
-import yaml
-import shtab
-
 from os import path
 from pathlib import Path, PurePath
 from zipfile import ZipFile, is_zipfile
 
-from opera.error import DataError, ParseError
+import shtab
+import yaml
+from yaml import YAMLError
+
+from opera.error import DataError, ParseError, OperaError
 from opera.parser import tosca
 from opera.parser.tosca.csar import CloudServiceArchive
 from opera.storage import Storage
@@ -16,8 +17,7 @@ from opera.storage import Storage
 def add_parser(subparsers):
     parser = subparsers.add_parser(
         "init",
-        help="Initialize the deployment environment "
-             "for the service template or CSAR"
+        help="Initialize the deployment environment for the service template or CSAR"
     )
     parser.add_argument(
         "--instance-path", "-p",
@@ -28,12 +28,11 @@ def add_parser(subparsers):
         help="YAML or JSON file with inputs",
     ).complete = shtab.FILE
     parser.add_argument(
-        "--clean", "-c", action='store_true',
-        help="Clean storage by removing previously "
-             "initialized service template or CSAR",
+        "--clean", "-c", action="store_true",
+        help="Clean storage by removing previously initialized service template or CSAR",
     )
     parser.add_argument(
-        "--verbose", "-v", action='store_true',
+        "--verbose", "-v", action="store_true",
         help="Turns on verbose mode",
     )
     parser.add_argument(
@@ -44,17 +43,15 @@ def add_parser(subparsers):
 
 
 def _parser_callback(args):
-    print("Warning: 'opera init' command is deprecated and will probably be "
-          "removed within one of the next releases. Please use 'opera deploy' "
-          "to initialize and deploy service templates or compressed CSARs.")
+    print("Warning: 'opera init' command is deprecated and will probably be removed within one of the next releases. "
+          "Please use 'opera deploy' to initialize and deploy service templates or compressed CSARs.")
     if args.instance_path and not path.isdir(args.instance_path):
-        raise argparse.ArgumentTypeError("Directory {} is not a valid path!"
-                                         .format(args.instance_path))
+        raise argparse.ArgumentTypeError("Directory {} is not a valid path!".format(args.instance_path))
 
     storage = Storage.create(args.instance_path)
     try:
         inputs = yaml.safe_load(args.inputs) if args.inputs else {}
-    except Exception as e:
+    except YAMLError as e:
         print("Invalid inputs: {}".format(e))
         return 1
 
@@ -71,22 +68,21 @@ def _parser_callback(args):
     except DataError as e:
         print(str(e))
         return 1
-    except Exception as e:
+    except OperaError as e:
         print("Invalid CSAR: {}".format(e))
         return 1
 
     return 0
 
 
-def init_compressed_csar(csar_name: str, inputs: typing.Optional[dict],
-                         storage: Storage, clean_storage: bool):
+def init_compressed_csar(csar_name: str, inputs: typing.Optional[dict], storage: Storage, clean_storage: bool):
     if storage.exists("root_file"):
         if clean_storage:
             storage.remove_all()
         else:
-            print("Looks like service template or CSAR has already been "
-                  "initialized. Use --clean/-c flag to clear the storage.")
-            return 1
+            print("Looks like service template or CSAR has already been initialized. "
+                  "Use the --clean/-c flag to clear the storage.")
+            return
 
     if inputs is None:
         inputs = {}
@@ -101,7 +97,7 @@ def init_compressed_csar(csar_name: str, inputs: typing.Optional[dict],
 
     # unzip csar and save the path to storage
     csar_dir = csars_dir / Path("csar")
-    ZipFile(csar_name, 'r').extractall(csar_dir)
+    ZipFile(csar_name, "r").extractall(csar_dir)
     csar_tosca_service_template_path = csar_dir / tosca_service_template
     storage.write(str(csar_tosca_service_template_path), "root_file")
 
@@ -117,9 +113,9 @@ def init_service_template(service_template: str, inputs: typing.Optional[dict],
         if clean_storage:
             storage.remove_all()
         else:
-            print("Looks like service template or CSAR has already been "
-                  "initialized. Use --clean/-c flag to clear the storage.")
-            return 1
+            print("Looks like service template or CSAR has already been initialized. "
+                  "Use --clean/-c flag to clear the storage.")
+            return
 
     if inputs is None:
         inputs = {}

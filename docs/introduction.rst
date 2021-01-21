@@ -4,16 +4,22 @@
 Introduction
 ************
 
-``xOpera project`` includes a set of tools for advanced orchestration, with an orchestration tool ``xOpera orchestrator`` or shorter ``opera``.
+``xOpera project`` includes a set of tools for advanced orchestration
+with an orchestration tool ``xOpera orchestrator`` or shorter ``opera``.
 
 ``opera`` aims to be a lightweight orchestrator compliant with `OASIS TOSCA <https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=tosca>`_.
 and the current compliance is with the `TOSCA Simple Profile in YAML v1.3 <https://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.3/TOSCA-Simple-Profile-YAML-v1.3.html>`_.
 ``opera`` is by following TOSCA primarily a (TOSCA) cloud orchestrator which enables orchestration of automated tasks
 within cloud applications for different cloud providers such as Amazon Web Services(AWS), Microsoft Azure, Google Cloud
-Platform(GCP), OpenFaaS, OpenStack and so on. Apart from that this tool can be used and integrated to other infrastructures
-in order to orchestrate services or applications and therefore reduce human factor.
+Platform(GCP), OpenFaaS, OpenStack and so on.
+Apart from that this tool can be used and integrated to other infrastructures in order to orchestrate services or
+applications and therefore reduce human factor.
 
-xOpera orchestrator engine - called xOpera library - xOpera CLI and xOpera API are an open-source project which currently reside on GitHub inside `xopera-opera <https://github.com/xlab-si/xopera-opera>`_ and `xopera-opera <https://github.com/xlab-si/xopera-api>`_repositories. As an orchestration tool xOpera uses `Ansible automation tool <https://www.ansible.com/>`_ to implement the TOSCA standard and to run its operations via Ansible playbook actuators which again opens a lot of new possibilities.
+xOpera orchestrator engine - called xOpera library - xOpera CLI and xOpera API are an open-source project which
+currently reside on GitHub inside `xopera-opera <https://github.com/xlab-si/xopera-opera>`_
+and `xopera-opera <https://github.com/xlab-si/xopera-api>`_repositories.
+As an orchestration tool xOpera uses `Ansible automation tool <https://www.ansible.com/>`_ to implement the TOSCA
+standard and to run its operations via Ansible playbook actuators which again opens a lot of new possibilities.
 
 .. _xopera_architecture:
 
@@ -27,15 +33,12 @@ xOpera orchestrator engine - called xOpera library - xOpera CLI and xOpera API a
 Currently a set of components is presented in figure :numref:`xopera_architecture`, where we can point out:
 
 
- - Opera CLI
- 	is a command line interface to the **xOpera library** for deploying TOSCA templates and CSARs
- - Opera API 
- 	allows integration of **xOpera library**. 
- - xOpera SaaS
- 	is a standalone service for application lifecycle management with xOpera orchestrator through GUI and API.
- - TPS or Template Publishing Service  
-  	is a library of published TOSCA templates and CSARs
-  
+ - Opera CLI is a command line interface to the **xOpera library** for deploying TOSCA templates and CSARs
+ - Opera API allows integration of **xOpera library**.
+ - xOpera SaaS is a standalone service for application lifecycle management with xOpera orchestrator
+   through GUI and API.
+ - TPS or Template Publishing Service is a library of published TOSCA templates and CSARs
+
 Each component is covered by corresponding This documentation will cover all xOpera components.
 
 ================
@@ -43,8 +46,9 @@ Background
 ================
 
 xOpera is a TOSCA standard compliant orchestrator that is following the paradigm of having a minimal set of
-features and is currently focusing on Ansible. xOpera is following the traditional UNIX philosophy of having a tool that
-does one thing, and does it right. So, with a minimal set of features xOpera will do just the orchestration, and do it well.
+features and is currently focusing on Ansible.
+xOpera is following the traditional UNIX philosophy of having a tool that does one thing, and does it right.
+So, with a minimal set of features xOpera will do just the orchestration, and do it well.
 
 xOpera is available on GitHub under Apache License 2.0.
 
@@ -75,7 +79,7 @@ Parser
 
 .. note::
 
-    *TBD*: This part of the documentation will be improved in the future. 
+   *TBD*: This part of the documentation will be improved in the future.
 
 xOpera orchestrator has its own YAML and TOSCA parser which is shown on the image below :ref:`opera_parser_structure`.
 

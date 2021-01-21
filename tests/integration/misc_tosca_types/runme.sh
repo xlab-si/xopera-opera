@@ -59,5 +59,8 @@ cd unpacked-csar
 $opera_executable deploy -i inputs.yaml service-template.yaml
 $opera_executable info
 # number of created .opera folders should be 1
+# shellcheck disable=SC1117,SC2010
 opera_count=$(ls -aR . | grep -c "^\.opera$")
-if [ "$opera_count" -ne 1 ]; then exit 1; fi
+if [ "$opera_count" -ne 1 ]; then
+    exit 1
+fi

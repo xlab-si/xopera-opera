@@ -1,10 +1,8 @@
-from ..entity import Entity
-from ..map import Map
-from ..string import String
-from ..void import Void
-
 from .notification_definition import NotificationDefinition
 from .operation_definition_for_template import OperationDefinitionForTemplate
+from ..entity import Entity
+from ..map import Map
+from ..void import Void
 
 
 class InterfaceDefinitionForTemplate(Entity):

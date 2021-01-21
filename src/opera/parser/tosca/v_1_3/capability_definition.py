@@ -1,15 +1,12 @@
 from opera.parser.yaml.node import Node
-
-from ..entity import Entity
-from ..reference import Reference
-from ..map import Map
-from ..list import List
-from ..string import String
-from ..void import Void
-
 from .attribute_definition import AttributeDefinition
 from .property_definition import PropertyDefinition
 from .range import Range
+from ..entity import Entity
+from ..list import List
+from ..map import Map
+from ..reference import Reference
+from ..string import String
 
 
 class CapabilityDefinition(Entity):

@@ -1,19 +1,14 @@
-import pytest
-
 from opera.compare.template_comparer import TemplateComparer, TemplateContext
 
 
 class TestTemplateCompare:
-    def test_service_template_comparison(self, service_template1,
-                                         service_template2):
+    def test_service_template_comparison(self, service_template1, service_template2):
         comparer = TemplateComparer()
         context = TemplateContext(service_template1[0],
                                   service_template2[0],
                                   service_template1[2],
                                   service_template2[2])
-        equal, diff = comparer.compare_service_template(service_template1[0],
-                                                        service_template2[0],
-                                                        context)
+        equal, diff = comparer.compare_service_template(service_template1[0], service_template2[0], context)
 
         assert equal is False
 
@@ -50,9 +45,7 @@ class TestTemplateCompare:
 
         node1_2 = service_template1[0].get_node("hello-2")
         node2_2 = service_template2[0].get_node("hello-2")
-        context = TemplateContext(node1_2, node2_2,
-                                  service_template1[2],
-                                  service_template2[2])
+        context = TemplateContext(node1_2, node2_2, service_template1[2], service_template2[2])
         equal, diff = comparer._compare_node(node1_2, node2_2, context)
 
         assert equal is False
@@ -68,36 +61,28 @@ class TestTemplateCompare:
         comparer = TemplateComparer()
         node1 = service_template1[0].get_node("hello-6")
         node2 = service_template2[0].get_node("hello-6")
-        context = TemplateContext(node1, node2,
-                                  service_template1[2],
-                                  service_template2[2])
+        context = TemplateContext(node1, node2, service_template1[2], service_template2[2])
         equal, diff = comparer._compare_node(node1, node2, context)
 
         assert equal is False
 
         assert "requirements" in diff.changed
         assert "dependency" in diff.changed["requirements"].changed
-        assert "target" in diff.changed["requirements"] \
-            .changed["dependency"].changed
+        assert "target" in diff.changed["requirements"].changed["dependency"].changed
 
     def test_interface_comparison(self, service_template1,
                                   service_template2):
         comparer = TemplateComparer()
         node1 = service_template1[0].get_node("hello-1")
         node2 = service_template2[0].get_node("hello-1")
-        context = TemplateContext(node1, node2,
-                                  service_template1[2],
-                                  service_template2[2])
+        context = TemplateContext(node1, node2, service_template1[2], service_template2[2])
         equal, diff = comparer._compare_node(node1, node2, context)
 
         assert equal is False
 
         assert "interfaces" in diff.changed
-        assert "create" in diff.changed["interfaces"] \
-            .changed["Standard"].changed["operations"].changed
-        assert "artifacts" in diff.changed["interfaces"] \
-            .changed["Standard"].changed["operations"] \
-            .changed["create"].changed
-        assert "inputs" in diff.changed["interfaces"] \
-            .changed["Standard"].changed["operations"] \
-            .changed["create"].changed
+        assert "create" in diff.changed["interfaces"].changed["Standard"].changed["operations"].changed
+        assert "artifacts" in \
+               diff.changed["interfaces"].changed["Standard"].changed["operations"].changed["create"].changed
+        assert "inputs" in \
+               diff.changed["interfaces"].changed["Standard"].changed["operations"].changed["create"].changed

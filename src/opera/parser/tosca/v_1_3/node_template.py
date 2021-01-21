@@ -1,20 +1,18 @@
 from opera.template.node import Node
 from opera.template.requirement import Requirement
-
+from .artifact_definition import ArtifactDefinition
+from .capability_assignment import CapabilityAssignment
+from .collector_mixin import CollectorMixin  # type: ignore
+from .interface_definition_for_template import InterfaceDefinitionForTemplate
+from .node_filter_definition import NodeFilterDefinition
+from .relationship_template import RelationshipTemplate
+from .requirement_assignment import RequirementAssignment
 from ..entity import Entity
 from ..list import List
 from ..map import Map
 from ..reference import Reference
 from ..string import String
 from ..void import Void
-
-from .artifact_definition import ArtifactDefinition
-from .capability_assignment import CapabilityAssignment
-from .collector_mixin import CollectorMixin
-from .interface_definition_for_template import InterfaceDefinitionForTemplate
-from .node_filter_definition import NodeFilterDefinition
-from .relationship_template import RelationshipTemplate
-from .requirement_assignment import RequirementAssignment
 
 
 # NOTE: We deviate form the TOSCA standard in attribute assignment statement,
@@ -66,10 +64,7 @@ class NodeTemplate(CollectorMixin, Entity):
                 continue
 
             if not assignment.dig("node"):
-                self.abort(
-                    "Opera does not support abstract requirements",
-                    assignment.loc,
-                )
+                self.abort("Opera does not support abstract requirements", assignment.loc)
 
             # Validate node template reference
             assignment.node.resolve_reference(service_ast)
@@ -80,19 +75,15 @@ class NodeTemplate(CollectorMixin, Entity):
                 relationship_name = relationship_ref.data
             else:
                 # Create an anonymous relationship template of the right type
-                relationship = RelationshipTemplate(
-                    dict(type=definitions[name].relationship), None,
-                )
-                relationship_name = "{}-{}-{}".format(
-                    node_name, name, assignment.node.data,
-                )
+                relationship = RelationshipTemplate(dict(type=definitions[name].relationship), None)
+                relationship_name = "{}-{}-{}".format(node_name, name, assignment.node.data)
 
             occurrences = definitions[name].get("occurrences")
 
-            requirements.append(Requirement(
-                name, assignment.node.data,
-                relationship.get_template(relationship_name, service_ast),
-                occurrences,
-            ))
+            requirements.append(
+                Requirement(
+                    name, assignment.node.data, relationship.get_template(relationship_name, service_ast), occurrences
+                )
+            )
 
         return requirements

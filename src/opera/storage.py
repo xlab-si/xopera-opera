@@ -41,4 +41,3 @@ class Storage:
         shutil.rmtree(self.path)
         # the storage dir needs to exist after we delete the content
         pathlib.Path(self.path).mkdir(exist_ok=True)
-

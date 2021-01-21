@@ -1,11 +1,10 @@
-from opera.parser.tosca.v_1_3.notification_definition import (
-    NotificationDefinition,
-)
+from opera.parser.tosca.v_1_3.notification_definition import NotificationDefinition
 
 
 class TestParse:
     def test_full(self, yaml_ast):
         NotificationDefinition.parse(yaml_ast(
+            # language=yaml
             """
             description: Bla bla bla
             implementation: path/to/artifact

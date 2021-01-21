@@ -1,11 +1,9 @@
-from ..entity import TypeEntity
-from ..map import Map
-from ..reference import Reference
-from ..string import String
-
 from .notification_definition import NotificationDefinition
 from .operation_definition_for_type import OperationDefinitionForType
 from .property_definition import PropertyDefinition
+from ..entity import TypeEntity
+from ..map import Map
+from ..reference import Reference
 
 
 class InterfaceType(TypeEntity):

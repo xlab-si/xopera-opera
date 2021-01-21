@@ -10,9 +10,7 @@ class TestNormalizeDefinition:
         assert ServiceTemplate.normalize(Node({})).bare == {}
 
     def test_dsl_definitions_removal(self):
-        assert ServiceTemplate.normalize(Node({
-            Node("dsl_definitions"): "data",
-        })).bare == {}
+        assert ServiceTemplate.normalize(Node({Node("dsl_definitions"): "data"})).bare == {}
 
     @pytest.mark.parametrize("data", [123, 1.4, []])
     def test_failure_with_non_dict_data(self, data):
@@ -22,7 +20,8 @@ class TestNormalizeDefinition:
 
 class TestParse:
     def test_full(self, yaml_ast, tmp_path):
-        ServiceTemplate.parse(yaml_ast(
+        ServiceTemplate.parse_service_template(yaml_ast(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             namespace: some.namespace
@@ -51,7 +50,8 @@ class TestParse:
         ), tmp_path, tmp_path, set())
 
     def test_minimal(self, yaml_ast, tmp_path):
-        ServiceTemplate.parse(yaml_ast(
+        ServiceTemplate.parse_service_template(yaml_ast(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             """
@@ -60,7 +60,8 @@ class TestParse:
 
 class TestMerge:
     def test_valid_section_merge(self, yaml_ast, tmp_path):
-        template = ServiceTemplate.parse(yaml_ast(
+        template = ServiceTemplate.parse_service_template(yaml_ast(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             node_types:
@@ -68,7 +69,8 @@ class TestMerge:
                 derived_from: a
             """
         ), tmp_path, tmp_path, set())[0]
-        template.merge(ServiceTemplate.parse(yaml_ast(
+        template.merge(ServiceTemplate.parse_service_template(yaml_ast(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             node_types:
@@ -82,7 +84,7 @@ class TestMerge:
         assert template.node_types["type_b"].data["derived_from"].data == "b"
 
     def test_valid_merge(self, yaml_ast, tmp_path):
-        template = ServiceTemplate.parse(yaml_ast(
+        template = ServiceTemplate.parse_service_template(yaml_ast(
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             data_types:
@@ -90,7 +92,8 @@ class TestMerge:
                 derived_from: a
             """
         ), tmp_path, tmp_path, set())[0]
-        template.merge(ServiceTemplate.parse(yaml_ast(
+        template.merge(ServiceTemplate.parse_service_template(yaml_ast(
+            # language=yaml
             """
             tosca_definitions_version: tosca_simple_yaml_1_3
             node_types:
@@ -104,14 +107,16 @@ class TestMerge:
 
     def test_duplicates(self, yaml_ast, tmp_path):
         with pytest.raises(ParseError, match="type_a"):
-            ServiceTemplate.parse(yaml_ast(
+            ServiceTemplate.parse_service_template(yaml_ast(
+                # language=yaml
                 """
                 tosca_definitions_version: tosca_simple_yaml_1_3
                 node_types:
                   type_a:
                     derived_from: a
                 """
-            ), tmp_path, tmp_path, set())[0].merge(ServiceTemplate.parse(yaml_ast(
+            ), tmp_path, tmp_path, set())[0].merge(ServiceTemplate.parse_service_template(yaml_ast(
+                # language=yaml
                 """
                 tosca_definitions_version: tosca_simple_yaml_1_3
                 node_types:

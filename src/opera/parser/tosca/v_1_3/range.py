@@ -28,15 +28,9 @@ class Range(Base):
             cls.abort("Upper bound must be integer or UNBOUNDED.", hi.loc)
 
         if isinstance(hi.value, int) and lo.value > hi.value:
-            cls.abort(
-                "Upper bound must be greater or equal to lower bound.",
-                yaml_node.loc,
-            )
+            cls.abort("Upper bound must be greater or equal to lower bound.", yaml_node.loc)
 
     @classmethod
     def build(cls, yaml_node):
         lo, hi = yaml_node.value
-        return cls(
-            (lo.value, math.inf if hi.value == "UNBOUNDED" else hi.value),
-            yaml_node.loc,
-        )
+        return cls((lo.value, math.inf if hi.value == "UNBOUNDED" else hi.value), yaml_node.loc)

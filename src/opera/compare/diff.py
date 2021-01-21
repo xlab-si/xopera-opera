@@ -1,4 +1,5 @@
 import copy
+from typing import Dict, Union
 
 
 class Diff:
@@ -8,9 +9,7 @@ class Diff:
         self.deleted = []
 
     def equal(self):
-        return (len(self.added) == 0 and
-                len(self.changed) == 0 and
-                len(self.deleted) == 0)
+        return len(self.added) == 0 and len(self.changed) == 0 and len(self.deleted) == 0
 
     def outputs(self):
         return self.convert(self)
@@ -20,7 +19,7 @@ class Diff:
             return list(diff)
         if not isinstance(diff, Diff):
             return diff
-        contents = {}
+        contents: Dict[str, Union[list, dict]] = {}
         if len(diff.added) != 0:
             contents["added"] = diff.added
         if len(diff.deleted) != 0:

@@ -1,9 +1,7 @@
 import pytest
 
 from opera.error import ParseError
-from opera.parser.tosca.v_1_3.notification_implementation_definition import (
-    NotificationImplementationDefinition,
-)
+from opera.parser.tosca.v_1_3.notification_implementation_definition import NotificationImplementationDefinition
 from opera.parser.yaml.node import Node
 
 
@@ -28,6 +26,7 @@ class TestNormalize:
 class TestParse:
     def test_full(self, yaml_ast):
         NotificationImplementationDefinition.parse(yaml_ast(
+            # language=yaml
             """
             primary: first
             dependencies:

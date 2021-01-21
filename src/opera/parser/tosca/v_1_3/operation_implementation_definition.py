@@ -1,11 +1,9 @@
 from opera.parser.yaml.node import Node
-
+from .artifact_definition import ArtifactDefinition
+from .operation_host import OperationHost
 from ..entity import Entity
 from ..integer import Integer
 from ..list import List
-
-from .artifact_definition import ArtifactDefinition
-from .operation_host import OperationHost
 
 
 class OperationImplementationDefinition(Entity):

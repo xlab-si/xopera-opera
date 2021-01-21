@@ -2,7 +2,6 @@ import math
 import textwrap
 
 import pytest
-from yaml.error import YAMLError
 
 from opera.parser import yaml
 
@@ -17,12 +16,14 @@ VALID_TEST_CASES = [
     ("1.2", 1.2),
     ("NULL", None),
     (
+        # language=yaml
         ystr("""
              test: map
              """),
         dict(test="map"),
     ),
     (
+        # language=yaml
         ystr("""
              - list
              - 1
@@ -33,6 +34,7 @@ VALID_TEST_CASES = [
         ["list", 1, " is", math.inf, "here"],
     ),
     (
+        # language=yaml
         ystr("""
              d:
                - with
@@ -54,6 +56,6 @@ VALID_TEST_CASES = [
 
 
 class TestLoad:
-    @pytest.mark.parametrize("input,output", VALID_TEST_CASES)
-    def test_load_valid_yaml(self, input, output):
-        assert yaml.load(input, "test").bare == output
+    @pytest.mark.parametrize("input_string,output", VALID_TEST_CASES)
+    def test_load_valid_yaml(self, input_string, output):
+        assert yaml.load(input_string, "test").bare == output

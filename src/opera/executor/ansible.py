@@ -5,8 +5,8 @@ import tempfile
 
 import yaml
 
-from . import utils
 from opera.threading import utils as thread_utils
+from . import utils
 
 
 def _get_inventory(host):
@@ -27,22 +27,19 @@ def _get_inventory(host):
     return yaml.safe_dump(dict(all=dict(hosts=dict(opera=inventory))))
 
 
-def run(host, primary, dependencies, artifacts, vars, verbose, workdir):
+def run(host, primary, dependencies, artifacts, variables, verbose, workdir):  # pylint: disable=too-many-locals
     with tempfile.TemporaryDirectory() as dir_path:
         playbook = os.path.join(dir_path, os.path.basename(primary))
         utils.copy(os.path.join(workdir, primary), playbook)
+
         for d in dependencies:
-            utils.copy(os.path.join(workdir, d),
-                       os.path.join(dir_path, os.path.basename(d)))
+            utils.copy(os.path.join(workdir, d), os.path.join(dir_path, os.path.basename(d)))
         for a in artifacts:
-            utils.copy(os.path.join(workdir, a),
-                       os.path.join(dir_path, os.path.basename(a)))
-        inventory = utils.write(
-            dir_path, _get_inventory(host), suffix=".yaml",
-        )
-        vars_file = utils.write(
-            dir_path, yaml.safe_dump(vars), suffix=".yaml",
-        )
+            utils.copy(os.path.join(workdir, a), os.path.join(dir_path, os.path.basename(a)))
+
+        inventory = utils.write(dir_path, _get_inventory(host), suffix=".yaml")
+        vars_file = utils.write(dir_path, yaml.safe_dump(variables), suffix=".yaml")
+
         with open("{}/ansible.cfg".format(dir_path), "w") as fd:
             fd.write("[defaults]\n")
             fd.write("retry_files_enabled = False\n")
@@ -51,12 +48,12 @@ def run(host, primary, dependencies, artifacts, vars, verbose, workdir):
                 "OPERA_SSH_HOST_KEY_CHECKING")
             if opera_ssh_host_key_checking is not None:
                 check = str(opera_ssh_host_key_checking).lower().strip()
-                if check[:1] == 'f' or check[:1] == "false":
+                if check[:1] == "f" or check[:1] == "false":
                     fd.write("host_key_checking = False\n")
 
         if verbose:
             print("***inputs***")
-            print(["{}: {}".format(key, vars[key]) for key in vars])
+            print(["{}: {}".format(key, variables[key]) for key in variables])
             print("***inputs***")
 
         cmd = [
@@ -73,12 +70,12 @@ def run(host, primary, dependencies, artifacts, vars, verbose, workdir):
         if code != 0 or verbose:
             thread_utils.print_thread("------------")
             with open(out) as fd:
-                for l in fd:
-                    print(l.rstrip())
+                for line in fd:
+                    print(line.rstrip())
             thread_utils.print_thread("------------")
             with open(err) as fd:
-                for l in fd:
-                    print(l.rstrip())
+                for line in fd:
+                    print(line.rstrip())
             thread_utils.print_thread("============")
 
         if code != 0:

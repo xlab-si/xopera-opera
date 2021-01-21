@@ -1,16 +1,14 @@
 from opera.error import DataError
 from opera.template.topology import Topology
-
-from ..entity import Entity
-from ..map import Map
-from ..list import List
-from ..string import String
-
 from .group_definition import GroupDefinition
 from .node_template import NodeTemplate
 from .parameter_definition import ParameterDefinition
 from .policy_definition import PolicyDefinition
 from .relationship_template import RelationshipTemplate
+from ..entity import Entity
+from ..list import List
+from ..map import Map
+from ..string import String
 
 
 class TopologyTemplate(Entity):
@@ -35,8 +33,7 @@ class TopologyTemplate(Entity):
             },
             relationships={
                 name: rel_ast.get_template(name, service_ast)
-                for name, rel_ast in
-                self.get("relationship_templates", {}).items()
+                for name, rel_ast in self.get("relationship_templates", {}).items()
             },
         )
         topology.resolve_requirements()
@@ -47,9 +44,7 @@ class TopologyTemplate(Entity):
         undeclared_inputs = set(inputs.keys()) - declared_inputs.keys()
 
         if undeclared_inputs:
-            raise DataError("Undeclared inputs: {}".format(
-                ", ".join(undeclared_inputs),
-            ))
+            raise DataError("Undeclared inputs: {}".format(", ".join(undeclared_inputs)))
 
         input_values = {
             name: definition.get_value(definition.get_value_type(service_ast))
@@ -65,9 +60,7 @@ class TopologyTemplate(Entity):
         return {
             name: dict(
                 description=getattr(definition.get("description"), "data", ""),
-                value=definition.get_value(
-                    definition.get_value_type(service_ast),
-                ),
+                value=definition.get_value(definition.get_value_type(service_ast)),
             ) for name, definition in self.get("outputs", {}).items()
         }
 

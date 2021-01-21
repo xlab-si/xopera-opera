@@ -1,16 +1,11 @@
-import collections
-
 from opera.template.relationship import Relationship
-from opera.template.operation import Operation
-
+from .collector_mixin import CollectorMixin  # type: ignore
+from .interface_definition_for_template import InterfaceDefinitionForTemplate
 from ..entity import Entity
 from ..map import Map
 from ..reference import Reference
 from ..string import String
 from ..void import Void
-
-from .collector_mixin import CollectorMixin
-from .interface_definition_for_template import InterfaceDefinitionForTemplate
 
 
 class RelationshipTemplate(CollectorMixin, Entity):

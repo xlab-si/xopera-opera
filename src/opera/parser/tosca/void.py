@@ -1,14 +1,9 @@
+from opera.parser.tosca.base import Base
 from opera.value import Value
-from opera.parser.yaml.node import Node
-
-from .base import Base
 
 
 class Void(Base):
-    """
-    Marker for parts of the document that should be parsed after initial
-    semantic analysis.
-    """
+    """Marker for parts of the document that should be parsed after initial semantic analysis."""
 
     @classmethod
     def build(cls, yaml_node):

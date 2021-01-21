@@ -72,9 +72,9 @@ You can use the following environment variables:
 
 .. _CLI Reference:
 
-===========================
-CLI reference and examples 
-===========================
+==========================
+CLI reference and examples
+==========================
 
 ``opera`` was  originally meant to be used in a terminal as a client and it
 currently allows users to execute the following commands:
@@ -99,7 +99,9 @@ currently allows users to execute the following commands:
 | ``opera init``      | initialize the service template or CSAR      |
 +---------------------+----------------------------------------------+
 
-The commands can be executed in a random order and the orchestrator will warn  and the orchestrator will warn you in case if any problems. Each CLI command is described more in detail in the following sections.
+The commands can be executed in a random order and the orchestrator will warn and the orchestrator will warn you
+in case if any problems.
+Each CLI command is described more in detail in the following sections.
 
 
 deploy
@@ -158,16 +160,16 @@ deploy
 
    .. tab:: Source
 
-   		CLI instructions for example
+      CLI instructions for example
 
-   		.. code-block:: bash 
-   		
-   			cd xopera-opera/examples/hello
-   			opera deploy service.yaml
-   			opera undeploy
+      .. code-block:: bash
 
-   		.. hint:: 
-   			Instead of ``service.yaml`` you can deploy a compressed TOSCA CSAR directly with ``deploy`` command.
+         cd xopera-opera/examples/hello
+         opera deploy service.yaml
+         opera undeploy
+
+      .. hint::
+         Instead of ``service.yaml`` you can deploy a compressed TOSCA CSAR directly with ``deploy`` command.
 
 
 
@@ -261,18 +263,18 @@ undeploy
 
    .. tab:: Source
 
-   		CLI instructions for example
+      CLI instructions for example
 
-   		.. code-block:: bash 
-   		
-   			cd xopera-opera/examples/hello
-   			opera deploy service.yaml
-   			opera undeploy
-   			# If undeploy was interrupted
-   			opera undeploy -r
+      .. code-block:: bash
 
-   		.. hint:: 
-   			Instead of ``service.yaml`` you can deploy a compressed TOSCA CSAR directly with ``deploy`` command.
+         cd xopera-opera/examples/hello
+         opera deploy service.yaml
+         opera undeploy
+         # If undeploy was interrupted
+         opera undeploy -r
+
+      .. hint::
+         Instead of ``service.yaml`` you can deploy a compressed TOSCA CSAR directly with ``deploy`` command.
 
 
    .. tab:: Details
@@ -334,17 +336,17 @@ Validates the structure of TOSCA template or CSAR
 
    .. tab:: Source
 
-   		CLI instructions for example
+      CLI instructions for example
 
-   		.. code-block:: bash 
-   		
-   			cd xopera-opera/examples/attribute_mapping
-   			opera validate service yaml
+      .. code-block:: bash
 
-   			opera validate -i inputs.yaml big.csar
+         cd xopera-opera/examples/attribute_mapping
+         opera validate service yaml
 
-   		.. hint:: 
-   			Instead of ``service.yaml`` you can deploy a compressed TOSCA CSAR directly with ``deploy`` command.
+         opera validate -i inputs.yaml big.csar
+
+      .. hint::
+         Instead of ``service.yaml`` you can deploy a compressed TOSCA CSAR directly with ``deploy`` command.
 
 
    .. tab:: Overview
@@ -354,7 +356,7 @@ Validates the structure of TOSCA template or CSAR
       end of this operation you will receive the validation result where opera
       will warn you about TOSCA template inconsistencies if there was any.
 
-   
+
 outputs
 #######
 
@@ -408,7 +410,7 @@ outputs
       defined in the TOSCA service template and print them out to the console
       in JSON or YAML format.
 
-  
+
 
 
 info

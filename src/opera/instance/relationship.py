@@ -1,6 +1,5 @@
 from opera.error import DataError
-
-from .base import Base
+from opera.instance.base import Base
 
 
 class Relationship(Base):
@@ -17,9 +16,7 @@ class Relationship(Base):
         host, attr, *rest = params
 
         if host not in ("SELF", "SOURCE", "TARGET"):
-            raise DataError(
-                "Attribute host should be set to 'SELF', 'SOURCE' or 'TARGET'."
-            )
+            raise DataError("Attribute host should be set to 'SELF', 'SOURCE' or 'TARGET'.")
 
         if host == "SOURCE":
             return self.source.get_attribute(["SELF", attr] + rest)
@@ -36,9 +33,7 @@ class Relationship(Base):
         host, prop, *rest = params
 
         if host not in ("SELF", "SOURCE", "TARGET"):
-            raise DataError(
-                "Property host should be set to 'SELF', 'SOURCE' or 'TARGET'."
-            )
+            raise DataError("Property host should be set to 'SELF', 'SOURCE' or 'TARGET'.")
 
         if host == "SOURCE":
             return self.source.get_property(["SELF", prop] + rest)
@@ -53,9 +48,7 @@ class Relationship(Base):
         host, attr, *rest = params
 
         if host not in ("SELF", "SOURCE", "TARGET"):
-            raise DataError(
-                "Attribute host should be set to 'SELF', 'SOURCE' or 'TARGET'."
-            )
+            raise DataError("Attribute host should be set to 'SELF', 'SOURCE' or 'TARGET'.")
 
         if host == "SOURCE":
             self.source.map_attribute(["SELF", attr] + rest, value)
@@ -68,9 +61,7 @@ class Relationship(Base):
         host, prop, *rest = params
 
         if host not in ("SELF", "SOURCE", "TARGET"):
-            raise DataError(
-                "Artifact host should be set to 'SELF', 'SOURCE' or 'TARGET'."
-            )
+            raise DataError("Artifact host should be set to 'SELF', 'SOURCE' or 'TARGET'.")
 
         if host == "SOURCE":
             return self.source.get_property(["SELF", prop] + rest)

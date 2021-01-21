@@ -1,17 +1,26 @@
+from typing import Optional, Set, Dict, Type, Union
+
+from .base import Base
+from .list import List
 from .map import Map, MapWrapper
-from .reference import Reference
+from .reference import Reference, ReferenceXOR
 from .string import String
 from .version import Version
 
 
 class Entity(MapWrapper):
-    ATTRS = {}  # This must be overridden in derived classes
-    REQUIRED = set()  # This can be overriden in derived classes
+    # This must be overridden in derived classes
+    ATTRS: Dict[str, Union[Type[Base], Base, Map, List, Reference, ReferenceXOR]] = {}
+
+    # This can be overridden in derived classes
+    REQUIRED: Set[str] = set()
 
     @classmethod
     def validate(cls, yaml_node):
-        assert cls.ATTRS != {}
-        assert isinstance(cls.REQUIRED, set)
+        if cls.ATTRS == {}:
+            raise AssertionError()
+        if not isinstance(cls.REQUIRED, set):
+            raise AssertionError()
 
         if not isinstance(yaml_node.value, dict):
             cls.abort("Expected map.", yaml_node.loc)
@@ -24,17 +33,11 @@ class Entity(MapWrapper):
 
         missing_keys = cls.REQUIRED - data_keys
         if missing_keys:
-            cls.abort(
-                "Missing required fields: {}".format(", ".join(missing_keys)),
-                yaml_node.loc,
-            )
+            cls.abort("Missing required fields: {}".format(", ".join(missing_keys)), yaml_node.loc)
 
         extra_keys = data_keys - cls.attrs().keys()
         if extra_keys:
-            cls.abort(
-                "Invalid keys: {}".format(", ".join(extra_keys)),
-                yaml_node.loc,
-            )
+            cls.abort("Invalid keys: {}".format(", ".join(extra_keys)), yaml_node.loc)
 
     @classmethod
     def build(cls, yaml_node):
@@ -52,12 +55,12 @@ class Entity(MapWrapper):
     def __getattr__(self, key):
         try:
             return self.data[key]
-        except KeyError:
-            raise AttributeError(key)
+        except KeyError as e:
+            raise AttributeError(key) from e
 
 
 class TypeEntity(Entity):
-    REFERENCE = None  # Override in subclasses
+    REFERENCE: Optional[Reference] = None  # Override in subclasses
 
     @classmethod
     def validate(cls, yaml_node):
@@ -69,8 +72,8 @@ class TypeEntity(Entity):
 
     @classmethod
     def attrs(cls):
-        assert isinstance(cls.REFERENCE, Reference), \
-            "Override REFERENCE in {} with Reference.".format(cls.__name__)
+        if not isinstance(cls.REFERENCE, Reference):
+            raise AssertionError("Override REFERENCE in {} with Reference.".format(cls.__name__))
 
         attributes = cls.ATTRS.copy()
         attributes.update(

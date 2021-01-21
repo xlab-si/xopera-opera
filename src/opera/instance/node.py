@@ -1,6 +1,6 @@
 from opera.error import DataError
-from .base import Base
 from opera.threading import utils as thread_utils
+from .base import Base
 
 
 class Node(Base):
@@ -11,7 +11,8 @@ class Node(Base):
         self.out_edges = {}  # This is what we fill during the linking phase.
 
     def instantiate_relationships(self):
-        assert self.topology, "Cannot instantiate relationships"
+        if not self.topology:
+            raise AssertionError("Cannot instantiate relationships")
 
         for requirement in self.template.requirements:
             rname = requirement.name
@@ -63,43 +64,33 @@ class Node(Base):
         self.set_state("creating")
         self.run_operation("HOST", "Standard", "create", verbose, workdir)
         self.set_state("created")
-
         self.set_state("configuring")
-        for requirement in set([r.name for r in self.template.requirements]):
-            for relationship in self.out_edges[requirement].values():
-                relationship.run_operation(
-                    "SOURCE", "Configure", "pre_configure_source", verbose,
-                    workdir
-                )
-        for requirement_dependants in self.in_edges.values():
-            for relationship in requirement_dependants.values():
-                relationship.run_operation(
-                    "TARGET", "Configure", "pre_configure_target", verbose,
-                    workdir
-                )
-        self.run_operation("HOST", "Standard", "configure", verbose, workdir)
-        for requirement in set([r.name for r in self.template.requirements]):
-            for relationship in self.out_edges[requirement].values():
-                relationship.run_operation(
-                    "SOURCE", "Configure", "post_configure_source", verbose,
-                    workdir
-                )
-        for requirement_dependants in self.in_edges.values():
-            for relationship in requirement_dependants.values():
-                relationship.run_operation(
-                    "TARGET", "Configure", "post_configure_target", verbose,
-                    workdir
-                )
-        self.set_state("configured")
 
+        for requirement in set(r.name for r in self.template.requirements):
+            for relationship in self.out_edges[requirement].values():
+                relationship.run_operation("SOURCE", "Configure", "pre_configure_source", verbose, workdir)
+
+        for requirement_dependants in self.in_edges.values():
+            for relationship in requirement_dependants.values():
+                relationship.run_operation("TARGET", "Configure", "pre_configure_target", verbose, workdir)
+
+        self.run_operation("HOST", "Standard", "configure", verbose, workdir)
+
+        for requirement in set(r.name for r in self.template.requirements):
+            for relationship in self.out_edges[requirement].values():
+                relationship.run_operation("SOURCE", "Configure", "post_configure_source", verbose, workdir)
+
+        for requirement_dependants in self.in_edges.values():
+            for relationship in requirement_dependants.values():
+                relationship.run_operation("TARGET", "Configure", "post_configure_target", verbose, workdir)
+
+        self.set_state("configured")
         self.set_state("starting")
         self.run_operation("HOST", "Standard", "start", verbose, workdir)
         self.set_state("started")
 
         # TODO(@tadeboro): Execute various add hooks
-        thread_utils.print_thread(
-            "  Deployment of {} complete".format(self.tosca_id)
-        )
+        thread_utils.print_thread("  Deployment of {} complete".format(self.tosca_id))
 
     def undeploy(self, verbose, workdir):
         thread_utils.print_thread("  Undeploying {}".format(self.tosca_id))
@@ -117,9 +108,7 @@ class Node(Base):
         self.reset_attributes()
         self.write()
 
-        thread_utils.print_thread(
-            "  Undeployment of {} complete".format(self.tosca_id)
-        )
+        thread_utils.print_thread("  Undeployment of {} complete".format(self.tosca_id))
 
     #
     # TOSCA functions
@@ -130,11 +119,9 @@ class Node(Base):
         if host == "HOST":
             raise DataError("HOST is not yet supported in opera.")
         if host != "SELF":
-            raise DataError(
-                "Attribute host should be set to 'SELF' which is the only "
-                "valid value. This is needed to indicate that the attribute "
-                "is referenced locally from something in the node itself."
-            )
+            raise DataError("Attribute host should be set to 'SELF' which is the only valid value. "
+                            "This is needed to indicate that the attribute is referenced locally from something "
+                            "in the node itself.")
 
         # TODO(@tadeboro): Add support for nested attribute values once we
         # have data type support.
@@ -142,21 +129,15 @@ class Node(Base):
             return self.attributes[attr].eval(self, attr)
 
         # Check if there are capability and requirement with the same name.
-        if attr in self.out_edges and attr in [c.name for c in
-                                               self.template.capabilities]:
-            raise DataError("There are capability and requirement with the "
-                            "same name: '{}'.".format(attr, ))
+        if attr in self.out_edges and attr in [c.name for c in self.template.capabilities]:
+            raise DataError("There are capability and requirement with the same name: '{}'.".format(attr, ))
 
         # If we have no attribute, try searching for capability.
-        capabilities = tuple(
-            c for c in self.template.capabilities if c.name == attr
-        )
+        capabilities = tuple(c for c in self.template.capabilities if c.name == attr)
         if len(capabilities) > 1:
-            raise DataError(
-                "More than one capability is named '{}'.".format(attr, ))
+            raise DataError("More than one capability is named '{}'.".format(attr, ))
 
-        if len(capabilities) == 1 and capabilities[0].attributes and len(
-                rest) != 0:
+        if len(capabilities) == 1 and capabilities[0].attributes and len(rest) != 0:
             return capabilities[0].attributes.get(rest[0]).data
 
         # If we have no attribute, try searching for requirement.
@@ -164,12 +145,8 @@ class Node(Base):
         if len(relationships) == 0:
             raise DataError("Cannot find attribute '{}'.".format(attr))
         if len(relationships) > 1:
-            raise DataError(
-                "Targeting more than one instance via '{}'.".format(attr),
-            )
-        return next(iter(relationships.values())).target.get_attribute(
-            ["SELF"] + rest,
-        )
+            raise DataError("Targeting more than one instance via '{}'.".format(attr))
+        return next(iter(relationships.values())).target.get_attribute(["SELF"] + rest)
 
     def get_property(self, params):
         return self.template.get_property(params)
@@ -178,16 +155,14 @@ class Node(Base):
         return self.template.get_input(params)
 
     def map_attribute(self, params, value):
-        host, attr, *rest = params
+        host, attr, *_ = params
 
         if host == "HOST":
             raise DataError("HOST is not yet supported in opera.")
         if host != "SELF":
-            raise DataError(
-                "Attribute host should be set to 'SELF' which is the only "
-                "valid value. This is needed to indicate that the attribute "
-                "is referenced locally from something in the node itself."
-            )
+            raise DataError("Attribute host should be set to 'SELF' which is the only valid value. "
+                            "This is needed to indicate that the attribute is referenced locally from something "
+                            "in the node itself.")
 
         # TODO(@tadeboro): Add support for nested attribute values once we
         # have data type support.

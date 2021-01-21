@@ -1,4 +1,4 @@
-from opera.commands import (
+from opera.commands import (  # noqa: F401
     deploy,
     diff,
     info,

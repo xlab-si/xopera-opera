@@ -4,6 +4,7 @@ from opera.parser.tosca.v_1_3.policy_definition import PolicyDefinition
 class TestParse:
     def test_full(self, yaml_ast):
         PolicyDefinition.parse(yaml_ast(
+            # language=yaml
             """
             type: policy.type
             description: Some muttering
@@ -25,6 +26,7 @@ class TestParse:
 
     def test_minimal(self, yaml_ast):
         PolicyDefinition.parse(yaml_ast(
+            # language=yaml
             """
             type: policy.type
             """

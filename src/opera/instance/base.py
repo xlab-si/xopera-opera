@@ -1,13 +1,16 @@
 import itertools
 
 from opera.error import DataError, OperationError
+from opera.instance.topology import Topology
 from opera.value import Value
 
 
 class Base:
     def __init__(self, template, instance_id):
         self.template = template
-        self.topology = None  # Set once we are added to topology.
+
+        # Set once we are added to topology.
+        self.topology: Topology = None
 
         # Set attributes that all instances should have
         self.attributes = dict(
@@ -23,10 +26,9 @@ class Base:
         # data. Shared stuff is left in the template. We also make every
         # property into an attribute as TOSCA standard requires.
         self.attributes.update(
-            (k, v.copy()) for k, v in itertools.chain(
-                self.template.properties.items(),
-                self.template.attributes.items(),
-            ) if k not in ("tosca_name", "tosca_id", "state")
+            (k, v.copy())
+            for k, v in itertools.chain(self.template.properties.items(), self.template.attributes.items())
+            if k not in ("tosca_name", "tosca_id", "state")
         )
 
     def write(self):
@@ -63,9 +65,7 @@ class Base:
             self.write()
 
     def run_operation(self, host, interface, operation, verbose, workdir):
-        success, outputs, attributes = self.template.run_operation(
-            host, interface, operation, self, verbose, workdir
-        )
+        success, outputs, attributes = self.template.run_operation(host, interface, operation, self, verbose, workdir)
 
         if not success:
             raise OperationError("Failed")

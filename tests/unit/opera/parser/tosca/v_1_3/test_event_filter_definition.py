@@ -4,6 +4,7 @@ from opera.parser.tosca.v_1_3.event_filter_definition import EventFilterDefiniti
 class TestParse:
     def test_full(self, yaml_ast):
         EventFilterDefinition.parse(yaml_ast(
+            # language=yaml
             """
             node: node_type_name
             requirement: requirement_name
@@ -13,6 +14,7 @@ class TestParse:
 
     def test_minimal(self, yaml_ast):
         EventFilterDefinition.parse(yaml_ast(
+            # language=yaml
             """
             node: node_template_name
             """
