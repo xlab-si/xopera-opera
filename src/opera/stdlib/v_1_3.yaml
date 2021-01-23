@@ -529,6 +529,8 @@ node_types:
     properties:
       maxsize:
         type: scalar-unit.size
+        # This differs from the definition in section 5.9.10 of the TOSCA standard
+        required: false
         constraints:
           - greater_or_equal: 0 GB
     capabilities:
