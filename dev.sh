@@ -50,6 +50,35 @@ run_shellcheck() {
     return "$aggregate_exit_code"
 }
 
+check_commit_messages() {
+    since=231884e0bb63e764ad23b2e55e5a1e726bc2c11e
+    echo "Checking git messages from $since to HEAD..."
+
+    commits="$(git log "${since}..HEAD" --pretty=format:"%H %s")"
+    echo "Found commits:"
+    echo "$commits"
+    echo
+
+    # shellcheck disable=SC1117
+    commits_with_trailing_period="$(echo -n "$commits" | grep -Ee ".*\.\s*$")"
+
+    if [ -z "$commits_with_trailing_period" ]; then
+        number_of_trailing_periods=0
+    else
+        number_of_trailing_periods="$(echo "$commits_with_trailing_period" | wc -l)"
+    fi
+
+    echo "Found $number_of_trailing_periods commits with a trailing period"
+    echo "$commits_with_trailing_period"
+    echo
+
+    if [ "$number_of_trailing_periods" -gt 0 ]; then
+        echo "Commits must not have a trailing period in their commit summary."
+        return 7
+    fi
+    return 0
+}
+
 run_sanity() {
     set +e
 
@@ -85,6 +114,10 @@ run_sanity() {
     output_shellcheck=$(run_shellcheck)
     code_shellcheck="$?"
 
+    echo "Checking commit messages"
+    output_commit_messages=$(check_commit_messages)
+    code_commit_messages="$?"
+
     set -e
 
     echo "pylint (src) output"
@@ -114,6 +147,9 @@ run_sanity() {
     echo "### shellcheck output ###"
     echo "exit code: $code_shellcheck"
     echo "$output_shellcheck"
+    echo "### commit message check output ###"
+    echo "exit code: $code_commit_messages"
+    echo "$output_commit_messages"
 
     echo "Applied overrides:"
     grep -rinEe "noqa:|pylint:|nosec|# shellcheck" \
@@ -133,6 +169,7 @@ run_sanity() {
         + code_doc8
         + code_pydocstyle
         + code_shellcheck
+        + code_commit_messages
     ))"
     exit "$combined_exit_code"
 }
