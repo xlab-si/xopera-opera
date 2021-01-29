@@ -34,38 +34,10 @@ So the simplest way to test ``opera`` is to install it into virtual environment:
    $ python3 -m venv .venv && . .venv/bin/activate
    (.venv) $ pip install opera
 
-====================================
-Secrets and Environment variables
-====================================
-
-You can use the following environment variables:
-
-+-----------------------------------+--------------------------------+---------------------------+
-| Environment variable              | Description                    | Example value             |
-+===================================+================================+===========================+
-| | ``OPERA_SSH_USER``              | | Username for the Ansible ssh | | ``ubuntu``              |
-| |                                 | | connection to a remote VM    | | (default is ``centos``) |
-+-----------------------------------+--------------------------------+---------------------------+
-| | ``OPERA_SSH_IDENTITY_FILE``     | | Path to the file containing  | | ``~/.ssh/id_ed25519``   |
-| |                                 | | your private ssh key that    | |                         |
-| |                                 | | will be used for a           | |                         |
-| |                                 | | connection to a remote VM    | |                         |
-+-----------------------------------+--------------------------------+---------------------------+
-| | ``OPERA_SSH_HOST_KEY_CHECKING`` | | Disable Ansible host key     | | ``false`` or ``f``      |
-| |                                 | | checking (not recommended)   | | (not case sensitive)    |
-+-----------------------------------+--------------------------------+---------------------------+
-
-.. danger::
-
-   Be very careful with your orchestration secrets (such as SSH private keys,
-   cloud credentials, passwords ans so on) that are stored as opera inputs.
-   To avoid exposing them don't share the inputs file and the created opera
-   storage folder with anyone.
-
 .. _CLI Reference:
 
 ==========================
-CLI reference and examples
+CLI commands reference
 ==========================
 
 ``opera`` was  originally meant to be used in a terminal as a client and it
@@ -1138,6 +1110,84 @@ init (deprecated since 0.6.1)
 
 ------------------------------------------------------------------------------------------------------------------------
 
+====================================
+Secrets and Environment variables
+====================================
+
+You can use the following environment variables:
+
++-----------------------------------+--------------------------------+---------------------------+
+| Environment variable              | Description                    | Example value             |
++===================================+================================+===========================+
+| | ``OPERA_SSH_USER``              | | Username for the Ansible ssh | | ``ubuntu``              |
+| |                                 | | connection to a remote VM    | | (default is ``centos``) |
++-----------------------------------+--------------------------------+---------------------------+
+| | ``OPERA_SSH_IDENTITY_FILE``     | | Path to the file containing  | | ``~/.ssh/id_ed25519``   |
+| |                                 | | your private ssh key that    | |                         |
+| |                                 | | will be used for a           | |                         |
+| |                                 | | connection to a remote VM    | |                         |
++-----------------------------------+--------------------------------+---------------------------+
+| | ``OPERA_SSH_HOST_KEY_CHECKING`` | | Disable Ansible host key     | | ``false`` or ``f``      |
+| |                                 | | checking (not recommended)   | | (not case sensitive)    |
++-----------------------------------+--------------------------------+---------------------------+
+
+.. danger::
+
+   Be very careful with your orchestration secrets (such as SSH private keys,
+   cloud credentials, passwords ans so on) that are stored as opera inputs.
+   To avoid exposing them don't share the inputs file and the created opera
+   storage folder with anyone.
+
+==========================
+Shell completion
+==========================
+
+For easier usage of the CLI tool ``opera`` enables tab completion for all CLI commands and arguments. We use `shtab`_
+in our code to generate a shell completion script. We don't have a separate command to do that since but rather a
+global optional argument that will print out the completion script for the main parser. This flag is called
+``--shell-completion/-s`` and it receives a shell type to generate completion for. Shtab currently supports `bash` and
+`zsh` so those are the options. So, after running ``opera -s bash|zsh`` the generated tab completion script will be
+printed out. To activate it you must source the contents which can be done with ``eval "$(opera -s bash)"`` or you can
+save it to a file and then source it.
+
+.. code-block:: console
+
+   # print out completion script for bash shell
+   (venv) $ opera -s bash
+   #!/usr/bin/env bash
+   # AUTOMATCALLY GENERATED by `shtab`
+
+   _shtab_opera_options_='-h --help -s --shell-completion'
+   _shtab_opera_commands_='deploy diff info init outputs package undeploy unpackage update validate'
+
+   _shtab_opera_deploy='-h --help --instance-path -p --inputs -i --workers -w --resume -r --clean-state -c --force -f --verbose -v'
+   _shtab_opera_deploy_COMPGEN=_shtab_compgen_files
+   ...
+
+   # print out completion script for zsh shell
+   (venv) $ opera -s zsh
+   #compdef opera
+
+   # AUTOMATCALLY GENERATED by `shtab`
+
+   _shtab_opera_options_=(
+   "(- :)"{-h,--help}"[show this help message and exit]"
+   {-s,--shell-completion}"[Generate tab completion script for your shell]:shell_completion:(bash zsh)"
+   )
+
+   _shtab_opera_commands_() {
+   local _commands=(
+   "deploy:"
+   "diff:"
+   "info:"
+   ...
+
+   # activate completion for bash directly
+   (venv) $ eval "$(opera -s bash)"
+
+   # activate completion for zsh directly
+   (venv) $ eval "$(opera -s zsh)"
+
 ==========================
 Troubleshooting
 ==========================
@@ -1161,3 +1211,4 @@ have a look at the existing `opera issues`_ or open a new one yourself.
 .. _opera integration tests CSAR examples: https://github.com/xlab-si/xopera-opera/tree/master/tests/integration
 .. _artifacts: https://github.com/xlab-si/xopera-examples/tree/master/tosca/artifacts
 .. _compare-templates: https://github.com/xlab-si/xopera-examples/tree/csar-examples/misc/compare-templates
+.. _shtab: https://github.com/iterative/shtab
