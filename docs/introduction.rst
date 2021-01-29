@@ -7,19 +7,17 @@ Introduction
 ``xOpera project`` includes a set of tools for advanced orchestration
 with an orchestration tool ``xOpera orchestrator`` or shorter ``opera``.
 
-``opera`` aims to be a lightweight orchestrator compliant with `OASIS TOSCA <https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=tosca>`_.
-and the current compliance is with the `TOSCA Simple Profile in YAML v1.3 <https://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.3/TOSCA-Simple-Profile-YAML-v1.3.html>`_.
-``opera`` is by following TOSCA primarily a (TOSCA) cloud orchestrator which enables orchestration of automated tasks
-within cloud applications for different cloud providers such as Amazon Web Services(AWS), Microsoft Azure, Google Cloud
-Platform(GCP), OpenFaaS, OpenStack and so on.
-Apart from that this tool can be used and integrated to other infrastructures in order to orchestrate services or
-applications and therefore reduce human factor.
+``opera`` aims to be a lightweight orchestrator compliant with `OASIS TOSCA`_.and the current compliance is with the
+`TOSCA Simple Profile in YAML v1.3`_. ``opera`` is by following TOSCA primarily a (TOSCA) cloud orchestrator which
+enables orchestration of automated tasks within cloud applications for different cloud providers such as Amazon Web
+Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), OpenFaaS, OpenStack and so on. Apart from that this tool
+can be used and integrated to other infrastructures in order to orchestrate services or applications and therefore
+reduce human factor.
 
 xOpera orchestrator engine - called xOpera library - xOpera CLI and xOpera API are an open-source project which
-currently reside on GitHub inside `xopera-opera <https://github.com/xlab-si/xopera-opera>`_
-and `xopera-opera <https://github.com/xlab-si/xopera-api>`_repositories.
-As an orchestration tool xOpera uses `Ansible automation tool <https://www.ansible.com/>`_ to implement the TOSCA
-standard and to run its operations via Ansible playbook actuators which again opens a lot of new possibilities.
+currently reside on GitHub inside `xopera-opera`_ and `xopera-api`_ repositories.
+As an orchestration tool xOpera uses `Ansible`_ automation tool to implement the the TOSCA standard and to run its
+interface operations via Ansible playbook actuators which again opens a lot of new possibilities.
 
 .. _xopera_architecture:
 
@@ -69,7 +67,7 @@ coordination, state of the deployment and so on.
 
 .. note::
 
-    More about xOpera's background, its origins and goals can be found here: `xOpera: an agile orchestrator <https://www.sodalite.eu/content/xopera-agile-orchestrator>`_
+    More about xOpera's background, its origins and goals can be found here: `xOpera - an agile orchestrator`_
 
 .. _Parser:
 
@@ -81,7 +79,8 @@ Parser
 
    *TBD*: This part of the documentation will be improved in the future.
 
-xOpera orchestrator has its own YAML and TOSCA parser which is shown on the image below :ref:`opera_parser_structure`.
+xOpera orchestrator has its own YAML and TOSCA parser which is shown on the image below
+(:numref:`opera_parser_structure`.)
 
 .. _opera_parser_structure:
 
@@ -92,4 +91,9 @@ xOpera orchestrator has its own YAML and TOSCA parser which is shown on the imag
 
    xOpera parser and executor
 
-
+.. _OASIS TOSCA: https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=tosca
+.. _TOSCA Simple Profile in YAML v1.3: https://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.3/TOSCA-Simple-Profile-YAML-v1.3.html
+.. _xopera-opera: https://github.com/xlab-si/xopera-opera
+.. _xopera-api: https://github.com/xlab-si/xopera-api
+.. _Ansible: https://www.ansible.com/
+.. _xOpera - an agile orchestrator: https://www.sodalite.eu/content/xopera-agile-orchestrator
