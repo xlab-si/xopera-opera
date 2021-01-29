@@ -771,6 +771,280 @@ unpackage
 
 ------------------------------------------------------------------------------------------------------------------------
 
+diff
+####
+
+**Name**
+
+``opera diff`` - compare TOSCA service templates and instances.
+
+**Usage**
+      .. argparse::
+         :filename: src/opera/cli.py
+         :func: create_parser
+         :prog: opera
+         :path: diff
+
+.. tabs::
+
+   .. tab:: Details
+
+      The ``opera diff`` CLI command holds the functionality to find the differences between the deployed TOSCA service
+      template and the updated TOSCA service template that you wish to redeploy. Moreover, this operation compares the
+      desired TOSCA service template to the one from the opera project storage (by default this one is located in
+      ``.opera``) and print out their differences.
+
+      The command includes two sub-operations that invoke template and instance comparers. The template comparer allows
+      the comparison of changed blueprint (and changed inputs) in a folder containing the existing TOSCA service
+      template that was deployed before. The instance comparer looks for changes in instance states and also traverses
+      the dependency graph in order to propagate changes from parent to child nodes. If a parent node is marked as
+      changed, then child node is also considered changed.
+
+      The output of ``opera diff`` is a human readable representation of templates differences, is formatted either as
+      JSON or YAML (default) and can be optionally saved in a file.
+
+   .. tab:: Example
+
+      Follow the next CLI instructions and results for the `compare-templates`_ example.
+
+      .. code-block:: console
+         :emphasize-lines: 21
+
+         (venv) $ cd tosca/compare-templates
+         (venv) misc/compare-templates$ opera deploy -i inputs1.yaml service1.yaml
+         [Worker_0]   Deploying my-workstation_0
+         [Worker_0]   Deployment of my-workstation_0 complete
+         [Worker_0]   Deploying hello-1_0
+         [Worker_0]     Executing create on hello-1_0
+         [Worker_0]   Deployment of hello-1_0 complete
+         [Worker_0]   Deploying hello-2_0
+         [Worker_0]     Executing create on hello-2_0
+         [Worker_0]   Deployment of hello-2_0 complete
+         [Worker_0]   Deploying hello-3_0
+         [Worker_0]     Executing create on hello-3_0
+         [Worker_0]   Deployment of hello-3_0 complete
+         [Worker_0]   Deploying hello-4_0
+         [Worker_0]     Executing create on hello-4_0
+         [Worker_0]   Deployment of hello-4_0 complete
+         [Worker_0]   Deploying hello-6_0
+         [Worker_0]     Executing create on hello-6_0
+         [Worker_0]   Deployment of hello-6_0 complete
+
+         (venv) misc/compare-templates$ opera diff -i inputs2.yaml service2.yaml
+         nodes:
+           added:
+           - hello-5
+           changed:
+             hello-1:
+               capabilities:
+                 deleted:
+                 - test
+               interfaces:
+                 Standard:
+                   operations:
+                     create:
+                       artifacts:
+                         added:
+                         - lib/files/file1_2.yaml
+                         deleted:
+                         - lib/files/file1_1.yaml
+                       inputs:
+                         marker:
+                         - marker1
+                         - marker2
+                         time:
+                         - '0'
+                         - '1'
+                     delete:
+                       artifacts:
+                         added:
+                         - lib/files/file1_2.yaml
+                         deleted:
+                         - lib/files/file1_1.yaml
+                       inputs:
+                         marker:
+                         - marker1
+                         - marker2
+                         time:
+                         - '0'
+                         - '1'
+               properties:
+                 time:
+                 - '0'
+                 - '1'
+             hello-2:
+               capabilities:
+                 test:
+                   properties:
+                     test1:
+                     - '2'
+                     - '3'
+                     test2:
+                     - '2'
+                     - '3'
+               dependencies:
+               - hello-2
+               interfaces:
+                 Standard:
+                   operations:
+                     create:
+                       artifacts:
+                         added:
+                         - lib/files/file2.yaml
+                         deleted:
+                         - lib/files/file1_1.yaml
+                       inputs:
+                         marker:
+                         - marker1
+                         - marker2
+                     delete:
+                       artifacts:
+                         added:
+                         - lib/files/file2.yaml
+                         deleted:
+                         - lib/files/file1_1.yaml
+                       inputs:
+                         marker:
+                         - marker1
+                         - marker2
+               properties:
+                 day:
+                 - '1'
+                 - '2'
+               requirements:
+                 added:
+                 - dependency
+               types:
+               - hello_type_old
+               - hello_type_new
+             hello-3:
+               interfaces:
+                 Standard:
+                   operations:
+                     create:
+                       inputs:
+                         marker:
+                         - marker1
+                         - marker2
+                     delete:
+                       inputs:
+                         marker:
+                         - marker1
+                         - marker2
+             hello-6:
+               dependencies:
+               - hello-6
+               interfaces:
+                 Standard:
+                   operations:
+                     create:
+                       inputs:
+                         marker:
+                         - marker1
+                         - marker2
+                     delete:
+                       inputs:
+                         marker:
+                         - marker1
+                         - marker2
+               requirements:
+                 dependency:
+                   target:
+                   - hello-1
+                   - hello-2
+           deleted:
+           - hello-4
+
+------------------------------------------------------------------------------------------------------------------------
+
+update
+######
+
+**Name**
+
+``opera update`` - update the deployed TOSCA service template and redeploy it according to the discovered template diff.
+
+**Usage**
+      .. argparse::
+         :filename: src/opera/cli.py
+         :func: create_parser
+         :prog: opera
+         :path: update
+
+.. tabs::
+
+   .. tab:: Details
+
+      The ``opera update`` command extends the usage of ``opera diff`` and is able to redeploy the update TOSCA service
+      template according to the changes that were made to the previously deployed template. This means that
+      ``opera update`` will first compare the two templates and instances with and then redeploy.
+
+      The user is able to run update command providing a changed blueprint and inputs in a folder containing existing
+      service template that was deployed before. The result of the execution would be undeployment of the nodes that
+      were removed from the service template, deployment of the nodes that were added to the service template and
+      consequential undeployment/deployment of changed nodes.
+
+   .. tab:: Example
+
+      Follow the next CLI instructions and results for the `compare-templates`_ example.
+
+      .. code-block:: console
+         :emphasize-lines: 21
+
+         (venv) $ cd tosca/compare-templates
+         (venv) misc/compare-templates$ opera deploy -i inputs1.yaml service1.yaml
+         [Worker_0]   Deploying my-workstation_0
+         [Worker_0]   Deployment of my-workstation_0 complete
+         [Worker_0]   Deploying hello-1_0
+         [Worker_0]     Executing create on hello-1_0
+         [Worker_0]   Deployment of hello-1_0 complete
+         [Worker_0]   Deploying hello-2_0
+         [Worker_0]     Executing create on hello-2_0
+         [Worker_0]   Deployment of hello-2_0 complete
+         [Worker_0]   Deploying hello-3_0
+         [Worker_0]     Executing create on hello-3_0
+         [Worker_0]   Deployment of hello-3_0 complete
+         [Worker_0]   Deploying hello-4_0
+         [Worker_0]     Executing create on hello-4_0
+         [Worker_0]   Deployment of hello-4_0 complete
+         [Worker_0]   Deploying hello-6_0
+         [Worker_0]     Executing create on hello-6_0
+         [Worker_0]   Deployment of hello-6_0 complete
+
+         (venv) misc/compare-templates$ opera update -i inputs2.yaml service2.yaml
+         [Worker_0]   Undeploying hello-2_0
+         [Worker_0]     Executing delete on hello-2_0
+         [Worker_0]   Undeployment of hello-2_0 complete
+         [Worker_0]   Undeploying hello-3_0
+         [Worker_0]     Executing delete on hello-3_0
+         [Worker_0]   Undeployment of hello-3_0 complete
+         [Worker_0]   Undeploying hello-4_0
+         [Worker_0]     Executing delete on hello-4_0
+         [Worker_0]   Undeployment of hello-4_0 complete
+         [Worker_0]   Undeploying hello-6_0
+         [Worker_0]     Executing delete on hello-6_0
+         [Worker_0]   Undeployment of hello-6_0 complete
+         [Worker_0]   Undeploying hello-1_0
+         [Worker_0]     Executing delete on hello-1_0
+         [Worker_0]   Undeployment of hello-1_0 complete
+         [Worker_0]   Deploying hello-1_0
+         [Worker_0]     Executing create on hello-1_0
+         [Worker_0]   Deployment of hello-1_0 complete
+         [Worker_0]   Deploying hello-2_0
+         [Worker_0]     Executing create on hello-2_0
+         [Worker_0]   Deployment of hello-2_0 complete
+         [Worker_0]   Deploying hello-3_0
+         [Worker_0]     Executing create on hello-3_0
+         [Worker_0]   Deployment of hello-3_0 complete
+         [Worker_0]   Deploying hello-5_0
+         [Worker_0]     Executing create on hello-5_0
+         [Worker_0]   Deployment of hello-5_0 complete
+         [Worker_0]   Deploying hello-6_0
+         [Worker_0]     Executing create on hello-6_0
+         [Worker_0]   Deployment of hello-6_0 complete
+
+------------------------------------------------------------------------------------------------------------------------
+
 init (deprecated since 0.6.1)
 #############################
 
@@ -883,3 +1157,4 @@ have a look at the existing `opera issues`_ or open a new one yourself.
 .. _policy-triggers: https://github.com/xlab-si/xopera-examples/tree/master/tosca/policy-triggers
 .. _opera integration tests CSAR examples: https://github.com/xlab-si/xopera-opera/tree/master/tests/integration
 .. _artifacts: https://github.com/xlab-si/xopera-examples/tree/master/tosca/artifacts
+.. _compare-templates: https://github.com/xlab-si/xopera-examples/tree/csar-examples/misc/compare-templates
