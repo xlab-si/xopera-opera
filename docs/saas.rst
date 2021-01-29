@@ -4,12 +4,13 @@
 xOpera SaaS
 ***********
 
-The Software as a Service edition of xOpera is available at https://xopera-radon.xlab.si/ui/.
+The Software as a Service edition of xOpera is available at `xopera-radon.xlab.si`_.
 
-It is a multi-user service offering all capabilities of the console-based `opera`, providing all of its functionalities
-as a service of Web 3.0 where you can interact with it through the browser, or an API, if you so desire.
+It is a multi-user service offering all capabilities of the console-based ``opera``, providing all of its
+functionalities as a service of Web 3.0 where you can interact with it through the browser, or an API, if you so desire.
 
-Please read the `warnings <xopera_saas_warnings_>`_ at the bottom, as you accept some inherent risks when using xOpera SaaS.
+Please read the `warnings <xopera_saas_warnings_>`_ at the bottom, as you accept some inherent risks when using xOpera
+SaaS.
 
 =================
 Browser interface
@@ -111,8 +112,8 @@ Eclipse Che plugin for xOpera SaaS
 The API
 =======
 
-A preview of the API reference is presented in :numref:`xopera_saas_api_excerpt` and the whole reference is located at the
-`API page <https://xopera-radon.xlab.si/apibrowser/>`_.
+A preview of the API reference is presented in :numref:`xopera_saas_api_excerpt` and the whole reference is located at
+the `SaaS API page`_.
 
 .. _xopera_saas_api_excerpt:
 
@@ -123,7 +124,7 @@ A preview of the API reference is presented in :numref:`xopera_saas_api_excerpt`
 
     An excerpt of the xOpera SaaS API.
 
-The following is a complete example of using the xOpera SaaS API through ``curl``::
+The following code block shows a complete example of using the xOpera SaaS API through ``curl``::
 
     csar_base64="$(base64 --wrap 0 test.csar)"
     api="https://xopera-radon.xlab.si/api"
@@ -137,17 +138,17 @@ The following is a complete example of using the xOpera SaaS API through ``curl`
     response_from_credentials_redirected_to_next_auth="$(cookiecurl $api/secret)"
 
     ### login flow - RADON auth ###
-        redirect_url_to_radonauth="$(echo $response_from_credentials_redirected_to_next_auth | xmllint --html --xpath "string(//a[@id='zocial-keycloak-xlab-oidc-provider-to-keycloak-radon']/@href)" - 2>/dev/null)"
-        response_radonauth="$(cookiecurl ${auth_base_url}${redirect_url_to_radonauth})"
+    redirect_url_to_radonauth="$(echo $response_from_credentials_redirected_to_next_auth | xmllint --html --xpath "string(//a[@id='zocial-keycloak-xlab-oidc-provider-to-keycloak-radon']/@href)" - 2>/dev/null)"
+    response_radonauth="$(cookiecurl ${auth_base_url}${redirect_url_to_radonauth})"
 
-        login_url_radonauth="$(echo $response_radonauth | xmllint --html --xpath "string(//form[@id='kc-form-login']/@action)" - 2>/dev/null)"
-        cookiecurl "$login_url_radonauth" -d "username=$your_username" -d "password=$your_password" -d credentialId=""
-        redirect_url="$redirect_url_radonauth"
+    login_url_radonauth="$(echo $response_radonauth | xmllint --html --xpath "string(//form[@id='kc-form-login']/@action)" - 2>/dev/null)"
+    cookiecurl "$login_url_radonauth" -d "username=$your_username" -d "password=$your_password" -d credentialId=""
+    redirect_url="$redirect_url_radonauth"
     ### end RADON auth login flow ###
 
     ### login flow - internal auth ###
-        redirect_url_internal="$(echo $response_from_credentials_redirected_to_next_auth | xmllint --html --xpath "string(//form[@id='kc-form-login']/@action)" - 2>/dev/null)"
-        redirect_url="$redirect_url_internal"
+    redirect_url_internal="$(echo $response_from_credentials_redirected_to_next_auth | xmllint --html --xpath "string(//form[@id='kc-form-login']/@action)" - 2>/dev/null)"
+    redirect_url="$redirect_url_internal"
     ### end internal auth login flow ###
 
     # final login step, sets cookies and automatically completes the /secret request
@@ -179,8 +180,7 @@ The following is a complete example of using the xOpera SaaS API through ``curl`
     cookiecurl "$project_url/outputs"
     cookiecurl "$project_url/undeploy" -XPOST
 
-For further interaction with each project, see
-`the xopera-api specification <https://github.com/xlab-si/xopera-api/blob/master/openapi-spec.yml>`_
+For further interaction with each project, see the `xopera-api specification`_
 
 .. _xopera_saas_warnings:
 
@@ -202,3 +202,7 @@ If you request xOpera SaaS server administrators to help you or access your proj
 to access the secrets.
 Whenever possible, use temporary secrets with limited access to the smallest required set of capabilities
 to improve your security.
+
+.. _xopera-radon.xlab.si: https://xopera-radon.xlab.si/ui/
+.. _SaaS API page: https://xopera-radon.xlab.si/apibrowser/
+.. _xopera-api specification: https://github.com/xlab-si/xopera-api/blob/master/openapi-spec.yml

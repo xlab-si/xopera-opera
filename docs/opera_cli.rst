@@ -88,12 +88,15 @@ currently allows users to execute the following commands:
 +---------------------+----------------------------------------------+
 | ``opera unpackage`` | retrieve outputs from service template       |
 +---------------------+----------------------------------------------+
+| ``opera diff``      | compare service templates and instances      |
++---------------------+----------------------------------------------+
+| ``opera update``    | update/redeploy template and instances       |
++---------------------+----------------------------------------------+
 | ``opera init``      | initialize the service template or CSAR      |
 +---------------------+----------------------------------------------+
 
 The commands can be executed in a random order and the orchestrator will warn and the orchestrator will warn you
-in case if any problems.
-Each CLI command is described more in detail in the following sections.
+in case if any problems. Each CLI command is described more in detail in the following sections.
 
 ------------------------------------------------------------------------------------------------------------------------
 

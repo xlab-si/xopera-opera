@@ -8,23 +8,10 @@ Quickstart
 Opera CLI Quickstart
 ====================
 
+After you `installed xOpera CLI <Opera CLI install>`_ into virtual environment you can test if everything is working
+as expected. We can now explain how to deploy the `hello-world`_ example.
 
-After you `installed xOpera CLI <Opera CLI install>`_ into virtual environment you can test if everything is working as expected. We can now try to
-deploy an example `hello-world service <https://github.com/xlab-si/xopera-opera/tree/master/examples/hello>`_ that is
-accessible on GitHub.::
-
-  (.venv) $ git clone git@github.com:xlab-si/xopera-opera.git
-  (.venv) $ cd examples/hello
-  (.venv) $ opera deploy service.yaml
-
-If nothing went wrong, new empty file has been created at ``/tmp/playing-opera/hello/hello.txt``.
-
-To delete the created directory, we can undeploy our stuff by running::
-
-   (.venv) $ opera undeploy
-
-
-If you want to try out one fast and easy xOpera example you can copy the hello world service template below.
+The hello world TOSCA service template is below.
 
 .. code-block:: yaml
 
@@ -63,30 +50,30 @@ If you want to try out one fast and easy xOpera example you can copy the hello w
             - host: my-workstation
     ...
 
-As you can see it is has only one node type defined.
-This `hello_type` here has two linked implementations that are actually two TOSCA operations (create and delete) that
-are implemented in a form of Ansible playbooks.
-The Ansible playbook for creation is shown below and it is used to create a new folder and hello world file
-in `/tmp` directory.
+As you can see it is has only one node type defined. This `hello_type` here has two linked implementations that are
+actually two TOSCA operations (create and delete) that are implemented in a form of Ansible playbooks. The Ansible
+playbook for creation is shown below and it is used to create a new folder and hello world file in `/tmp` directory.
 
-.. code-block:: yaml
+The deployment operation returns the following output:
 
-    ---
-    - hosts: all
-      gather_facts: false
+.. code-block:: console
 
-      tasks:
-        - name: Create the new folder structure
-          file:
-            path: /tmp/opera-test/hello
-            recurse: true
-            state: directory
+   (.venv) $ git clone git@github.com:xlab-si/xopera-opera.git
+   (.venv) $ cd examples/hello
+   (.venv) examples/hello$ opera deploy service.yaml
+   [Worker_0]   Deploying my-workstation_0
+   [Worker_0]   Deployment of my-workstation_0 complete
+   [Worker_0]   Deploying hello_0
+   [Worker_0]     Executing create on hello_0
+   [Worker_0]   Deployment of hello_0 complete
 
-        - name: Create hello.txt and add content
-          copy:
-            dest: /tmp/opera-test/hello/hello.txt
-            content: "{{ content }}"
-    ...
+If nothing went wrong, new empty file has been created at ``/tmp/playing-opera/hello/hello.txt``.
+
+.. code-block:: console
+
+   (venv) examples/hello$ ls -lh /tmp/playing-opera/hello/
+   total 0
+   -rw-rw-rw- 1 user user 0 Feb 20 16:02 hello.txt
 
 And the playbook for destroying the service is below.
 
@@ -103,18 +90,25 @@ And the playbook for destroying the service is below.
             state: absent
     ...
 
-You can initiate xOpera orchestration service with ``opera deploy tosca-template.yml`` in order to start the deployment
-and then also ``opera undeploy`` to un-deploy the solution (see image below :ref:`opera_deploy_cli`).
+To delete the created directory, we can undeploy our stuff by running:
 
-.. _opera_deploy_cli:
+.. code-block:: console
 
-.. figure:: /images/opera_deploy_cli.png
-    :target: _images/opera_deploy_cli.png
-    :width: 80%
-    :align: center
+   (venv) examples/hello$ opera undeploy
+   [Worker_0]   Undeploying hello_0
+   [Worker_0]     Executing delete on hello_0
+   [Worker_0]   Undeployment of hello_0 complete
+   [Worker_0]   Undeploying my-workstation_0
+   [Worker_0]   Undeployment of my-workstation_0 complete
 
-    xOpera CLI deployment
+After that the created directory and file are deleted:
 
+.. code-block:: console
+
+   (venv) examples/hello$ ls -lh /tmp/playing-opera/hello/
+   ls: cannot access '/tmp/playing-opera/hello/': No such file or directory
+
+.. _hello-world: https://github.com/xlab-si/xopera-opera/tree/master/examples/hello>
 
 ======================
 xOpera SaaS Quickstart
