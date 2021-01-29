@@ -14,30 +14,29 @@ This section explains the installation of xOpera orchestrator.
 
 **Prerequisites**
 
-
 ``opera`` requires python 3 and a virtual environment. In a typical modern
 Linux environment, we should already be set. In Ubuntu, however, we might need
-to run the following commands::
+to run the following commands:
 
-  $ sudo apt update
-  $ sudo apt install -y python3-venv python3-wheel python-wheel-common
+.. code-block:: console
+
+   $ sudo apt update
+   $ sudo apt install -y python3-venv python3-wheel python-wheel-common
 
 **Install**
 
+xOpera is distributed as Python package that is regularly published on `PyPI`_.
+So the simplest way to test ``opera`` is to install it into virtual environment:
 
-xOpera is distributed as Python package that is regularly published on `PyPI <https://pypi.org/project/opera/>`_.
-So the simplest way to test ``opera`` is to install it into virtual environment::
+.. code-block:: console
 
-  $ mkdir ~/opera && cd ~/opera
-  $ python3 -m venv .venv && . .venv/bin/activate
-  (.venv) $ pip install opera
-
+   $ mkdir ~/opera && cd ~/opera
+   $ python3 -m venv .venv && . .venv/bin/activate
+   (.venv) $ pip install opera
 
 ====================================
 Secrets and Environment variables
 ====================================
-
-
 
 You can use the following environment variables:
 
@@ -62,13 +61,6 @@ You can use the following environment variables:
    cloud credentials, passwords ans so on) that are stored as opera inputs.
    To avoid exposing them don't share the inputs file and the created opera
    storage folder with anyone.
-
-.. tip::
-
-   If you have any problems have a look at the existing issues here: https://github.com/xlab-si/xopera-opera/issues
-   or open a new one yourself.
-
-
 
 .. _CLI Reference:
 
@@ -103,13 +95,14 @@ The commands can be executed in a random order and the orchestrator will warn an
 in case if any problems.
 Each CLI command is described more in detail in the following sections.
 
+------------------------------------------------------------------------------------------------------------------------
 
 deploy
 ######
 
 **Name**
 
-``deploy`` - used to deploy and control deployment of the application described in YAML or CSAR.
+``opera deploy`` - used to deploy and control deployment of the application described in YAML or CSAR.
 
 **Usage**
 
@@ -121,67 +114,16 @@ deploy
 
          The ``--resume/-r`` and ``--clean-state/-c`` options are mutually exclusive.
 
-
 .. tabs::
-
-   .. tab:: Example
-
-      A simple deployment of TOSCA service template is shown on the next image (:numref:`opera_deploy_service_template_svg`).
-
-      .. _opera_deploy_service_template_svg:
-
-      .. figure:: /images/opera_deploy_service_template.svg
-         :target: _images/opera_deploy_service_template.svg
-         :width: 100%
-         :align: center
-
-         Example of `hello world <https://github.com/xlab-si/xopera-opera/tree/master/examples/hello>`_ template opera deployment.
-
-      Another example (:numref:`opera_deploy_csar_svg`) is below and shows a more
-      complex usage of ``opera deploy`` command, deploying the compressed TOSCA
-      CSAR with inputs and additional CLI flags. The CSAR is first deployed with
-      the supplied `YAML inputs <https://github.com/xlab-si/xopera-opera/tree/master/docs/files/csars/big/inputs.yaml>`_
-      (using ``--inputs/-i`` flag) and with two workers (``--workers/-w`` switch)
-      that can run two Ansible playbook operations simultaneously. Then the CSAR
-      is deployed again (using the ``--clean-state/-c`` option) from the beginning,
-      but the execution gets interrupted. Therefore the third deployment is used
-      to resume the deployment process from where it was interrupted (using the
-      ``--resume/-r`` flag, we also used ``--force/-f`` flag here to skip all
-      yes/no prompts).
-
-      .. _opera_deploy_csar_svg:
-
-      .. figure:: /images/opera_deploy_csar.svg
-         :target: _images/opera_deploy_csar.svg
-         :width: 100%
-         :align: center
-
-         The `big CSAR <https://github.com/xlab-si/xopera-opera/tree/master/docs/files/csars/big/big.csar>`_ example deployment.
-
-   .. tab:: Source
-
-      CLI instructions for example
-
-      .. code-block:: bash
-
-         cd xopera-opera/examples/hello
-         opera deploy service.yaml
-         opera undeploy
-
-      .. hint::
-         Instead of ``service.yaml`` you can deploy a compressed TOSCA CSAR directly with ``deploy`` command.
-
-
-
 
    .. tab:: Details
 
       The ``opera deploy`` command is used to initiate the deployment
       orchestration process using the supplied TOSCA service template or the
       compressed TOSCA CSAR. Within this CLI command the xOpera orchestrator
-      invokes multiple `TOSCA interface operations <https://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.3/cos01/TOSCA-Simple-Profile-YAML-v1.3-cos01.html#_Toc26969470>`_
-      (TOSCA `Standard interface` node operations and also TOSCA `Configure interface`
-      relationship operations). The operations are executed in the following order:
+      invokes multiple `TOSCA interface operations`_ (TOSCA `Standard interface`
+      node operations and also TOSCA `Configure interface` relationship operations).
+      The operations are executed in the following order:
 
       1. ``create``
       2. ``pre_configure_source``
@@ -203,18 +145,62 @@ deploy
       - ``instances`` folder - includes JSON files that carry the information about the status of TOSCA node and relationship instances
       - ``csars`` folder contains the extracted copy of your CSAR (created only if you deployed the compressed TOSCA CSAR)
 
+   .. tab:: Example
 
+      Follow the next CLI instructions and results for the `hello-world`_ example.
 
+      .. code-block:: console
+         :emphasize-lines: 2
 
+         (venv) $ cd misc/hello-world
+         (venv) misc/hello-world$ opera deploy service.yaml
+         [Worker_0]   Deploying my-workstation_0
+         [Worker_0]   Deployment of my-workstation_0 complete
+         [Worker_0]   Deploying hello_0
+         [Worker_0]     Executing create on hello_0
+         [Worker_0]   Deployment of hello_0 complete
 
+   .. tab:: Screencast
+
+      A simple deployment of TOSCA service template is shown on the next image (:numref:`opera_deploy_service_template_svg`).
+
+      .. _opera_deploy_service_template_svg:
+
+      .. figure:: /images/opera_deploy_service_template.svg
+         :target: _images/opera_deploy_service_template.svg
+         :width: 100%
+         :align: center
+
+         Example of `hello-world`_ template opera deployment.
+
+      Another example (:numref:`opera_deploy_csar_svg`) is below and shows a more
+      complex usage of ``opera deploy`` command, deploying the compressed TOSCA
+      CSAR with inputs and additional CLI flags. The CSAR is first deployed with
+      the supplied YAML inputs (using ``--inputs/-i`` flag) and with two workers
+      (``--workers/-w`` switch) that can run two Ansible playbook operations simultaneously.
+      Then the CSAR is deployed again (using the ``--clean-state/-c`` option) from
+      the beginning, but the execution gets interrupted. Therefore the third deployment
+      is used to resume the deployment process from where it was interrupted (using the
+      ``--resume/-r`` flag, we also used ``--force/-f`` flag here to skip all
+      yes/no prompts).
+
+      .. _opera_deploy_csar_svg:
+
+      .. figure:: /images/opera_deploy_csar.svg
+         :target: _images/opera_deploy_csar.svg
+         :width: 100%
+         :align: center
+
+         The `misc-tosca-types-csar`_ example deployment.
+
+------------------------------------------------------------------------------------------------------------------------
 
 undeploy
 #########
 
 **Name**
 
-
-``undeploy`` - undeploys application; removes all application instances and components.
+``opera undeploy`` - undeploys application; removes all application instances and components.
 
 **Usage**
 
@@ -226,56 +212,7 @@ undeploy
 
          The ``opera undeploy`` command does not take any positional arguments.
 
-
 .. tabs::
-
-   .. tab:: Example
-
-      A simple undeployment process of TOSCA service template is shown on the
-      next image (:numref:`opera_undeploy_svg`). The service template should
-      be deployed first and the you can undeploy the solution.
-
-      .. _opera_undeploy_svg:
-
-      .. figure:: /images/opera_cli.svg
-         :target: _images/opera_cli.svg
-         :width: 100%
-         :align: center
-
-         Example showing `hello <https://github.com/xlab-si/xopera-opera/tree/master/examples/hello>`_ template opera undeployment.
-
-      Another example (:numref:`opera_undeploy_csar_svg`) is below and shows a more
-      complex usage of ``opera undeploy`` command, undeploying the compressed TOSCA
-      CSAR with additional CLI flags. The CSAR was first deployed with the supplied
-      `inputs file <https://github.com/xlab-si/xopera-opera/tree/master/docs/files/csars/big/inputs.yaml>`_
-      Then the CSAR is undeployed, but the execution gets interrupted. To resume
-      the undeployment process from where it was interrupted the ``--resume/-r``
-      flag is used.
-
-      .. _opera_undeploy_csar_svg:
-
-      .. figure:: /images/opera_undeploy_csar.svg
-         :target: _images/opera_undeploy_csar.svg
-         :width: 100%
-         :align: center
-
-         The undeployment of the `big CSAR example <https://github.com/xlab-si/xopera-opera/tree/master/docs/files/csars/big/big.csar>`_.
-
-   .. tab:: Source
-
-      CLI instructions for example
-
-      .. code-block:: bash
-
-         cd xopera-opera/examples/hello
-         opera deploy service.yaml
-         opera undeploy
-         # If undeploy was interrupted
-         opera undeploy -r
-
-      .. hint::
-         Instead of ``service.yaml`` you can deploy a compressed TOSCA CSAR directly with ``deploy`` command.
-
 
    .. tab:: Details
 
@@ -289,14 +226,66 @@ undeploy
       The operation gets executed if it is defined within the TOSCA service template
       and has a link to the corresponding Ansible playbook.
 
+   .. tab:: Example
 
+      Follow the next CLI instructions and results for the `hello-world`_ example.
+
+      .. code-block:: console
+         :emphasize-lines: 8
+
+         (venv) $ cd misc/hello-world
+         (venv) misc/hello-world$ opera deploy service.yaml
+         [Worker_0]   Deploying my-workstation_0
+         [Worker_0]   Deployment of my-workstation_0 complete
+         [Worker_0]   Deploying hello_0
+         [Worker_0]     Executing create on hello_0
+         [Worker_0]   Deployment of hello_0 complete
+         (venv) misc/hello-world$ opera undeploy
+         [Worker_0]   Undeploying hello_0
+         [Worker_0]     Executing delete on hello_0
+         [Worker_0]   Undeployment of hello_0 complete
+         [Worker_0]   Undeploying my-workstation_0
+         [Worker_0]   Undeployment of my-workstation_0 complete
+
+   .. tab:: Screencast
+
+      A simple undeployment process of TOSCA service template is shown on the
+      next image (:numref:`opera_undeploy_svg`). The service template should
+      be deployed first and the you can undeploy the solution.
+
+      .. _opera_undeploy_svg:
+
+      .. figure:: /images/opera_cli.svg
+         :target: _images/opera_cli.svg
+         :width: 100%
+         :align: center
+
+         Example showing `hello-world`_ template opera undeployment.
+
+      Another example (:numref:`opera_undeploy_csar_svg`) is below and shows a more
+      complex usage of ``opera undeploy`` command, undeploying the compressed TOSCA
+      CSAR with additional CLI flags. The CSAR was first deployed with the supplied
+      YAML inputs file. Then the CSAR is undeployed, but the execution gets interrupted.
+      To resume the undeployment process from where it was interrupted the ``--resume/-r``
+      flag is used.
+
+      .. _opera_undeploy_csar_svg:
+
+      .. figure:: /images/opera_undeploy_csar.svg
+         :target: _images/opera_undeploy_csar.svg
+         :width: 100%
+         :align: center
+
+         The undeployment of the `misc-tosca-types-csar`_.
+
+------------------------------------------------------------------------------------------------------------------------
 
 validate
 ########
 
 **Name**
 
-Validates the structure of TOSCA template or CSAR
+``opera validate`` - validates the structure of TOSCA template or CSAR.
 
 **Usage**
       .. argparse::
@@ -305,10 +294,32 @@ Validates the structure of TOSCA template or CSAR
          :prog: opera
          :path: validate
 
-
 .. tabs::
 
+   .. tab:: Details
+
+      With ``opera validate`` you can validate any TOSCA template or CSAR (including its inputs)
+      and find out whether it's properly structured and deployable by opera. At the
+      end of this operation you will receive the validation result where opera
+      will warn you about TOSCA template inconsistencies if there was any. Since validation
+      can be successful or unsuccessful the `opera validate` commands has corresponding
+      return codes - 0 for success and 1 for failure. If the validation succeeds this means
+      that your TOSCA templates are valid and that all their implementations (e.g. Ansible playbooks)
+      can be invoked. However, this doesn't mean that these operations will succeed.
+
    .. tab:: Example
+
+      Follow the next CLI instructions and results for the `misc-tosca-types-csar`_ example.
+
+      .. code-block:: console
+         :emphasize-lines: 2
+
+         (venv) $ cd misc/hello-world
+         (venv) csars/misc-tosca-types$ opera validate -i inputs.yaml service.yaml
+         Validating service template...
+         Done.
+
+   .. tab:: Screencast
 
       The first image below (:numref:`opera_validate_service_template_svg`) shows an example of
       TOSCA service template validation.
@@ -320,7 +331,7 @@ Validates the structure of TOSCA template or CSAR
          :width: 100%
          :align: center
 
-         Example showing `attribute mapping <https://github.com/xlab-si/xopera-opera/tree/master/examples/attribute_mapping>`_ template validation.
+         Example showing `attribute-mapping`_ template validation.
 
       The second image (:numref:`opera_validate_csar_svg`) shows an example of
       TOSCA zipped CSAR validation where orchestration YAML inputs file is also supplied.
@@ -332,41 +343,18 @@ Validates the structure of TOSCA template or CSAR
          :width: 100%
          :align: center
 
-         Example showing `big <https://github.com/xlab-si/xopera-opera/tree/master/docs/files/csars/big/big.csar>`_ CSAR validation.
+         Example showing `misc-tosca-types-csar`_ CSAR validation.
 
-   .. tab:: Source
-
-      CLI instructions for example
-
-      .. code-block:: bash
-
-         cd xopera-opera/examples/attribute_mapping
-         opera validate service yaml
-
-         opera validate -i inputs.yaml big.csar
-
-      .. hint::
-         Instead of ``service.yaml`` you can deploy a compressed TOSCA CSAR directly with ``deploy`` command.
-
-
-   .. tab:: Overview
-
-      With ``opera validate`` you can validate any TOSCA template or CSAR and
-      find out whether it's properly structured and deployable by opera. At the
-      end of this operation you will receive the validation result where opera
-      will warn you about TOSCA template inconsistencies if there was any.
-
+------------------------------------------------------------------------------------------------------------------------
 
 outputs
 #######
 
-
 **Name**
 
-``outputs`` Print the outputs of the deploy/undeploy.
+``opera outputs`` - print the outputs of the deploy/undeploy.
 
 **Usage**
-
 
       .. argparse::
          :filename: src/opera/cli.py
@@ -376,7 +364,34 @@ outputs
 
 .. tabs::
 
+   .. tab:: Details
+
+      The ``opera outputs`` command lets you access the orchestration outputs
+      defined in the TOSCA service template and print them out to the console
+      in JSON or YAML format (used by default).
+
    .. tab:: Example
+
+      Follow the next CLI instructions and results for the `outputs`_ example.
+
+      .. code-block:: console
+         :emphasize-lines: 7
+
+         (venv) $ cd tosca/outputs
+         (venv) tosca/outputs$ opera deploy service.yaml
+         [Worker_0]   Deploying my_node_0
+         [Worker_0]     Executing create on my_node_0
+         [Worker_0]   Deployment of my_node_0 complete
+
+         (venv) tosca/outputs$ opera outputs
+         output_attr:
+           description: Example of attribute output
+           value: my_custom_attribute_value
+         output_prop:
+           description: Example of property output
+           value: 123
+
+   .. tab:: Screencast
 
       The image below (:numref:`opera_outputs_service_template_svg`) shows an
       example of retrieving the orchestration outputs after the deployment process.
@@ -388,11 +403,10 @@ outputs
          :width: 100%
          :align: center
 
-         Example showing `orchestration outputs <https://github.com/xlab-si/xopera-opera/tree/master/examples/outputs>`_ retrieval.
+         Example showing `outputs`_ retrieval.
 
       Another example in the figure below (:numref:`opera_outputs_csar_svg`)
-      shows deploying the TOSCA CSAR with the supplied
-      `JSON inputs file <https://github.com/xlab-si/xopera-opera/tree/master/docs/files/csars/small/inputs.json>`_.
+      shows deploying the TOSCA CSAR with the supplied JSON inputs file.
       After that the outputs are retrieved and formatted in JSON (using ``--format/-f`` option).
 
       .. _opera_outputs_csar_svg:
@@ -402,23 +416,16 @@ outputs
          :width: 100%
          :align: center
 
-         Example showing `small CSAR <https://github.com/xlab-si/xopera-opera/tree/master/docs/files/csars/small/small.csar>`_ deployment and outputs retrieval.
+         Example showing `small-csar`_ deployment and outputs retrieval.
 
-   .. tab:: Details
-
-      The ``opera outputs`` command lets you access the orchestration outputs
-      defined in the TOSCA service template and print them out to the console
-      in JSON or YAML format.
-
-
-
+------------------------------------------------------------------------------------------------------------------------
 
 info
 #######
 
 **Name**
 
-``info`` - print the details of current deployment project
+``opera info`` - print the details of current deployment project.
 
 **Usage**
 
@@ -428,46 +435,7 @@ info
          :prog: opera
          :path: info
 
-
 .. tabs::
-
-   .. tab:: Example
-
-      A minimal ``opera info`` example is shown on the image below (:numref:`opera_info_minimal_svg`).
-      The service template is deployed first with the debug mode turned on
-      (``--verbose/-v`` flag is used, which prints out the inputs and the
-      Ansible playbook tasks outputs). Then ``opera info`` command is used to
-      print out the information about the current opera project.
-
-      .. _opera_info_minimal_svg:
-
-      .. figure:: /images/opera_info_minimal.svg
-         :target: _images/opera_info_minimal.svg
-         :width: 100%
-         :align: center
-
-         Testing opera info on the `capability_attributes_properties example <https://github.com/xlab-si/xopera-opera/tree/master/examples/capability_attributes_properties>`_.
-
-      A more complex example (:numref:`opera_info_full_svg`) is below and shows a
-      combined usage of init, deploy and undeploy commands on the zipped TOSCA
-      CSAR with additional CLI flags. After every operation ``opera info`` CLI
-      command is called to explore the current status of the project.
-
-      The CSAR was first initialized without the inputs. Those (in `inputs.json file <https://github.com/xlab-si/xopera-opera/tree/master/docs/files/csars/small/inputs.json>`_)
-      were supplied within the second deployment step, which gets interrupted
-      and this affects the current project state. To resume the deployment
-      process from where it was interrupted the ``--resume/-r`` flag is used.
-      Then the CSAR is undeployed. The ``opera info`` output is printed
-      out in both YAML and JSON formats (here ``--format/-f`` is used).
-
-      .. _opera_info_full_svg:
-
-      .. figure:: /images/opera_info_full.svg
-         :target: _images/opera_info_full.svg
-         :width: 100%
-         :align: center
-
-         The opera info testing on the `small TOSCA CSAR example <https://github.com/xlab-si/xopera-opera/tree/master/docs/files/csars/smal/small.csar>`_.
 
    .. tab:: Details
 
@@ -486,14 +454,149 @@ info
          "status":            "initialized | deployed | undeployed | interrupted | null"
          }
 
+   .. tab:: Example
+
+      Follow the next CLI instructions and results for the `misc-tosca-types-csar`_ example.
+
+      .. code-block:: console
+         :emphasize-lines: 2, 12, 34, 56, 84
+
+         (venv) $ cd csars/misc-tosca-types
+         (venv) csars/misc-tosca-types$ opera info
+         content_root: null
+         inputs: null
+         service_template: null
+         status: null
+
+         (venv) csars/misc-tosca-types$ opera init -i inputs.yaml service.yaml
+         Warning: 'opera init' command is deprecated and will probably be removed within one of the next releases. Please use 'opera deploy' to initialize and deploy service templates or compressed CSARs.
+         Service template was initialized
+
+         (venv) csars/misc-tosca-types$ opera info
+         content_root: null
+         inputs: /home/user/Desktop/xopera-examples/csars/misc-tosca-types/.opera/inputs
+         service_template: service.yaml
+         status: initialized
+
+         (venv) csars/misc-tosca-types$ opera deploy
+         [Worker_0]   Deploying my-workstation1_0
+         [Worker_0]   Deployment of my-workstation1_0 complete
+         [Worker_0]   Deploying my-workstation2_0
+         [Worker_0]   Deployment of my-workstation2_0 complete
+         [Worker_0]   Deploying file_0
+         [Worker_0]     Executing create on file_0
+         [Worker_0]   Deployment of file_0 complete
+         [Worker_0]   Deploying hello_0
+         [Worker_0]     Executing create on hello_0
+         [Worker_0]   Deployment of hello_0 complete
+         [Worker_0]   Deploying interfaces_0
+         [Worker_0]     Executing create on interfaces_0
+         ^C[Worker_0] ------------
+         KeyboardInterrupt
+
+         (venv) csars/misc-tosca-types$ opera info
+
+         content_root: null
+         inputs: /home/user/Desktop/xopera-examples/csars/misc-tosca-types/.opera/inputs
+         service_template: service.yaml
+         status: interrupted
+
+         (venv) csars/misc-tosca-types$ opera deploy -r -f
+         [Worker_0]   Deploying interfaces_0
+         [Worker_0]     Executing create on interfaces_0
+         [Worker_0]     Executing configure on interfaces_0
+         [Worker_0]     Executing start on interfaces_0
+         [Worker_0]   Deployment of interfaces_0 complete
+         [Worker_0]   Deploying noimpl_0
+         [Worker_0]   Deployment of noimpl_0 complete
+         [Worker_0]   Deploying setter_0
+         [Worker_0]     Executing create on setter_0
+         [Worker_0]   Deployment of setter_0 complete
+         [Worker_0]   Deploying test_0
+         [Worker_0]     Executing create on test_0
+         [Worker_0]   Deployment of test_0 complete
+
+         (venv) csars/misc-tosca-types$ opera info
+
+         content_root: null
+         inputs: /home/user/Desktop/xopera-examples/csars/misc-tosca-types/.opera/inputs
+         service_template: service.yaml
+         status: deployed
+
+         (venv) csars/misc-tosca-types$ opera undeploy
+         [Worker_0]   Undeploying my-workstation2_0
+         [Worker_0]   Undeployment of my-workstation2_0 complete
+         [Worker_0]   Undeploying file_0
+         [Worker_0]     Executing delete on file_0
+         [Worker_0]   Undeployment of file_0 complete
+         [Worker_0]   Undeploying interfaces_0
+         [Worker_0]     Executing stop on interfaces_0
+         [Worker_0]     Executing delete on interfaces_0
+         [Worker_0]   Undeployment of interfaces_0 complete
+         [Worker_0]   Undeploying noimpl_0
+         [Worker_0]   Undeployment of noimpl_0 complete
+         [Worker_0]   Undeploying setter_0
+         [Worker_0]   Undeployment of setter_0 complete
+         [Worker_0]   Undeploying hello_0
+         [Worker_0]   Undeployment of hello_0 complete
+         [Worker_0]   Undeploying my-workstation1_0
+         [Worker_0]   Undeployment of my-workstation1_0 complete
+         [Worker_0]   Undeploying test_0
+         [Worker_0]   Undeployment of test_0 complete
+
+         (venv) csars/misc-tosca-types$ opera info
+
+         content_root: null
+         inputs: /home/user/Desktop/xopera-examples/csars/misc-tosca-types/.opera/inputs
+         service_template: service.yaml
+         status: undeployed
+
+   .. tab:: Screencast
+
+      A minimal ``opera info`` example is shown on the image below (:numref:`opera_info_minimal_svg`).
+      The service template is deployed first with the debug mode turned on
+      (``--verbose/-v`` flag is used, which prints out the inputs and the
+      Ansible playbook tasks outputs). Then ``opera info`` command is used to
+      print out the information about the current opera project.
+
+      .. _opera_info_minimal_svg:
+
+      .. figure:: /images/opera_info_minimal.svg
+         :target: _images/opera_info_minimal.svg
+         :width: 100%
+         :align: center
+
+         Testing opera info on the `capability-attributes-properties`_.
+
+      A more complex example (:numref:`opera_info_full_svg`) is below and shows a
+      combined usage of init, deploy and undeploy commands on the zipped TOSCA
+      CSAR with additional CLI flags. After every operation ``opera info`` CLI
+      command is called to explore the current status of the project.
+
+      The CSAR was first initialized without the JSON inputs file.
+      were supplied within the second deployment step, which gets interrupted
+      and this affects the current project state. To resume the deployment
+      process from where it was interrupted the ``--resume/-r`` flag is used.
+      Then the CSAR is undeployed. The ``opera info`` output is printed
+      out in both YAML and JSON formats (here ``--format/-f`` is used).
+
+      .. _opera_info_full_svg:
+
+      .. figure:: /images/opera_info_full.svg
+         :target: _images/opera_info_full.svg
+         :width: 100%
+         :align: center
+
+         The opera info testing on the `small-csar`_.
+
+------------------------------------------------------------------------------------------------------------------------
 
 package
 #######
 
-
 **Name**
 
-``package`` create compressed CSAR from the service template represeted with YAML-s.
+``opera package`` - package TOSCA YAML templates and their accompanying files to a compressed TOSCA CSAR.
 
 **Usage**
 
@@ -504,47 +607,6 @@ package
          :path: package
 
 .. tabs::
-
-   .. tab:: Example
-
-      A minimal ``opera package`` example is shown on the image below
-      (:numref:`opera_package_minimal_svg`). The CSAR is created without any
-      optional params and current folder (.) is passed as a source dir. Opera
-      then looks for the root level yaml (``service.yaml``) and takes it as
-      the entrypoint for ``TOSCA.meta`` (``Entry-Definitions`` YAML keyname).
-      Since the output is not specified a random UUID (with the length of 6
-      chars) is created and the default zip format is used for the compression.
-      The example also has another scenario which features creating a CSAR
-      tarball (``tar`` compression format is specified using the
-      ``--format/-f`` CLI switch).
-
-      .. _opera_package_minimal_svg:
-
-      .. figure:: /images/opera_package_minimal.svg
-         :target: _images/opera_package_minimal.svg
-         :width: 100%
-         :align: center
-
-         Testing opera package on `intrinsic_functions <https://github.com/xlab-si/xopera-opera/tree/master/examples/intrinsic_functions>`_ and `policy_triggers <https://github.com/xlab-si/xopera-opera/tree/master/examples/policy_triggers>`_ example.
-
-      A more complex example (:numref:`opera_package_full_svg`) is below and
-      shows usage of packaging command with additional CLI flags. First a
-      zipped CSAR is created from already prepared extracted CSAR structure.
-      This CSAR is then validated with ``opera validate`` to show that the
-      created CSAR structure is deployable by the opera orchestrator. The
-      second part shows the creation of tar compressed TOSCA CSAR. The flags
-      ``--service-template/-t``, ``--output/-o`` and ``--format/-f`` are used
-      both times.
-
-      .. _opera_package_full_svg:
-
-      .. figure:: /images/opera_package_full.svg
-         :target: _images/opera_package_full.svg
-         :width: 100%
-         :align: center
-
-         Running opera package on the `opera integration tests CSAR examples <https://github.com/xlab-si/xopera-opera/tree/master/tests/integration>`_.
-
 
    .. tab:: Details
 
@@ -565,13 +627,69 @@ package
       compressed. The input folder is the mandatory positional argument, but
       there are also other command flags that can be used.
 
+   .. tab:: Example
+
+      Follow the next CLI instructions and results for the `hello-world`_ and `misc-tosca-types-csar`_ examples.
+
+      .. code-block:: console
+         :emphasize-lines: 2, 6
+
+         (venv) $ cd misc/hello-world
+         (venv) misc/hello-world$ opera package .
+         CSAR was created and packed to '/home/user/Desktop/xopera-examples/misc/hello-world/opera-package-45045f.zip'.
+
+         (venv) misc/hello-world$ cd ../../csars
+         (venv) csars$ opera package -t service.yaml -o misc-tosca-types  misc-tosca-types/
+         CSAR was created and packed to '/home/user/Desktop/xopera-examples/csars/misc-tosca-types.zip'.
+
+   .. tab:: Screencast
+
+      A minimal ``opera package`` example is shown on the image below
+      (:numref:`opera_package_minimal_svg`). The CSAR is created without any
+      optional params and current folder (.) is passed as a source dir. Opera
+      then looks for the root level yaml (``service.yaml``) and takes it as
+      the entrypoint for ``TOSCA.meta`` (``Entry-Definitions`` YAML keyname).
+      Since the output is not specified a random UUID (with the length of 6
+      chars) is created and the default zip format is used for the compression.
+      The example also has another scenario which features creating a CSAR
+      tarball (``tar`` compression format is specified using the
+      ``--format/-f`` CLI switch).
+
+      .. _opera_package_minimal_svg:
+
+      .. figure:: /images/opera_package_minimal.svg
+         :target: _images/opera_package_minimal.svg
+         :width: 100%
+         :align: center
+
+         Testing opera package on `intrinsic-functions`_ and `policy-triggers`_ example.
+
+      A more complex example (:numref:`opera_package_full_svg`) is below and
+      shows usage of packaging command with additional CLI flags. First a
+      zipped CSAR is created from already prepared extracted CSAR structure.
+      This CSAR is then validated with ``opera validate`` to show that the
+      created CSAR structure is deployable by the opera orchestrator. The
+      second part shows the creation of tar compressed TOSCA CSAR. The flags
+      ``--service-template/-t``, ``--output/-o`` and ``--format/-f`` are used
+      both times.
+
+      .. _opera_package_full_svg:
+
+      .. figure:: /images/opera_package_full.svg
+         :target: _images/opera_package_full.svg
+         :width: 100%
+         :align: center
+
+         Running opera package on the `opera integration tests CSAR examples`_.
+
+------------------------------------------------------------------------------------------------------------------------
 
 unpackage
 ##########
 
 **Name**
 
-``unpackage`` uncompress CSAR.
+``opera unpackage`` - uncompress TOSCA CSAR.
 
 **Usage**
       .. argparse::
@@ -582,7 +700,40 @@ unpackage
 
 .. tabs::
 
+   .. tab:: Details
+
+      The ``opera unpackage`` has the opposite function of the ``opera package``
+      command. It  serves for unpacking (i.e. validating and extracting) the
+      compressed TOSCA CSAR files. The opera unpackage command receives a
+      compressed CSAR as a positional argument. It then validates and extracts
+      the CSAR to a given location.
+
+      There's no ``--format/-f`` option. Rather than that, the compressed file
+      format (that will be used to extract the CSAR) is determined
+      automatically. Currently, the compressed CSARs can be supplied in two
+      different compression formats - `zip` or `tar`.
+
    .. tab:: Example
+
+      Follow the next CLI instructions and results for the `misc-tosca-types-csar`_ and `small-csar`_ examples.
+
+      .. code-block:: console
+         :emphasize-lines: 5, 11
+
+         (venv) $ cd csars
+         (venv) csars$ opera package -t service.yaml -o misc-tosca-types misc-tosca-types/
+         CSAR was created and packed to '/home/user/Desktop/xopera-examples/csars/misc-tosca-types.zip'.
+
+         (venv) csars$ opera unpackage misc-tosca-types.zip
+         The CSAR was unpackaged to '/home/user/Desktop/xopera-examples/csars/opera-unpackage-1cabf6'.
+
+         (venv) csars$ opera package -t service.yaml -o small small/
+         CSAR was created and packed to '/home/user/Desktop/xopera-examples/csars/small.zip'.
+
+         (venv) csars$ opera unpackage -d small-extracted small.zip
+         The CSAR was unpackaged to '/home/user/Desktop/xopera-examples/csars/small-extracted'.
+
+   .. tab:: Screencast
 
       A minimal example of ``opera unpackage`` is shown on the image below
       (:numref:`opera_unpackage_minimal_svg`). The CSAR is unpacked without any
@@ -597,7 +748,7 @@ unpackage
          :width: 100%
          :align: center
 
-         Testing opera unpackage on the `prepared small CSAR example <https://github.com/xlab-si/xopera-opera/tree/master/docs/files/csars/smal/small.csar>`_.
+         Testing opera unpackage on the `small-csar`_.
 
       A more complex example (:numref:`opera_unpackage_full_svg`) is below and
       shows usage of unpackaging command with additional CLI flags and in
@@ -616,25 +767,18 @@ unpackage
          :width: 100%
          :align: center
 
-         Running opera unpackage on the `hello world example <https://github.com/xlab-si/xopera-opera/tree/master/examples/hello>`_.
+         Running opera unpackage on the `hello-world`_ example.
 
-
-   .. tab:: Details
-
-      The ``opera unpackage`` has the opposite function of the ``opera package``
-      command. It  serves for unpacking (i.e. validating and extracting) the
-      compressed TOSCA CSAR files. The opera unpackage command receives a
-      compressed CSAR as a positional argument. It then validates and extracts
-      the CSAR to a given location.
-
-      There's no ``--format/-f`` option. Rather than that, the compressed file
-      format (that will be used to extract the CSAR) is determined
-      automatically. Currently, the compressed CSARs can be supplied in two
-      different compression formats - `zip` or `tar`.
-
+------------------------------------------------------------------------------------------------------------------------
 
 init (deprecated since 0.6.1)
 #############################
+
+**Name**
+
+``opera init`` - initialize TOSCA CSAR or service template.
+
+**Usage**
 
       .. argparse::
          :filename: src/opera/cli.py
@@ -643,36 +787,6 @@ init (deprecated since 0.6.1)
          :path: init
 
 .. tabs::
-
-   .. tab:: Example
-
-      The image below (:numref:`opera_init_service_template_svg`) shows an
-      example of initializing the TOSCA service template and then deploying it.
-      To save the orchestration data we created a custom folder (using the
-      ``--instance-path/-p option``) instead of the default ``.opera``.
-
-      .. _opera_init_service_template_svg:
-
-      .. figure:: /images/opera_init_service_template.svg
-         :target: _images/opera_init_service_template.svg
-         :width: 100%
-         :align: center
-
-         Initialization and deployment of `artifacts example <https://github.com/xlab-si/xopera-opera/tree/master/examples/artifacts>`_.
-
-      Another example in the figure below (:numref:`opera_init_csar_svg`)
-      shows the initialization and deployment of the compressed TOSCA CSAR
-      along with its `JSON inputs <https://github.com/xlab-si/xopera-opera/tree/master/docs/files/csars/small/inputs.json>`_.
-
-      .. _opera_init_csar_svg:
-
-      .. figure:: /images/opera_init_csar.svg
-         :target: _images/opera_init_csar.svg
-         :width: 100%
-         :align: center
-
-         Initialization and deployment of `small CSAR example <https://github.com/xlab-si/xopera-opera/tree/master/docs/files/csars/small/small.csar>`_.
-
 
    .. tab:: Details
 
@@ -698,7 +812,46 @@ init (deprecated since 0.6.1)
 
       .. deprecated:: 0.6.1
 
+   .. tab:: Example
 
+      Follow the next CLI instructions and results for the `misc-tosca-types-csar`_ example.
+
+      .. code-block:: console
+         :emphasize-lines: 2
+
+         (venv) $ cd csars/misc-tosca-types
+         (venv) csars/misc-tosca-types$ opera init -i inputs.yaml service.yaml
+         Warning: 'opera init' command is deprecated and will probably be removed within one of the next releases. Please use 'opera deploy' to initialize and deploy service templates or compressed CSARs.
+         Service template was initialized
+
+   .. tab:: Screencast
+
+      The image below (:numref:`opera_init_service_template_svg`) shows an
+      example of initializing the TOSCA service template and then deploying it.
+      To save the orchestration data we created a custom folder (using the
+      ``--instance-path/-p option``) instead of the default ``.opera``.
+
+      .. _opera_init_service_template_svg:
+
+      .. figure:: /images/opera_init_service_template.svg
+         :target: _images/opera_init_service_template.svg
+         :width: 100%
+         :align: center
+
+         Initialization and deployment of `artifacts`_.
+
+      Another example in the figure below (:numref:`opera_init_csar_svg`)
+      shows the initialization and deployment of the compressed TOSCA CSAR
+      along with its JSON inputs.
+
+      .. _opera_init_csar_svg:
+
+      .. figure:: /images/opera_init_csar.svg
+         :target: _images/opera_init_csar.svg
+         :width: 100%
+         :align: center
+
+         Initialization and deployment of `small-csar`_.
 
 .. note::
 
@@ -706,9 +859,27 @@ init (deprecated since 0.6.1)
    within one of the next releases. Please use ``opera deploy`` to initialize
    and deploy service templates or compressed CSARs.
 
-.. hint::
+------------------------------------------------------------------------------------------------------------------------
 
-   Every CLI command is equipped with ``--help/-h`` switch that displays the
-   information about it and its arguments, and with ``--verbose/-v`` switch
-   which turns on debug mode and prints out the orchestration parameters and
-   the results from the executed Ansible playbooks.
+==========================
+Troubleshooting
+==========================
+
+Every CLI command is equipped with ``--help/-h`` switch that displays the information about it and its arguments, and
+with ``--verbose/-v`` switch which turns on debug mode and prints out the orchestration parameters and the results from
+the executed Ansible playbooks. Consider using the two switches if you face any problems. If the issue persists please
+have a look at the existing `opera issues`_ or open a new one yourself.
+
+.. _PyPI: https://pypi.org/project/opera/
+.. _opera issues: https://github.com/xlab-si/xopera-opera/issues
+.. _TOSCA interface operations: https://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.3/cos01/TOSCA-Simple-Profile-YAML-v1.3-cos01.html#_Toc26969470
+.. _misc-tosca-types-csar: https://github.com/xlab-si/xopera-examples/tree/master/csars/misc-tosca-types
+.. _small-csar: https://github.com/xlab-si/xopera-examples/tree/master/csars/small
+.. _hello-world: https://github.com/xlab-si/xopera-examples/tree/csar-examples/misc/hello-world
+.. _outputs: https://github.com/xlab-si/xopera-examples/tree/master/tosca/outputs
+.. _attribute-mapping: https://github.com/xlab-si/xopera-examples/tree/master/tosca/attribute-mapping
+.. _capability-attributes-properties: https://github.com/xlab-si/xopera-examples/tree/master/tosca/capability-attributes-properties
+.. _intrinsic-functions: https://github.com/xlab-si/xopera-examples/tree/master/tosca/intrinsic-functions
+.. _policy-triggers: https://github.com/xlab-si/xopera-examples/tree/master/tosca/policy-triggers
+.. _opera integration tests CSAR examples: https://github.com/xlab-si/xopera-opera/tree/master/tests/integration
+.. _artifacts: https://github.com/xlab-si/xopera-examples/tree/master/tosca/artifacts
