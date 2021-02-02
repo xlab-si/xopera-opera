@@ -11,4 +11,8 @@ node_types:
       test_string:
         type: string
         required: false
+    requirements:
+      - host:
+          capability: tosca.capabilities.Compute
+          relationship: tosca.relationships.HostedOn
 ...
