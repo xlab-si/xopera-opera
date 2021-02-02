@@ -8,7 +8,7 @@ import shtab
 from opera.error import DataError, ParseError
 from opera.parser import tosca
 from opera.storage import Storage
-from opera.utils import format_outputs
+from opera.utils import format_outputs, save_outputs
 
 
 def add_parser(subparsers):
@@ -25,6 +25,10 @@ def add_parser(subparsers):
         help="Output format",
     )
     parser.add_argument(
+        "--output", "-o",
+        help="Output file location"
+    )
+    parser.add_argument(
         "--verbose", "-v", action="store_true",
         help="Turns on verbose mode",
     )
@@ -39,7 +43,10 @@ def _parser_callback(args):
 
     try:
         outs = outputs(storage)
-        print(format_outputs(outs, args.format))
+        if args.output:
+            save_outputs(outs, args.format, args.output)
+        else:
+            print(format_outputs(outs, args.format))
     except ParseError as e:
         print("{}: {}".format(e.loc, e))
         return 1
