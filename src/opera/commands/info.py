@@ -11,7 +11,7 @@ from opera.error import DataError, ParseError, OperaError
 from opera.parser import tosca
 from opera.parser.tosca.csar import CloudServiceArchive
 from opera.storage import Storage
-from opera.utils import format_outputs
+from opera.utils import format_outputs, save_outputs
 
 
 def add_parser(subparsers):
@@ -26,6 +26,10 @@ def add_parser(subparsers):
     parser.add_argument(
         "--format", "-f", choices=("yaml", "json"), type=str, default="yaml",
         help="Output format",
+    )
+    parser.add_argument(
+        "--output", "-o",
+        help="Output file location"
     )
     parser.add_argument(
         "--verbose", "-v", action="store_true",
@@ -45,7 +49,10 @@ def _parser_callback(args):
     storage = Storage.create(args.instance_path)
     try:
         outs = info(args.csar_or_rootdir, storage)
-        print(format_outputs(outs, args.format))
+        if args.output:
+            save_outputs(outs, args.format, args.output)
+        else:
+            print(format_outputs(outs, args.format))
     except ParseError as e:
         print("{}: {}".format(e.loc, e))
         return 1
