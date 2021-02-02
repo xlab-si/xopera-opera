@@ -17,11 +17,11 @@ from opera.storage import Storage
 def add_parser(subparsers):
     parser = subparsers.add_parser(
         "init",
-        help="Initialize the deployment environment for the service template or CSAR"
+        help="Initialize the deployment environment for the TOSCA service template or CSAR"
     )
     parser.add_argument(
         "--instance-path", "-p",
-        help=".opera storage folder location"
+        help="Storage folder location (instead of default .opera)"
     ).complete = shtab.DIR
     parser.add_argument(
         "--inputs", "-i", type=argparse.FileType("r"),
@@ -29,7 +29,7 @@ def add_parser(subparsers):
     ).complete = shtab.FILE
     parser.add_argument(
         "--clean", "-c", action="store_true",
-        help="Clean storage by removing previously initialized service template or CSAR",
+        help="Clean storage by removing previously initialized TOSCA service template or CSAR",
     )
     parser.add_argument(
         "--verbose", "-v", action="store_true",
@@ -37,7 +37,7 @@ def add_parser(subparsers):
     )
     parser.add_argument(
         "csar", type=argparse.FileType("r"),
-        help="Cloud service archive or service template file"
+        help="TOSCA YAML service template file or CSAR"
     ).complete = shtab.FILE
     parser.set_defaults(func=_parser_callback)
 

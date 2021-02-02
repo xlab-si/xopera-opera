@@ -14,11 +14,11 @@ from opera.utils import prompt_yes_no_question
 def add_parser(subparsers):
     parser = subparsers.add_parser(
         "undeploy",
-        help="Undeploy service template"
+        help="Undeploy TOSCA service template or CSAR"
     )
     parser.add_argument(
         "--instance-path", "-p",
-        help=".opera storage folder location"
+        help="Storage folder location (instead of default .opera)"
     ).complete = shtab.DIR
     parser.add_argument(
         "--workers", "-w", type=int, default=1,

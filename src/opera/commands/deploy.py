@@ -19,11 +19,11 @@ from opera.utils import prompt_yes_no_question
 def add_parser(subparsers):
     parser = subparsers.add_parser(
         "deploy",
-        help="Deploy service template from CSAR"
+        help="Deploy TOSCA service template or CSAR"
     )
     parser.add_argument(
         "--instance-path", "-p",
-        help=".opera storage folder location"
+        help="Storage folder location (instead of default .opera)"
     )
     parser.add_argument(
         "--inputs", "-i", type=argparse.FileType("r"),
@@ -54,7 +54,7 @@ def add_parser(subparsers):
     )
     parser.add_argument(
         "template", type=argparse.FileType("r"), nargs="?",
-        help="TOSCA YAML service template file",
+        help="TOSCA YAML service template file or CSAR",
     ).complete = shtab.FILE
     parser.set_defaults(func=_parser_callback)
 
