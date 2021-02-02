@@ -2,8 +2,8 @@ import argparse
 import tempfile
 from os import path
 
+import shtab
 import yaml
-from yaml import YAMLError
 
 from opera.commands.diff import diff_instances
 from opera.compare.diff import Diff
@@ -22,11 +22,11 @@ def add_parser(subparsers):
     parser.add_argument(
         "--instance-path", "-p",
         help=".opera storage folder location"
-    )
+    ).complete = shtab.DIR
     parser.add_argument(
         "--inputs", "-i", type=argparse.FileType("r"),
         help="Optional: YAML or JSON file with inputs that will be used for deployment update",
-    )
+    ).complete = shtab.FILE
     parser.add_argument(
         "--workers", "-w", type=int, default=1,
         help="Maximum number of concurrent update threads (positive number, default 1)"
@@ -38,7 +38,7 @@ def add_parser(subparsers):
     parser.add_argument(
         "template", type=argparse.FileType("r"), nargs="?",
         help="TOSCA YAML service template file",
-    )
+    ).complete = shtab.FILE
     parser.set_defaults(func=_parser_callback)
 
 
@@ -65,7 +65,7 @@ def _parser_callback(args):
             inputs_new = yaml.safe_load(args.inputs)
         else:
             inputs_new = {}
-    except YAMLError as e:
+    except yaml.YAMLError as e:
         print("Invalid inputs: {}".format(e))
         return 1
 
