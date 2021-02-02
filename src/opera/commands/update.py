@@ -21,7 +21,7 @@ def add_parser(subparsers):
     )
     parser.add_argument(
         "--instance-path", "-p",
-        help=".opera storage folder location"
+        help="Storage folder location (instead of default .opera)"
     ).complete = shtab.DIR
     parser.add_argument(
         "--inputs", "-i", type=argparse.FileType("r"),

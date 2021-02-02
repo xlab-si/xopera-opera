@@ -16,7 +16,7 @@ from opera.parser.tosca.csar import CloudServiceArchive
 def add_parser(subparsers):
     parser = subparsers.add_parser(
         "validate",
-        help="Validate service template from CSAR"
+        help="Validate TOSCA service template or CSAR"
     )
     parser.add_argument(
         "--inputs", "-i", type=argparse.FileType("r"),
@@ -28,7 +28,7 @@ def add_parser(subparsers):
     )
     parser.add_argument(
         "csar", type=argparse.FileType("r"),
-        help="Cloud service archive or service template file"
+        help="TOSCA YAML service template file or CSAR"
     ).complete = shtab.FILE
     parser.set_defaults(func=_parser_callback)
 

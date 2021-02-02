@@ -14,11 +14,11 @@ from opera.utils import format_outputs, save_outputs
 def add_parser(subparsers):
     parser = subparsers.add_parser(
         "outputs",
-        help="Retrieve service template outputs"
+        help="Retrieve deployment outputs (from TOSCA service template)"
     )
     parser.add_argument(
         "--instance-path", "-p",
-        help=".opera storage folder location"
+        help="Storage folder location (instead of default .opera)"
     ).complete = shtab.DIR
     parser.add_argument(
         "--format", "-f", choices=("yaml", "json"), type=str, default="yaml",

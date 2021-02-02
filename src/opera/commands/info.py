@@ -21,7 +21,7 @@ def add_parser(subparsers):
     )
     parser.add_argument(
         "--instance-path", "-p",
-        help=".opera storage folder location"
+        help="Storage folder location (instead of default .opera)"
     ).complete = shtab.DIR
     parser.add_argument(
         "--format", "-f", choices=("yaml", "json"), type=str, default="yaml",
@@ -37,7 +37,7 @@ def add_parser(subparsers):
     )
     parser.add_argument(
         "csar_or_rootdir", nargs="?",
-        help="Path to a packed or unpacked CSAR. Defaults to the current directory if not specified.",
+        help="Path to a packed or unpacked TOSCA CSAR (defaults to the current directory if not specified)",
     ).complete = shtab.DIR
     parser.set_defaults(func=_parser_callback)
 
