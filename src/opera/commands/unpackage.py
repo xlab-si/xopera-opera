@@ -5,7 +5,7 @@ import shtab
 
 from opera.error import DataError, ParseError
 from opera.parser.tosca.csar import CloudServiceArchive
-from opera.utils import determine_archive_format, generate_random_pathname
+from opera.utils import generate_random_pathname
 
 
 def add_parser(subparsers):
@@ -45,8 +45,7 @@ def _parser_callback(args):
         abs_csar_path = str(csar_path.resolve())
         abs_dest_path = str(extracted_folder.resolve())
 
-        archive_format = determine_archive_format(abs_csar_path)
-        unpackage(abs_csar_path, abs_dest_path, archive_format)
+        unpackage(abs_csar_path, abs_dest_path)
         print("The CSAR was unpackaged to '{}'.".format(abs_dest_path))
     except ParseError as e:
         print("{}: {}".format(e.loc, e))
@@ -58,7 +57,7 @@ def _parser_callback(args):
     return 0
 
 
-def unpackage(csar_input: str, output_dir: str, csar_format: str):
+def unpackage(csar_input: str, output_dir: str):
     csar = CloudServiceArchive.create(PurePath(csar_input))
     # validate CSAR before unpacking it
     csar.validate_csar()
