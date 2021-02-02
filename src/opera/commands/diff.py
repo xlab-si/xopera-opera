@@ -4,8 +4,8 @@ import typing
 from os import path
 from pathlib import Path, PurePath
 
+import shtab
 import yaml
-from yaml import YAMLError
 
 from opera.compare.instance_comparer import InstanceComparer
 from opera.compare.template_comparer import TemplateComparer, TemplateContext
@@ -23,11 +23,11 @@ def add_parser(subparsers):
     parser.add_argument(
         "--instance-path", "-p",
         help=".opera storage folder location"
-    )
+    ).complete = shtab.DIR
     parser.add_argument(
         "--inputs", "-i", type=argparse.FileType("r"),
         help="Optional: YAML or JSON file with inputs that will be used along with the comparison",
-    )
+    ).complete = shtab.FILE
     parser.add_argument(
         "--verbose", "-v", action="store_true",
         help="Turns on verbose mode",
@@ -47,7 +47,7 @@ def add_parser(subparsers):
     parser.add_argument(
         "template", type=argparse.FileType("r"), nargs="?",
         help="TOSCA YAML service template file",
-    )
+    ).complete = shtab.FILE
     parser.set_defaults(func=_parser_callback)
 
 
@@ -80,7 +80,7 @@ def _parser_callback(args):
             inputs_new = yaml.safe_load(args.inputs)
         else:
             inputs_new = {}
-    except YAMLError as e:
+    except yaml.YAMLError as e:
         print("Invalid inputs: {}".format(e))
         return 1
 
