@@ -150,8 +150,7 @@ The `openfaas-thumbnail-generator`_ solution is made of two parts. Since OpenFaa
 cloud you have to set it up on a remote VM first. The second part with image-resize functionality makes use of OpenFaaS
 functions.
 
-To deploy the application follow the steps below
-or navigate to `opera-examples repository`_.
+To deploy the application follow the steps below or navigate to `opera-examples repository`_.
 
 .. code-block:: console
 
@@ -213,7 +212,103 @@ solution to AWS Lambda:
 Docker and Kubernetes
 =====================
 
-TBD.
+The ``opera`` orchestrator is capable of deploying blueprints that use Docker and Kubernetes. The following examples
+show some deployments to get you started.
+
+Docker and MinIO
+################
+
+xOpera orchestrator is able to run Docker containers by using the proper Ansible modules in the Ansible playbooks. The
+`docker`_ example was made to show how the installation of the Docker service and running Docker containers can be done
+with ``opera``, TOSCA and Ansible. To deploy the example follow the steps below.
+
+.. code-block:: console
+
+   (venv) $ cd kubernetes/docker
+   (venv) kubernetes/docker$ opera deploy -i inputs.yaml service.yaml
+   [Worker_0]   Deploying my-workstation_0
+   [Worker_0]   Deployment of my-workstation_0 complete
+   [Worker_0]   Deploying docker_0
+   [Worker_0]     Executing create on docker_0
+   [Worker_0]   Deployment of docker_0 complete
+   [Worker_0]   Deploying minio_0
+   [Worker_0]     Executing create on minio_0
+   [Worker_0]   Deployment of minio_0 complete
+
+   (venv) kubernetes/docker$ opera undeploy
+   [Worker_0]   Undeploying docker_0
+   [Worker_0]   Undeployment of docker_0 complete
+   [Worker_0]     Executing delete on docker_0
+   [Worker_0]   Undeploying minio_0
+   [Worker_0]   Undeployment of minio_0 complete
+   [Worker_0]     Executing delete on minio_0
+   [Worker_0]   Undeploying my-workstation_0
+
+The example will install Docker on a target machine and will run `MinIO object storage`_ that will be accessible on
+``localhost:9000`` where you can login wit the credentials you specified in ``inputs.yaml``.
+
+Kubernetes with Rancher
+#######################
+
+Kubernetes can be deployed using `Rancher platform`_, which is the open-source multi-cluster orchestration platform.
+The `rancher`_ example is can be used to deploy Rancher Docker container that will set up Kubernetes which can be
+accessed through the Rancher dashboard, where you can create your account (see :numref:`rancher_kubernetes_login`) and
+use cluster explorer (see :numref:`rancher_kubernetes_cluster_explorer`) to do manipulate with Kubernetes.
+
+.. _rancher_kubernetes_login:
+
+.. figure:: /images/rancher-kubernetes-login.png
+    :target: _images/rancher-kubernetes-login.png
+    :width: 80%
+    :align: center
+
+    Log in to Rancher Kubernetes dashboard.
+
+To deploy the example follow the steps below.
+
+.. code-block:: console
+
+   (venv) $ cd kubernetes/rancher
+   (venv) kubernetes/rancher opera deploy -i inputs.yaml service.yaml
+   [Worker_0]   Deploying my-workstation_0
+   [Worker_0]   Deployment of my-workstation_0 complete
+   [Worker_0]   Deploying rancher_0
+   [Worker_0]     Executing create on rancher_0
+   [Worker_0]   Deployment of rancher_0 complete
+   [Worker_0]   Deploying prometheus-helm-chart_0
+   [Worker_0]     Executing create on prometheus-helm-chart_0
+   [Worker_0]   Deployment of prometheus-helm-chart_0 complete
+
+   (venv) kubernetes/rancher$ opera undeploy
+   [Worker_0]   Undeploying prometheus-helm-chart_0
+   [Worker_0]     Executing delete on prometheus-helm-chart_0
+   [Worker_0]   Undeployment of prometheus-helm-chart_0 complete
+   [Worker_0]   Undeploying rancher_0
+   [Worker_0]     Executing delete on rancher_0
+   [Worker_0]   Undeployment of rancher_0 complete
+   [Worker_0]   Undeploying my-workstation_0
+   [Worker_0]   Undeployment of my-workstation_0 complete
+
+After running the example the Rancher dashboard will be accessible on ``localhost:80`` and ``localhost:443``.
+Additionally we deploy the `Prometheus helm chart`_ to be able to monitor the Kubernetes cluster.
+
+.. _rancher-kubernetes-dashboard:
+
+.. figure:: /images/rancher-kubernetes-dashboard.png
+    :target: _images/rancher-kubernetes-dashboard.png
+    :width: 80%
+    :align: center
+
+    Rancher Kubernetes dashboard.
+
+.. _rancher_kubernetes_cluster_explorer:
+
+.. figure:: /images/rancher-kubernetes-cluster-explorer.png
+    :target: _images/rancher-kubernetes-cluster-explorer.png
+    :width: 90%
+    :align: center
+
+    Kubernetes cluster explorer in Rancher dashboard.
 
 ===
 HPC
@@ -436,11 +531,25 @@ Cloud examples
 ||                                           || with image-resize and image-watermark functionalities          |
 +--------------------------------------------+-----------------------------------------------------------------+
 
-.. _aws-thumbnail-generator: https://github.com/xlab-si/xopera-examples/tree/csar-examples/cloud/aws/thumbnail-generator
-.. _azure-thumbnail-generator: https://github.com/xlab-si/xopera-examples/tree/csar-examples/cloud/azure/thumbnail-generator
-.. _gcp-thumbnail-generator: https://github.com/xlab-si/xopera-examples/tree/csar-examples/cloud/gcp/thumbnail-generator
-.. _openfaas-thumbnail-generator: https://github.com/xlab-si/xopera-examples/tree/csar-examples/cloud/openfaas/thumbnail-generator
-.. _aws-azure-platform-connection: https://github.com/xlab-si/xopera-examples/tree/csar-examples/cloud/platform-connection/aws-azure-connection
+.. _aws-thumbnail-generator: https://github.com/xlab-si/xopera-examples/tree/master/cloud/aws/thumbnail-generator
+.. _azure-thumbnail-generator: https://github.com/xlab-si/xopera-examples/tree/master/cloud/azure/thumbnail-generator
+.. _gcp-thumbnail-generator: https://github.com/xlab-si/xopera-examples/tree/master/cloud/gcp/thumbnail-generator
+.. _openfaas-thumbnail-generator: https://github.com/xlab-si/xopera-examples/tree/master/cloud/openfaas/thumbnail-generator
+.. _aws-azure-platform-connection: https://github.com/xlab-si/xopera-examples/tree/master/cloud/platform-connection/aws-azure-connection
+
+Kubernetes examples
+######################
+
++--------------------------------------------+-----------------------------------------------------------------+
+| Example name and link                      | Purpose                                                         |
++============================================+=================================================================+
+| `docker`_                                  | Install Docker and run a Docker container on a target machine   |
++--------------------------------------------+-----------------------------------------------------------------+
+| `rancher`_                                 | Run Kubernetes service using Rancher Docker container           |
++--------------------------------------------+-----------------------------------------------------------------+
+
+.. _docker: https://github.com/xlab-si/xopera-examples/tree/master/kubernetes/docker
+.. _rancher: https://github.com/xlab-si/xopera-examples/tree/master/kubernetes/rancher
 
 Miscellaneous examples
 ######################
@@ -459,12 +568,15 @@ Miscellaneous examples
 | `server-client`_                           | Connect server and client nodes with TOSCA relationships        |
 +--------------------------------------------+-----------------------------------------------------------------+
 
-.. _compare-templates: https://github.com/xlab-si/xopera-examples/tree/csar-examples/misc/compare-templates
-.. _concurrency: https://github.com/xlab-si/xopera-examples/tree/csar-examples/misc/concurrency
-.. _hello-world: https://github.com/xlab-si/xopera-examples/tree/csar-examples/misc/hello-world
-.. _nginx-openstack: https://github.com/xlab-si/xopera-examples/tree/csar-examples/misc/nginx-openstack
-.. _server-client: https://github.com/xlab-si/xopera-examples/tree/csar-examples/misc/server-client
+.. _compare-templates: https://github.com/xlab-si/xopera-examples/tree/master/misc/compare-templates
+.. _concurrency: https://github.com/xlab-si/xopera-examples/tree/master/misc/concurrency
+.. _hello-world: https://github.com/xlab-si/xopera-examples/tree/master/misc/hello-world
+.. _nginx-openstack: https://github.com/xlab-si/xopera-examples/tree/master/misc/nginx-openstack
+.. _server-client: https://github.com/xlab-si/xopera-examples/tree/master/misc/server-client
 
 .. _opera-examples repository: https://github.com/xlab-si/xopera-examples
 .. _object-store: https://pypi.org/project/object-store
 .. _python-object-store-library: https://github.com/xlab-si/python-object-store-library
+.. _MinIO object storage: https://min.io
+.. _Rancher platform: https://rancher.com
+.. _Prometheus helm chart: https://artifacthub.io/packages/helm/prometheus-community/prometheus
