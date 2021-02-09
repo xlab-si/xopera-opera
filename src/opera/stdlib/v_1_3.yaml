@@ -494,8 +494,9 @@ node_types:
         description: the logical name of the database
       port:
         type: integer
-        description: >
-          The port the underlying database service will listen to for data.
+        description: the port the underlying database service will listen to for data
+        # This differs from the definition in section 5.9.8 of the TOSCA standard
+        required: false
       user:
         type: string
         description: the optional user account name for DB administration
