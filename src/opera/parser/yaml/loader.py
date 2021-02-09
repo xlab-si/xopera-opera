@@ -2,7 +2,12 @@ from .constructor import Constructor
 from .resolver import Resolver
 
 try:
-    from _yaml import CParser
+    try:
+        # PyYAML>=5.4
+        from yaml._yaml import CParser
+    except ModuleNotFoundError:
+        # PyYAML<5.4
+        from _yaml import CParser
 
 
     class Loader(CParser, Constructor, Resolver):  # noqa: E303
@@ -13,6 +18,7 @@ try:
 
 
 except ImportError:
+    # pylint: disable=ungrouped-imports
     from yaml.composer import Composer
     from yaml.parser import Parser
     from yaml.reader import Reader
