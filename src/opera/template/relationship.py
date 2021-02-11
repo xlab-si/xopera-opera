@@ -1,5 +1,6 @@
 from typing import Dict
 
+from opera.constants import OperationHost as Host
 from opera.error import DataError
 from opera.instance.relationship import Relationship as Instance
 from opera.template.topology import Topology
@@ -39,12 +40,12 @@ class Relationship:
     def get_property(self, params):
         host, prop, *_ = params
 
-        if host == "HOST":
-            raise DataError("HOST is not yet supported in opera.")
-        if host != "SELF":
+        if host == Host.TARGET:
+            raise DataError("{} is not yet supported in opera.".format(Host.HOST))
+        if host != Host.SELF:
             raise DataError(
-                "Property host should be set to 'SELF' which is the only valid value. This is needed to indicate that "
-                "the property is referenced locally from something in the node itself."
+                "Property host should be set to '{}' which is the only valid value. This is needed to indicate that "
+                "the property is referenced locally from something in the node itself.".format(Host.SELF)
             )
 
         # TODO(@tadeboro): Add support for nested property values once we
@@ -57,12 +58,12 @@ class Relationship:
     def get_attribute(self, params):
         host, attr, *_ = params
 
-        if host == "HOST":
-            raise DataError("HOST is not yet supported in opera.")
-        if host != "SELF":
+        if host == Host.HOST:
+            raise DataError("{} is not yet supported in opera.".format(Host.HOST))
+        if host != Host.SELF:
             raise DataError(
-                "Attribute host should be set to 'SELF' which is the only valid value. This is needed to indicate that "
-                "the attribute is referenced locally from something in the node itself."
+                "Attribute host should be set to '{}' which is the only valid value. This is needed to indicate that "
+                "the attribute is referenced locally from something in the node itself.".format(Host.SELF)
             )
 
         if attr not in self.attributes:
@@ -84,8 +85,9 @@ class Relationship:
     def map_attribute(self, params, value):
         host, *_ = params
 
-        if host not in ("SELF", "SOURCE", "TARGET"):
-            raise DataError("Attribute host should be set to 'SELF', 'SOURCE' or 'TARGET'.")
+        valid_hosts = [i.value for i in Host]
+        if host not in valid_hosts:
+            raise DataError("Attribute host should be set to one of {}.".format(", ".join(valid_hosts)))
 
         if len(self.instances) != 1:
             raise DataError("Mapping an attribute for multiple instances not supported")

@@ -1,9 +1,11 @@
 from collections import Counter
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List
 
+from opera.constants import OperationHost as Host
 from opera.error import DataError
 from opera.instance.node import Node as Instance
+from opera.template.policy import Policy
 from opera.template.topology import Topology
 
 
@@ -28,7 +30,10 @@ class Node:
         self.interfaces = interfaces
         self.artifacts = artifacts
 
-        # This will be set when the node is inserted into a topology
+        # This will be set when the connected policies are resolved in topology.
+        self.policies: List[Policy] = []
+
+        # This will be set when the node is inserted into a topology.
         self.topology: Topology = None
 
         # This will be set at instantiation time.
@@ -87,8 +92,7 @@ class Node:
 
         return host or "localhost"
 
-    def run_operation(self, host, interface, operation, instance, verbose,
-                      workdir):
+    def run_operation(self, host, interface, operation, instance, verbose, workdir):
         operation = self.interfaces[interface].operations.get(operation)
         if operation:
             return operation.run(host, instance, verbose, workdir)
@@ -100,12 +104,12 @@ class Node:
     def get_property(self, params):
         host, prop, *rest = params
 
-        if host == "HOST":
-            raise DataError("HOST is not yet supported in opera.")
-        if host != "SELF":
+        if host == Host.HOST:
+            raise DataError("{} is not yet supported in opera.".format(Host.HOST))
+        if host != Host.SELF:
             raise DataError(
-                "Property host should be set to 'SELF' which is the only valid value. This is needed to indicate that "
-                "the property is referenced locally from something in the node itself."
+                "Property host should be set to '{}' which is the only valid value. This is needed to indicate that "
+                "the property is referenced locally from something in the node itself.".format(Host.SELF)
             )
 
         # TODO(@tadeboro): Add support for nested property values.
@@ -131,17 +135,17 @@ class Node:
             raise DataError("Cannot find property '{}'.".format(prop))
         if len(requirements) > 1:
             raise DataError("More than one requirement is named '{}'.".format(prop))
-        return requirements[0].target.get_property(["SELF"] + rest)
+        return requirements[0].target.get_property([Host.SELF] + rest)
 
     def get_attribute(self, params):
         host, *_ = params
 
-        if host == "HOST":
-            raise DataError("HOST is not yet supported in opera.")
-        if host != "SELF":
+        if host == Host.HOST:
+            raise DataError("{} is not yet supported in opera.".format(Host.HOST))
+        if host != Host.SELF:
             raise DataError(
-                "Attribute host should be set to 'SELF' which is the only valid value. This is needed to indicate that "
-                "the attribute is referenced locally from something in the node itself."
+                "Attribute host should be set to '{}' which is the only valid value. This is needed to indicate that "
+                "the attribute is referenced locally from something in the node itself.".format(Host.SELF)
             )
         if len(self.instances) != 1:
             raise DataError("Cannot get an attribute from multiple instances")
@@ -154,12 +158,12 @@ class Node:
     def map_attribute(self, params, value):
         host, *_ = params
 
-        if host == "HOST":
-            raise DataError("HOST is not yet supported in opera.")
-        if host != "SELF":
+        if host == Host.HOST:
+            raise DataError("{} is not yet supported in opera.".format(Host.HOST))
+        if host != Host.SELF:
             raise DataError(
-                "Attribute host should be set to 'SELF' which is the only valid value. This is needed to indicate that "
-                "the attribute is referenced locally from something in the node itself."
+                "Attribute host should be set to '{}' which is the only valid value. This is needed to indicate that "
+                "the attribute is referenced locally from something in the node itself.".format(Host.SELF)
             )
 
         if len(self.instances) != 1:
@@ -179,12 +183,12 @@ class Node:
         if len(rest) == 2:
             location, remove = rest
 
-        if host == "HOST":
-            raise DataError("HOST is not yet supported in opera.")
-        if host != "SELF":
+        if host == Host.HOST:
+            raise DataError("{} is not yet supported in opera.".format(Host.HOST))
+        if host != Host.SELF:
             raise DataError(
-                "Artifact host should be set to 'SELF' which is the only valid value. This is needed to indicate that "
-                "the artifact is referenced locally from something in the node itself."
+                "Artifact host should be set to '{}' which is the only valid value. This is needed to indicate that "
+                "the artifact is referenced locally from something in the node itself.".format(Host.SELF)
             )
 
         if location == "LOCAL_FILE":

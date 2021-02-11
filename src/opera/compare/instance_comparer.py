@@ -1,5 +1,6 @@
 from typing import Dict
 
+from opera.constants import NodeState as State
 from .comparisons import MapComparison
 from .diff import Diff
 
@@ -28,12 +29,12 @@ class InstanceComparer:
         for node1 in topology_template1.nodes.values():
             node_name = self._get_template_name(node1)
             if not nodes_diff.find_key(node_name):
-                node1.set_state("initial", write=False)
+                node1.set_state(State.INITIAL, write=False)
 
         for node2 in topology_template2.nodes.values():
             node_name = self._get_template_name(node2)
             if not nodes_diff.find_key(node_name):
-                node2.set_state("started", write=False)
+                node2.set_state(State.STARTED, write=False)
 
     def _check_dependencies(self, nodes, changed_nodes, parent_name, parent_changed):
         dependency_changes: Dict[str, set] = {}
@@ -82,4 +83,4 @@ class InstanceComparer:
         # comparing states we assume that all nodes in new instance model
         # would be in "started" state after deployment
         state1 = node1.attributes["state"].data
-        return state1 == "started", [state1, "started"]
+        return state1 == State.STARTED, [state1, State.STARTED]
