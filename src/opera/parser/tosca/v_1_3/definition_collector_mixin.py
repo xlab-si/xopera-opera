@@ -2,6 +2,8 @@
 
 import collections
 
+from opera.constants import StandardInterfaceOperation, ConfigureInterfaceOperation
+
 
 class DefinitionCollectorMixin:
     def collect_types(self, service_ast):
@@ -41,6 +43,20 @@ class DefinitionCollectorMixin:
                 defs[name]["operations"].update(definition["operations"])
 
         for name, definition in self.get("interfaces", {}).items():
+            if name == StandardInterfaceOperation.shorthand_name() or name == StandardInterfaceOperation.type_uri():
+                valid_standard_interface_operation_names = [i.value for i in StandardInterfaceOperation]
+                for operation in definition.get("operations", {}):
+                    if operation not in valid_standard_interface_operation_names:
+                        self.abort("Invalid operation for {} interface: {}. Valid operation names are: {}"
+                                   .format(name, operation, valid_standard_interface_operation_names), self.loc)
+
+            if name == ConfigureInterfaceOperation.shorthand_name() or name == ConfigureInterfaceOperation.type_uri():
+                valid_configure_interface_operation_names = [i.value for i in ConfigureInterfaceOperation]
+                for operation in definition.get("operations", {}):
+                    if operation not in valid_configure_interface_operation_names:
+                        self.abort("Invalid operation for {} interface: {}. Valid operation names are: {}"
+                                   .format(name, operation, valid_configure_interface_operation_names), self.loc)
+
             defs[name]["inputs"].update(definition.get("inputs", {}))
             defs[name]["operations"].update(definition.get("operations", {}))
 

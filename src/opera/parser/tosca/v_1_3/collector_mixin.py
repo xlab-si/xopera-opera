@@ -61,7 +61,7 @@ class CollectorMixin:
 
         undeclared_interfaces = set(assignments.keys()) - definitions.keys()
         if undeclared_interfaces:
-            self.abort("Invalid interfaces: {}.".format(", ".join(undeclared_interfaces)), self.loc)
+            self.abort("Undeclared interfaces: {}.".format(", ".join(undeclared_interfaces)), self.loc)
 
         # Next section is nasty. You have been warned.
         interfaces = {}
