@@ -1,3 +1,4 @@
+from opera.constants import OperationHost as Host
 from opera.error import DataError
 from opera.executor import ansible
 from opera.threading import utils as thread_utils
@@ -22,11 +23,11 @@ class Operation:
         # TODO(@tadeboro): Properly handle SELF - not even sure what this
         # proper way would be at this time.
         host = self.host or host
-        if host in ("SELF", "HOST"):
+        if host in (Host.SELF, Host.HOST):
             actual_host = instance.get_host()
-        elif host == "SOURCE":
+        elif host == Host.SOURCE:
             actual_host = instance.source.get_host()
-        elif host == "TARGET":
+        elif host == Host.TARGET:
             actual_host = instance.target.get_host()
         else:  # ORCHESTRATOR
             actual_host = "localhost"

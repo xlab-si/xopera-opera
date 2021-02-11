@@ -1,5 +1,6 @@
 import itertools
 
+from opera.constants import NodeState as State
 from opera.error import DataError, OperationError
 from opera.instance.topology import Topology
 from opera.value import Value
@@ -16,7 +17,7 @@ class Base:
         self.attributes = dict(
             tosca_name=Value(None, True, template.name),
             tosca_id=Value(None, True, instance_id),
-            state=Value(None, True, "initial"),
+            state=Value(None, True, State.INITIAL),
         )
 
         self.reset_attributes()

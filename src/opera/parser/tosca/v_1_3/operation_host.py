@@ -1,8 +1,9 @@
+from opera.constants import OperationHost as Host
 from ..string import String
 
 
 class OperationHost(String):
-    VALID_HOSTS = {"SELF", "HOST", "SOURCE", "TARGET", "ORCHESTRATOR"}
+    VALID_HOSTS = [h.value for h in Host]
 
     @classmethod
     def validate(cls, yaml_node):

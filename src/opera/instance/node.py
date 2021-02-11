@@ -1,3 +1,5 @@
+from opera.constants import StandardInterfaceOperation as Standard, ConfigureInterfaceOperation as Configure, \
+    NodeState as State, OperationHost as Host
 from opera.error import DataError
 from opera.threading import utils as thread_utils
 from .base import Base
@@ -31,11 +33,11 @@ class Node(Base):
 
     @property
     def deployed(self):
-        return self.state == "started"
+        return self.state == State.STARTED
 
     @property
     def undeployed(self):
-        return self.state == "initial"
+        return self.state == State.INITIAL
 
     @property
     def ready_for_deploy(self):
@@ -61,33 +63,37 @@ class Node(Base):
     def deploy(self, verbose, workdir):
         thread_utils.print_thread("  Deploying {}".format(self.tosca_id))
 
-        self.set_state("creating")
-        self.run_operation("HOST", "Standard", "create", verbose, workdir)
-        self.set_state("created")
-        self.set_state("configuring")
+        self.set_state(State.CREATING)
+        self.run_operation(Host.HOST, Standard.shorthand_name(), Standard.CREATE, verbose, workdir)
+        self.set_state(State.CREATED)
+        self.set_state(State.CONFIGURING)
 
         for requirement in set(r.name for r in self.template.requirements):
             for relationship in self.out_edges[requirement].values():
-                relationship.run_operation("SOURCE", "Configure", "pre_configure_source", verbose, workdir)
+                relationship.run_operation(Host.SOURCE, Configure.shorthand_name(), Configure.PRE_CONFIGURE_SOURCE,
+                                           verbose, workdir)
 
         for requirement_dependants in self.in_edges.values():
             for relationship in requirement_dependants.values():
-                relationship.run_operation("TARGET", "Configure", "pre_configure_target", verbose, workdir)
+                relationship.run_operation(Host.TARGET, Configure.shorthand_name(), Configure.PRE_CONFIGURE_TARGET,
+                                           verbose, workdir)
 
-        self.run_operation("HOST", "Standard", "configure", verbose, workdir)
+        self.run_operation(Host.HOST, Standard.shorthand_name(), Standard.CONFIGURE, verbose, workdir)
 
         for requirement in set(r.name for r in self.template.requirements):
             for relationship in self.out_edges[requirement].values():
-                relationship.run_operation("SOURCE", "Configure", "post_configure_source", verbose, workdir)
+                relationship.run_operation(Host.SOURCE, Configure.shorthand_name(), Configure.POST_CONFIGURE_SOURCE,
+                                           verbose, workdir)
 
         for requirement_dependants in self.in_edges.values():
             for relationship in requirement_dependants.values():
-                relationship.run_operation("TARGET", "Configure", "post_configure_target", verbose, workdir)
+                relationship.run_operation(Host.TARGET, Configure.shorthand_name(), Configure.POST_CONFIGURE_TARGET,
+                                           verbose, workdir)
 
-        self.set_state("configured")
-        self.set_state("starting")
-        self.run_operation("HOST", "Standard", "start", verbose, workdir)
-        self.set_state("started")
+        self.set_state(State.CONFIGURED)
+        self.set_state(State.STARTING)
+        self.run_operation(Host.HOST, Standard.shorthand_name(), Standard.START, verbose, workdir)
+        self.set_state(State.STARTED)
 
         # TODO(@tadeboro): Execute various add hooks
         thread_utils.print_thread("  Deployment of {} complete".format(self.tosca_id))
@@ -95,13 +101,13 @@ class Node(Base):
     def undeploy(self, verbose, workdir):
         thread_utils.print_thread("  Undeploying {}".format(self.tosca_id))
 
-        self.set_state("stopping")
-        self.run_operation("HOST", "Standard", "stop", verbose, workdir)
-        self.set_state("configured")
+        self.set_state(State.STOPPING)
+        self.run_operation(Host.HOST, Standard.shorthand_name(), Standard.STOP, verbose, workdir)
+        self.set_state(State.CONFIGURED)
 
-        self.set_state("deleting")
-        self.run_operation("HOST", "Standard", "delete", verbose, workdir)
-        self.set_state("initial")
+        self.set_state(State.DELETING)
+        self.run_operation(Host.HOST, Standard.shorthand_name(), Standard.DELETE, verbose, workdir)
+        self.set_state(State.INITIAL)
 
         # TODO(@tadeboro): Execute various remove hooks
 
@@ -116,9 +122,9 @@ class Node(Base):
     def get_attribute(self, params):
         host, attr, *rest = params
 
-        if host == "HOST":
+        if host == Host.HOST:
             raise DataError("HOST is not yet supported in opera.")
-        if host != "SELF":
+        if host != Host.SELF:
             raise DataError("Attribute host should be set to 'SELF' which is the only valid value. "
                             "This is needed to indicate that the attribute is referenced locally from something "
                             "in the node itself.")
@@ -146,7 +152,7 @@ class Node(Base):
             raise DataError("Cannot find attribute '{}'.".format(attr))
         if len(relationships) > 1:
             raise DataError("Targeting more than one instance via '{}'.".format(attr))
-        return next(iter(relationships.values())).target.get_attribute(["SELF"] + rest)
+        return next(iter(relationships.values())).target.get_attribute([Host.SELF] + rest)
 
     def get_property(self, params):
         return self.template.get_property(params)
@@ -157,9 +163,9 @@ class Node(Base):
     def map_attribute(self, params, value):
         host, attr, *_ = params
 
-        if host == "HOST":
+        if host == Host.HOST:
             raise DataError("HOST is not yet supported in opera.")
-        if host != "SELF":
+        if host != Host.SELF:
             raise DataError("Attribute host should be set to 'SELF' which is the only valid value. "
                             "This is needed to indicate that the attribute is referenced locally from something "
                             "in the node itself.")

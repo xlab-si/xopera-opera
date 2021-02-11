@@ -1,5 +1,6 @@
 import itertools
 
+from opera.constants import OperationHost as Host
 from opera.error import DataError
 from opera.instance.topology import Topology as Instance
 
@@ -86,16 +87,16 @@ class Topology:
     def get_property(self, params):
         entity_name, *rest = params
 
-        return self.find_node_or_relationship(entity_name).get_property(["SELF"] + rest)
+        return self.find_node_or_relationship(entity_name).get_property([Host.SELF] + rest)
 
     def get_attribute(self, params):
         entity_name, *rest = params
-        return self.find_node_or_relationship(entity_name).get_attribute(["SELF"] + rest)
+        return self.find_node_or_relationship(entity_name).get_attribute([Host.SELF] + rest)
 
     def get_artifact(self, params):
         entity_name, *rest = params
 
-        return self.find_node_or_relationship(entity_name).get_artifact(["SELF"] + rest)
+        return self.find_node_or_relationship(entity_name).get_artifact([Host.SELF] + rest)
 
     def concat(self, params, node=None):
         if not isinstance(params, list):
