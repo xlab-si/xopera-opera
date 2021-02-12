@@ -110,8 +110,8 @@ class CollectorMixin:
                     ), self.loc)
 
                 # Outputs, which define the attribute mapping, come from:
-                #  1. inteface operation definition,
-                #  2. inteface operation assignment in template section
+                #  1. interface operation definition,
+                #  2. interface operation assignment in template section
                 outputs = {
                     k: [s.data for s in v.data]
                     for k, v in op_definition.get("outputs", {}).items()
