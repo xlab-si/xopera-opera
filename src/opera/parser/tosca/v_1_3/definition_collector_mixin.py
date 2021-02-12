@@ -64,3 +64,9 @@ class DefinitionCollectorMixin:
 
     def collect_artifact_definitions(self, service_ast):
         return self._collect_definitions("artifacts", service_ast)
+
+    def collect_target_definitions(self, service_ast):
+        return {target.data: target for target in self.get("targets", [])}
+
+    def collect_trigger_definitions(self, service_ast):
+        return self._collect_definitions("triggers", service_ast)

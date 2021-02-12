@@ -6,11 +6,12 @@ from opera.instance.topology import Topology as Instance
 
 
 class Topology:
-    def __init__(self, inputs, outputs, nodes, relationships):
+    def __init__(self, inputs, outputs, nodes, relationships, policies):
         self.inputs = inputs
         self.outputs = outputs
         self.nodes = nodes
         self.relationships = relationships
+        self.policies = policies
 
         for node in self.nodes.values():
             node.topology = self

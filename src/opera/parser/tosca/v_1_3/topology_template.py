@@ -24,17 +24,22 @@ class TopologyTemplate(Entity):
     )
 
     def get_template(self, inputs, service_ast):
+        # nodes will be used also for collecting policies so retrieve them here only once
+        nodes = {name: node_ast.get_template(name, service_ast)
+                 for name, node_ast in self.get("node_templates", {}).items()}
+
         topology = Topology(
             inputs=self.collect_inputs(inputs, service_ast),
             outputs=self.collect_outputs(service_ast),
-            nodes={
-                name: node_ast.get_template(name, service_ast)
-                for name, node_ast in self.get("node_templates", {}).items()
-            },
+            nodes=nodes,
             relationships={
                 name: rel_ast.get_template(name, service_ast)
                 for name, rel_ast in self.get("relationship_templates", {}).items()
             },
+            policies=[
+                next(pol_ast.get_template(name, service_ast, nodes) for name, pol_ast in pol.items())
+                for pol in self.get("policies", [])
+            ]
         )
         topology.resolve_requirements()
         return topology
