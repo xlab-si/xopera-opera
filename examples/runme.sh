@@ -47,6 +47,7 @@ $opera_executable outputs -p intrinsic_functions/.opera
 echo "Testing an example from ./policy_triggers ..."
 mkdir policy_triggers/.opera
 $opera_executable deploy -p policy_triggers/.opera policy_triggers/service.yaml
+$opera_executable undeploy -p policy_triggers/.opera
 
 # test an example from ./relationship_outputs
 echo "Testing an example from ./relationship_outputs ..."
