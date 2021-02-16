@@ -25,8 +25,14 @@ node_types:
       Standard:
         type: tosca.interfaces.node.lifecycle.Standard
         operations:
-          create:
-            implementation: playbooks/create.yaml
+          create: playbooks/create.yaml
+          delete: playbooks/delete.yaml
+      scaling_up:
+        type: radon.interfaces.scaling.ScaleUp
+      scaling_down:
+        type: radon.interfaces.scaling.ScaleDown
+      autoscaling:
+        type: radon.interfaces.scaling.AutoScale
 
 interface_types:
   radon.interfaces.scaling.ScaleDown:
@@ -61,8 +67,8 @@ policy_types:
   radon.policies.scaling.ScaleDown:
     derived_from: tosca.policies.Scaling
     properties:
-      cpu_upper_bound:
-        description: The upper bound for the CPU
+      cpu_lower_bound:
+        description: The lower bound for the CPU
         type: float
         required: false
         constraints:
@@ -75,19 +81,20 @@ policy_types:
           - less_or_equal: -1
     targets: [ radon.nodes.OpenStack.VM ]
     triggers:
-      radon.triggers.scaling:
+      radon.triggers.scaling.ScaleDown:
         description: A trigger for scaling down
         event: scale_down_trigger
         target_filter:
           node: radon.nodes.OpenStack.VM
         condition:
-          - not:
-              - and:
-                  - available_instances: [ { greater_than: 42 } ]
-                  - available_space: [ { greater_than: 1000 } ]
+          constraint:
+            - not:
+                - and:
+                    - available_instances: [ { greater_than: 42 } ]
+                    - available_space: [ { greater_than: 1000 } ]
         action:
           - call_operation:
-              operation: radon.interfaces.scaling.ScaleDown.scale_down
+              operation: scaling_down.scale_down
               inputs:
                 adjustment: { get_property: [ SELF, adjustment ] }
 
@@ -108,19 +115,20 @@ policy_types:
           - greater_or_equal: 1
     targets: [ radon.nodes.OpenStack.VM ]
     triggers:
-      radon.triggers.scaling:
+      radon.triggers.scaling.ScaleUp:
         description: A trigger for scaling up
         event: scale_up_trigger
         target_filter:
           node: radon.nodes.OpenStack.VM
         condition:
-          - not:
-              - and:
-                  - available_instances: [ { greater_than: 42 } ]
-                  - available_space: [ { greater_than: 1000 } ]
+          constraint:
+            - not:
+                - and:
+                    - available_instances: [ { greater_than: 42 } ]
+                    - available_space: [ { greater_than: 1000 } ]
         action:
           - call_operation:
-              operation: radon.interfaces.scaling.ScaleUp.scale_up
+              operation: scaling_up.scale_up
               inputs:
                 adjustment: { get_property: [ SELF, adjustment ] }
 
@@ -165,7 +173,7 @@ topology_template:
     - scale_down:
         type: radon.policies.scaling.ScaleDown
         properties:
-          cpu_upper_bound: 90
+          cpu_lower_bound: 10
           adjustment: 1
 
     - scale_up:
@@ -181,7 +189,7 @@ topology_template:
           max_size: 7
         targets: [ openstack_vm ]
         triggers:
-          radon.triggers.scaling:
+          radon.triggers.scaling.AutoScale:
             description: A trigger for autoscaling
             event: auto_scale_trigger
             schedule:
@@ -201,5 +209,5 @@ topology_template:
               evaluations: 2
               method: average
             action:
-              - call_operation: radon.interfaces.scaling.AutoScale.retrieve_info
-              - call_operation: radon.interfaces.scaling.AutoScale.autoscale
+              - call_operation: autoscaling.retrieve_info
+              - call_operation: autoscaling.autoscale
