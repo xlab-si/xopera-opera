@@ -42,6 +42,7 @@ class TopologyTemplate(Entity):
             ]
         )
         topology.resolve_requirements()
+        topology.resolve_policies()
         return topology
 
     def collect_inputs(self, inputs, service_ast):
