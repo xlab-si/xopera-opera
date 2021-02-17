@@ -1,3 +1,5 @@
+from typing import Optional
+
 from opera.threading import NodeExecutor
 
 
@@ -34,7 +36,7 @@ class Topology:
                 do_deploy = executor.wait_results()
 
     def undeploy(self, verbose, workdir, num_workers=None):
-        # Currently, we are running a really stupid O(n^3) algorithm, but  unless we get to the templates with
+        # Currently, we are running a really stupid O(n^3) algorithm, but unless we get to the templates with
         # millions of node instances, we should be fine.
         with NodeExecutor(num_workers) as executor:
             do_undeploy = True
@@ -45,6 +47,18 @@ class Topology:
                             and executor.can_submit(node.tosca_id)):
                         executor.submit_operation(node.undeploy, node.tosca_id, verbose, workdir)
                 do_undeploy = executor.wait_results()
+
+    def notify(self, verbose: bool, workdir: str, trigger_name_or_event: Optional[str],
+               notification_file_contents: Optional[str], num_workers=1):
+        # This will run selected interface operations on triggers from policies that have been applied to nodes.
+        with NodeExecutor(num_workers) as executor:
+            do_notify = True
+            while do_notify:
+                for node in self.nodes.values():
+                    if not node.notified and executor.can_submit(node.tosca_id):
+                        executor.submit_operation(node.notify, node.tosca_id, verbose, workdir, trigger_name_or_event,
+                                                  notification_file_contents)
+                do_notify = executor.wait_results()
 
     def write(self, data, instance_id):
         self.storage.write_json(data, "instances", instance_id)
