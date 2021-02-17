@@ -3,6 +3,7 @@ from opera.commands import (  # noqa: F401
     diff,
     info,
     init,
+    notify,
     outputs,
     package,
     undeploy,
