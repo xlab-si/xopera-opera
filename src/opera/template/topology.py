@@ -31,6 +31,17 @@ class Topology:
                 if relationship.name in self.relationships.keys():
                     self.relationships[relationship.name] = relationship
 
+    def resolve_policies(self):
+        for node in self.nodes.values():
+            for policy in self.policies:
+                if policy.targets:
+                    # apply policy to node if node name matches the target names that policy is limited to
+                    if node.name in policy.targets.keys():
+                        node.policies.append(policy)
+                else:
+                    # if we don't have target limits or filters apply policy to every node
+                    node.policies.append(policy)
+
     def instantiate(self, storage):
         return Instance(storage, itertools.chain.from_iterable(node.instantiate() for node in self.nodes.values()))
 
