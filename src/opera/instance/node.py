@@ -1,7 +1,12 @@
+from typing import Optional
+
 from opera.constants import StandardInterfaceOperation as Standard, ConfigureInterfaceOperation as Configure, \
     NodeState as State, OperationHost as Host
 from opera.error import DataError
+from opera.error import ToscaDeviationError
+from opera.template.trigger import Trigger
 from opera.threading import utils as thread_utils
+from opera.value import Value
 from .base import Base
 
 
@@ -11,6 +16,7 @@ class Node(Base):
 
         self.in_edges = {}  # This gets filled by other instances for us.
         self.out_edges = {}  # This is what we fill during the linking phase.
+        self.notified = False  # This indicates whether the node has been notified.
 
     def instantiate_relationships(self):
         if not self.topology:
@@ -116,6 +122,50 @@ class Node(Base):
 
         thread_utils.print_thread("  Undeployment of {} complete".format(self.tosca_id))
 
+    def invoke_trigger(self, verbose: bool, workdir: str, trigger: Trigger,
+                       notification_file_contents: Optional[str]):
+        for interface_name, operation_name, _ in trigger.action:
+            # get node's interface and interface operations that are referenced in a trigger action
+            interface = self.template.interfaces.get(interface_name, None)
+            operation = interface.operations.get(operation_name, None) if interface else None
+
+            if interface is not None and operation is not None:
+                if notification_file_contents:
+                    # add notification file contents to operation inputs that are exposed in the executor
+                    if "notification" in operation.inputs:
+                        raise ToscaDeviationError("The input name: notification within the node: {} cannot be "
+                                                  "used. It it reserved and holds the contents of notification "
+                                                  "file. Please rename it.".format(self.template.name))
+
+                    notification_value = Value(None, True, notification_file_contents)
+                    operation.inputs.update({"notification": notification_value})
+
+                self.run_operation(Host.HOST, interface_name, operation_name, verbose, workdir)
+
+    def notify(self, verbose: bool, workdir: str, trigger_name_or_event: Optional[str],
+               notification_file_contents: Optional[str]):
+        thread_utils.print_thread("  Notifying {}".format(self.tosca_id))
+
+        for policy in self.template.policies:
+            for trigger_name, trigger in policy.triggers.items():
+                # break here if trigger is not targeting this node
+                if trigger.target_filter and trigger.target_filter[0] != self.template.name:
+                    break
+
+                invoke_trigger = True
+                if trigger_name_or_event is not None and trigger_name_or_event not in (trigger_name,
+                                                                                       trigger.event.data):
+                    invoke_trigger = False
+
+                # invoke the chosen trigger only if it contains any actions
+                if invoke_trigger and trigger.action:
+                    thread_utils.print_thread("   Calling trigger {} with event {}".format(trigger_name, trigger.event))
+                    self.invoke_trigger(verbose, workdir, trigger, notification_file_contents)
+                    thread_utils.print_thread("   Calling trigger actions with event {} complete".format(trigger.event))
+
+        self.notified = True
+        thread_utils.print_thread("  Notification on {} complete".format(self.tosca_id))
+
     #
     # TOSCA functions
     #
@@ -123,11 +173,11 @@ class Node(Base):
         host, attr, *rest = params
 
         if host == Host.HOST:
-            raise DataError("HOST is not yet supported in opera.")
+            raise DataError("{} is not yet supported in opera.".format(Host.HOST))
         if host != Host.SELF:
-            raise DataError("Attribute host should be set to 'SELF' which is the only valid value. "
+            raise DataError("Attribute host should be set to '{}' which is the only valid value. "
                             "This is needed to indicate that the attribute is referenced locally from something "
-                            "in the node itself.")
+                            "in the node itself.".format(Host.SELF))
 
         # TODO(@tadeboro): Add support for nested attribute values once we
         # have data type support.
@@ -164,11 +214,11 @@ class Node(Base):
         host, attr, *_ = params
 
         if host == Host.HOST:
-            raise DataError("HOST is not yet supported in opera.")
+            raise DataError("{} is not yet supported in opera.".format(Host.HOST))
         if host != Host.SELF:
-            raise DataError("Attribute host should be set to 'SELF' which is the only valid value. "
+            raise DataError("Attribute host should be set to '{}' which is the only valid value. "
                             "This is needed to indicate that the attribute is referenced locally from something "
-                            "in the node itself.")
+                            "in the node itself.".format(Host.SELF))
 
         # TODO(@tadeboro): Add support for nested attribute values once we
         # have data type support.
