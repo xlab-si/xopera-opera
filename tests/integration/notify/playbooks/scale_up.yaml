@@ -1,0 +1,14 @@
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: Start scaling up
+      debug:
+        msg: "Scaling up..."
+
+    - name: See what's in the notification file from monitoring that was supplied to opera notify
+      debug:
+        msg: "{{ notification }}"
+
+    - name: Finish scaling up
+      debug:
+        msg: "Scaled up..."

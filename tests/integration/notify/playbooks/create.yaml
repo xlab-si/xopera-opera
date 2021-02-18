@@ -1,0 +1,10 @@
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: Start creating AWS Lambda
+      debug:
+        msg: "Creating AWS Lambda..."
+
+    - name: Finish creating AWS Lambda
+      debug:
+        msg: "Created AWS Lambda."

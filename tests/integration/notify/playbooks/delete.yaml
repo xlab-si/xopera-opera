@@ -1,0 +1,10 @@
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: Start deleting AWS Lambda
+      debug:
+        msg: "Deleting AWS Lambda..."
+
+    - name: Finish deleting AWS Lambda
+      debug:
+        msg: "Deleted AWS Lambda."
