@@ -11,8 +11,16 @@ In this section we show some simple examples of orchestrating with xOpera. All t
 Private cloud
 =============
 
+The xOpera orchestration tool enables setting up and deployment within private cloud providers such as OpenStack or
+OpenFaaS.
+
+IaaS
+####
+
+This part contains Infrastructure as a Service (IaaS) examples for private cloud providers.
+
 OpenStack client setup
-######################
+----------------------
 
 This subsection describes `nginx-openstack`_ example.
 Because using OpenStack modules from Ansible playbooks is quite common, we can
@@ -33,6 +41,44 @@ we must source the rc file by running::
 After we enter the password, we are ready to start using the OpenStack modules
 in playbooks that implement life cycle operations.
 
+FaaS
+####
+
+This part contains Function as a Service (FaaS) and Serverless examples for private cloud providers.
+
+To get you started with cloud deployment we prepared a simple thumbnail generator application for different platforms
+which also supports the idea of Serverless computing in FaaS environments. The main functionality of this solution is t
+he image resize functionality. To create thumbnails the source image must be uploaded into input bucket and then three
+thumbnails will be created and saved to another output bucket.
+
+OpenFaaS
+--------
+
+The `openfaas-thumbnail-generator`_ solution is made of two parts. Since OpenFaaS can be treated as a sort of private
+cloud you have to set it up on a remote VM first. The second part with image-resize functionality makes use of OpenFaaS
+functions.
+
+To deploy the application follow the steps below or navigate to `opera-examples repository`_.
+
+.. code-block:: console
+
+    # install necessary prerequisites
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install --upgrade pip
+    pip install git+https://github.com/ansible/ansible.git@devel
+    pip install opera
+
+    # configure MinIO credentials (here we use default example access and secret key)
+    echo '{ "minio_access_key": "AKIAIOSFODNN7EXAMPLE", "minio_secret_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" }' > /tmp/credentials.json
+
+    # modify vars in inputs.yaml and run ansible playbook build.yaml it to build and pack docker image with image-resize function (or use prepared tar in examples)
+    cd docker-image-templates
+    ansible-playbook build.yaml
+
+    # run deployment with with xOpera (here you should prepare a new VM on OpenStack and configure it to use passwordless ssh)
+    OPERA_SSH_USER=root opera deploy -i inputs.yaml service.yaml
+
 .. warning::
 
     If you want to deploy on a remote VM you should use ``OPERA_SSH_USER`` env var to tell xOpera as which user you want
@@ -43,14 +89,16 @@ Public cloud
 ============
 
 xOpera and Ansible open up a great possibility to deploy solutions on different public cloud providers such as
-Amazon Web Services (AWS), Microsoft Azure (Azure), Google Cloud Platform (GCP), OpenFaaS.
+Amazon Web Services (AWS), Microsoft Azure (Azure) or Google Cloud Platform (GCP).
 
-Serverless
-##########
+FaaS
+####
+
+This part contains Function as a Service (FaaS) and Serverless examples for public cloud providers.
 
 To get you started with cloud deployment we prepared a simple thumbnail generator application for different cloud
 platforms which also supports the idea of Serverless computing in FaaS environments. The main functionality of this
-solution is the  image resize functionality. Zo create thumbnails the ource image must be uploaded into input bucket
+solution is the image resize functionality. To create thumbnails the source image must be uploaded into input bucket
 and then three thumbnails will be created and saved to another output bucket.
 
 Amazon Web Services (AWS)
@@ -142,34 +190,6 @@ application follow the steps below or navigate to `opera-examples repository`_.
 
     # run xOpera service (don't forget to set the appropriate inputs in inputs.yaml)
     opera deploy -i inputs.yaml service.yaml
-
-OpenFaaS
---------
-
-The `openfaas-thumbnail-generator`_ solution is made of two parts. Since OpenFaaS can be treated as a sort of private
-cloud you have to set it up on a remote VM first. The second part with image-resize functionality makes use of OpenFaaS
-functions.
-
-To deploy the application follow the steps below or navigate to `opera-examples repository`_.
-
-.. code-block:: console
-
-    # install necessary prerequisites
-    python3 -m venv .venv
-    source .venv/bin/activate
-    pip install --upgrade pip
-    pip install git+https://github.com/ansible/ansible.git@devel
-    pip install opera
-
-    # configure MinIO credentials (here we use default example access and secret key)
-    echo '{ "minio_access_key": "AKIAIOSFODNN7EXAMPLE", "minio_secret_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" }' > /tmp/credentials.json
-
-    # modify vars in inputs.yaml and run ansible playbook build.yaml it to build and pack docker image with image-resize function (or use prepared tar in examples)
-    cd docker-image-templates
-    ansible-playbook build.yaml
-
-    # run deployment with with xOpera (here you should prepare a new VM on OpenStack and configure it to use passwordless ssh)
-    OPERA_SSH_USER=root opera deploy -i inputs.yaml service.yaml
 
 Connection of cloud platforms
 -----------------------------
