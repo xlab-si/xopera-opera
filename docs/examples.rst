@@ -47,8 +47,8 @@ FaaS
 This part contains Function as a Service (FaaS) and Serverless examples for private cloud providers.
 
 To get you started with cloud deployment we prepared a simple thumbnail generator application for different platforms
-which also supports the idea of Serverless computing in FaaS environments. The main functionality of this solution is t
-he image resize functionality. To create thumbnails the source image must be uploaded into input bucket and then three
+which also supports the idea of Serverless computing in FaaS environments. The main functionality of this solution is
+the image resize functionality. To create thumbnails the source image must be uploaded into input bucket and then three
 thumbnails will be created and saved to another output bucket.
 
 OpenFaaS
@@ -81,8 +81,8 @@ To deploy the application follow the steps below or navigate to `opera-examples 
 
 .. warning::
 
-    If you want to deploy on a remote VM you should use ``OPERA_SSH_USER`` env var to tell xOpera as which user you want
-    to connect.
+    If you want to deploy on a remote VM you should use ``OPERA_SSH_USER`` env var to tell xOpera as which user you
+    want to connect.
 
 ============
 Public cloud
@@ -138,7 +138,8 @@ Microsoft Azure (Azure)
 -----------------------
 
 The `azure-thumbnail-generator`_ solution uses Azure Resource Group, Azure Storage Account, Azure Containers and Azure
-Function App cloud resources. To deploy the application follow the steps below or navigate to `opera-examples repository`_.
+Function App cloud resources. To deploy the application follow the steps below or navigate to
+`opera-examples repository`_.
 
 .. code-block:: console
 

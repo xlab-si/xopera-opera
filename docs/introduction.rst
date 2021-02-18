@@ -60,10 +60,10 @@ manages the actual deployment. The Ansible playbooks are now in the role of the 
 declared system, its topology and contextualisation of the components and networking.
 
 This design takes the best of both worlds. TOSCA service template is a system definition, written in proverbial stone,
-while the qualities of the individual Ansible playbooks are now shining. Within the playbooks, we can now entirely focus
-on particular elements of the overall system, such as provisioning virtual machines at the cloud provider, installing
-and configuring a service on a target node, etc. xOpera, in its capacity, takes care of all the untidy inter-playbook
-coordination, state of the deployment and so on.
+while the qualities of the individual Ansible playbooks are now shining. Within the playbooks, we can now entirely
+focus on particular elements of the overall system, such as provisioning virtual machines at the cloud provider,
+installing and configuring a service on a target node, etc. xOpera, in its capacity, takes care of all the untidy
+inter-playbook coordination, state of the deployment and so on.
 
 .. note::
 

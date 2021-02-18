@@ -53,8 +53,8 @@ The list of contributors:
 Acknowledgments
 ================
 
-- This work is being supported by the European Union’s Horizon 2020 research and innovation programme (grant no. 825040,
-  `RADON`_).
+- This work is being supported by the European Union’s Horizon 2020 research and innovation programme
+  (grant no. 825040, `RADON`_).
 
 - The work described here has been conducted within the Research & Innovation action `SODALITE`_ (project no. 825480),
   started in February 2019, and co-funded by the European Commission under the Information and Communication

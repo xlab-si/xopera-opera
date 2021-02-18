@@ -117,8 +117,10 @@ deploy
 
       - ``root_file`` file - contains the path to the service template or CSAR
       - ``inputs`` file - JSON file with the supplied inputs
-      - ``instances`` folder - includes JSON files that carry the information about the status of TOSCA node and relationship instances
-      - ``csars`` folder contains the extracted copy of your CSAR (created only if you deployed the compressed TOSCA CSAR)
+      - ``instances`` folder - includes JSON files that carry the information about the status of TOSCA node and
+        relationship instances
+      - ``csars`` folder contains the extracted copy of your CSAR (created only if you deployed the compressed TOSCA
+        CSAR)
 
    .. tab:: Example
 
@@ -137,7 +139,8 @@ deploy
 
    .. tab:: Screencast
 
-      A simple deployment of TOSCA service template is shown on the next image (:numref:`opera_deploy_service_template_svg`).
+      A simple deployment of TOSCA service template is shown on the next image
+      (:numref:`opera_deploy_service_template_svg`).
 
       .. _opera_deploy_service_template_svg:
 
@@ -1052,7 +1055,8 @@ init (deprecated since 0.6.1)
 
       - ``root_file`` file - contains the path to the service template or CSAR
       - ``inputs`` file - JSON file with the supplied inputs
-      - ``csars`` folder contains the extracted copy of your CSAR (created only if you deployed the compressed TOSCA CSAR)
+      - ``csars`` folder contains the extracted copy of your CSAR (created only if you deployed the compressed TOSCA
+        CSAR)
 
       After running ``opera init`` you will be able to initiate the deployment
       process using just the ``opera deploy`` command without any positional
