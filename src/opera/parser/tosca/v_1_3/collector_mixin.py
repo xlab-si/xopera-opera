@@ -123,17 +123,17 @@ class CollectorMixin:
 
                 # Operation implementation details
                 impl = op_assignment.get("implementation") or op_definition.get("implementation")
-                # TODO(@tadeboro): impl can be None here. Fix this.
+                # TODO(@tadeboro): when impl is None we also pass that forward to operation objects. Fix this if needed.
                 timeout, operation_host = 0, None
-                if "timeout" in impl:
+                if impl and "timeout" in impl:
                     timeout = impl.timeout.data
-                if "operation_host" in impl:
+                if impl and "operation_host" in impl:
                     operation_host = impl.operation_host.data
 
                 operations[op_name] = Operation(
                     op_name,
-                    primary=impl.primary.file.data,
-                    dependencies=[d.file.data for d in impl.get("dependencies", [])],
+                    primary=impl.primary.file.data if impl else None,
+                    dependencies=[d.file.data for d in impl.get("dependencies", [])] if impl else [],
                     artifacts=[a.data for a in self.collect_artifacts(service_ast).values()],
                     inputs=inputs,
                     outputs=outputs,

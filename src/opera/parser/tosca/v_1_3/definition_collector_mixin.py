@@ -43,19 +43,32 @@ class DefinitionCollectorMixin:
                 defs[name]["operations"].update(definition["operations"])
 
         for name, definition in self.get("interfaces", {}).items():
-            if name == StandardInterfaceOperation.shorthand_name() or name == StandardInterfaceOperation.type_uri():
+            standard_interface_names = [StandardInterfaceOperation.shorthand_name(),
+                                        StandardInterfaceOperation.type_uri()]
+            configure_interface_names = [ConfigureInterfaceOperation.shorthand_name(),
+                                         ConfigureInterfaceOperation.type_uri()]
+
+            if name in standard_interface_names:
                 valid_standard_interface_operation_names = [i.value for i in StandardInterfaceOperation]
                 for operation in definition.get("operations", {}):
                     if operation not in valid_standard_interface_operation_names:
-                        self.abort("Invalid operation for {} interface: {}. Valid operation names are: {}"
+                        self.abort("Invalid operation for {} interface: {}. Valid operation names are: {}."
                                    .format(name, operation, valid_standard_interface_operation_names), self.loc)
 
-            if name == ConfigureInterfaceOperation.shorthand_name() or name == ConfigureInterfaceOperation.type_uri():
+            if name in configure_interface_names:
                 valid_configure_interface_operation_names = [i.value for i in ConfigureInterfaceOperation]
                 for operation in definition.get("operations", {}):
                     if operation not in valid_configure_interface_operation_names:
-                        self.abort("Invalid operation for {} interface: {}. Valid operation names are: {}"
+                        self.abort("Invalid operation for {} interface: {}. Valid operation names are: {}."
                                    .format(name, operation, valid_configure_interface_operation_names), self.loc)
+
+            # collect operations and inputs from linked interface_types
+            # do this only when type is specified and interface name is not Standard or Configure
+            if definition.get("type", None) and name not in standard_interface_names + configure_interface_names:
+                parent_interface_type = definition.type.resolve_reference(service_ast)
+                if parent_interface_type:
+                    defs[name]["inputs"].update(parent_interface_type.get("inputs", {}))
+                    defs[name]["operations"].update(parent_interface_type.get("operations", {}))
 
             defs[name]["inputs"].update(definition.get("inputs", {}))
             defs[name]["operations"].update(definition.get("operations", {}))
