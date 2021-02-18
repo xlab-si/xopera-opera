@@ -34,6 +34,10 @@ class Operation:
 
         operation_inputs = {k: v.eval(instance, k) for k, v in self.inputs.items()}
 
+        # TODO(@tadeboro): Currently when primary is None we skip running the operation. Fix this if needed.
+        if not self.primary:
+            return True, {}, {}
+
         # TODO(@tadeboro): Generalize executors.
         success, ansible_outputs = ansible.run(
             actual_host, str(self.primary),
