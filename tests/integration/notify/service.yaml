@@ -1,0 +1,84 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  radon.nodes.aws.AwsLambda:
+    derived_from: tosca.nodes.SoftwareComponent
+    interfaces:
+      tosca.interfaces.node.lifecycle.Standard:
+        operations:
+          create: playbooks/create.yaml
+          delete: playbooks/delete.yaml
+      radon.interfaces.scaling:
+        operations:
+          scale_down: playbooks/scale_down.yaml
+          scale_up: playbooks/scale_up.yaml
+
+  radon.nodes.monitoring.configure:
+    derived_from: tosca.nodes.SoftwareComponent
+    interfaces:
+      Standard:
+        type: tosca.interfaces.node.lifecycle.Standard
+        operations:
+          configure:
+            implementation: playbooks/configure.yaml
+            inputs:
+              cpu_lower_bound:
+                type: float
+                default: { get_property: [ radon.policies.scaling.ScaleDown, cpu_lower_bound ] }
+              cpu_upper_bound:
+                type: float
+                default: { get_property: [ radon.policies.scaling.ScaleUp, cpu_upper_bound ] }
+
+policy_types:
+  radon.policies.scaling.ScaleDown:
+    derived_from: tosca.policies.Scaling
+    properties:
+      cpu_lower_bound:
+        description: The lower bound for the CPU
+        type: float
+        required: false
+    targets: [ radon.nodes.aws.AwsLambda, radon.nodes.monitoring.configure ]
+    triggers:
+      radon.triggers.scaling.ScaleDown:
+        description: A trigger for scaling down
+        event: scale_down_trigger
+        target_filter:
+          node: radon.nodes.aws.AwsLambda
+        action:
+          - call_operation: radon.interfaces.scaling.scale_down
+
+  radon.policies.scaling.ScaleUp:
+    derived_from: tosca.policies.Scaling
+    properties:
+      cpu_upper_bound:
+        description: The upper bound for the CPU
+        type: float
+        required: false
+    targets: [ radon.nodes.aws.AwsLambda, radon.nodes.monitoring.configure ]
+    triggers:
+      radon.triggers.scaling.ScaleUp:
+        description: A trigger for scaling up
+        event: scale_up_trigger
+        target_filter:
+          node: radon.nodes.aws.AwsLambda
+        action:
+          - call_operation: radon.interfaces.scaling.scale_up
+
+topology_template:
+  node_templates:
+    aws_lambda:
+      type: radon.nodes.aws.AwsLambda
+
+    configure_monitoring:
+      type: radon.nodes.monitoring.configure
+
+  policies:
+    - scale_down:
+        type: radon.policies.scaling.ScaleDown
+        properties:
+          cpu_lower_bound: 10
+
+    - scale_up:
+        type: radon.policies.scaling.ScaleUp
+        properties:
+          cpu_upper_bound: 90

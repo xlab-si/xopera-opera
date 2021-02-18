@@ -1,0 +1,18 @@
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: Start the configuration of monitoring
+      debug:
+        msg: "Configuring monitoring..."
+
+    - name: Print out cpu_lower_bound input
+      debug:
+        msg: "{{ cpu_lower_bound }}"
+
+    - name: Print out cpu_upper_bound input
+      debug:
+        msg: "{{ cpu_upper_bound }}"
+
+    - name: Finish the configuration of monitoring
+      debug:
+        msg: "Monitoring configured."
