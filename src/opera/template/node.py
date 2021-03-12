@@ -107,9 +107,18 @@ class Node:
         if host == Host.HOST:
             raise DataError("{} is not yet supported in opera.".format(Host.HOST))
         if host != Host.SELF:
+            # try to find the property within connected TOSCA polices
+            for policy in self.policies:
+                if host == policy.name or host in policy.types:
+                    # TODO(@tadeboro): Add support for nested property values.
+                    if prop in policy.properties:
+                        return policy.properties[prop].eval(self, prop)
+
             raise DataError(
                 "Property host should be set to '{}' which is the only valid value. This is needed to indicate that "
-                "the property is referenced locally from something in the node itself.".format(Host.SELF)
+                "the property is referenced locally from something in the node itself. The only valid entity to get "
+                "properties from are currently TOSCA policies, but we were unable to find the policy: {}.".format(
+                    Host.SELF, host)
             )
 
         # TODO(@tadeboro): Add support for nested property values.
@@ -141,11 +150,11 @@ class Node:
         host, *_ = params
 
         if host == Host.HOST:
-            raise DataError("{} is not yet supported in opera.".format(Host.HOST))
+            raise DataError("HOST is not yet supported in opera.")
         if host != Host.SELF:
             raise DataError(
-                "Attribute host should be set to '{}' which is the only valid value. This is needed to indicate that "
-                "the attribute is referenced locally from something in the node itself.".format(Host.SELF)
+                "Attribute host should be set to 'SELF' which is the only valid value. This is needed to indicate that "
+                "the attribute is referenced locally from something in the node itself."
             )
         if len(self.instances) != 1:
             raise DataError("Cannot get an attribute from multiple instances")
@@ -159,11 +168,11 @@ class Node:
         host, *_ = params
 
         if host == Host.HOST:
-            raise DataError("{} is not yet supported in opera.".format(Host.HOST))
+            raise DataError("HOST is not yet supported in opera.")
         if host != Host.SELF:
             raise DataError(
-                "Attribute host should be set to '{}' which is the only valid value. This is needed to indicate that "
-                "the attribute is referenced locally from something in the node itself.".format(Host.SELF)
+                "Attribute host should be set to 'SELF' which is the only valid value. This is needed to indicate that "
+                "the attribute is referenced locally from something in the node itself."
             )
 
         if len(self.instances) != 1:
@@ -184,11 +193,11 @@ class Node:
             location, remove = rest
 
         if host == Host.HOST:
-            raise DataError("{} is not yet supported in opera.".format(Host.HOST))
+            raise DataError("HOST is not yet supported in opera.")
         if host != Host.SELF:
             raise DataError(
-                "Artifact host should be set to '{}' which is the only valid value. This is needed to indicate that "
-                "the artifact is referenced locally from something in the node itself.".format(Host.SELF)
+                "Artifact host should be set to 'SELF' which is the only valid value. This is needed to indicate that "
+                "the artifact is referenced locally from something in the node itself."
             )
 
         if location == "LOCAL_FILE":
