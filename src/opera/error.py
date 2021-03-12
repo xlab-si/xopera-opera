@@ -16,3 +16,7 @@ class DataError(OperaError):
 
 class OperationError(OperaError):
     """Raised on failed operation executions."""
+
+
+class ToscaDeviationError(OperaError):
+    """Raised when something is compatible with TOSCA standard, but not acceptable for the orchestrator."""
