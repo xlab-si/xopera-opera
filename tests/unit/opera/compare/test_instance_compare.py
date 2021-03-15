@@ -2,6 +2,7 @@ import pytest
 
 from opera.compare.instance_comparer import InstanceComparer
 from opera.compare.template_comparer import TemplateComparer, TemplateContext
+from opera.constants import NodeState
 
 
 class TestInstanceCompare:
@@ -56,12 +57,12 @@ class TestInstanceCompare:
     def test_prepare_update(self, service_template1, service_template2, template_diff):
         comparer = InstanceComparer()
         for node1 in service_template1[1].nodes.values():
-            node1.set_state("started")
-        assert service_template2[1].nodes["my-workstation_0"].state == "initial"
+            node1.set_state(NodeState.STARTED)
+        assert service_template2[1].nodes["my-workstation_0"].state == NodeState.INITIAL
 
         equal, diff = comparer.compare_topology_template(service_template1[1], service_template2[1], template_diff)
-        assert equal is False
+        assert not equal
 
         comparer.prepare_update(service_template1[1], service_template2[1], diff)
-        assert service_template1[1].nodes["my-workstation_0"].state == "initial"
-        assert service_template2[1].nodes["my-workstation_0"].state == "started"
+        assert service_template1[1].nodes["my-workstation_0"].state == NodeState.INITIAL
+        assert service_template2[1].nodes["my-workstation_0"].state == NodeState.STARTED

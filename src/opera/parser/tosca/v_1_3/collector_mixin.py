@@ -1,5 +1,6 @@
 # type: ignore
-
+from opera.constants import OperationHost
+from opera.error import DataError
 from opera.template.capability import Capability
 from opera.template.interface import Interface
 from opera.template.operation import Operation
@@ -128,7 +129,12 @@ class CollectorMixin:
                 if impl and "timeout" in impl:
                     timeout = impl.timeout.data
                 if impl and "operation_host" in impl:
-                    operation_host = impl.operation_host.data
+                    operation_host_value = impl.operation_host.data
+                    try:
+                        operation_host = next(oh for oh in OperationHost if oh.value == operation_host_value)
+                    except StopIteration as e:
+                        raise DataError("Could not find operation host {} in "
+                                        "{}".format(operation_host_value, list(OperationHost))) from e
 
                 operations[op_name] = Operation(
                     op_name,

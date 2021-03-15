@@ -61,7 +61,7 @@ class TestAttributeMapping:
     @pytest.mark.parametrize("host", ["SOURCE", "TARGET", "HOST" "my_collector", "other"])
     def test_map_attribute_node_bad_host(self, service_template, host):
         node = service_template.find_node("my_node")
-        with pytest.raises(DataError, match="Attribute host should be set to 'SELF'"):
+        with pytest.raises(DataError, match="The attribute's 'host' should be set to 'SELF'"):
             node.map_attribute([host, "colour"], "black")
 
     def test_map_attribute_node_bad_attribute(self, service_template):
@@ -97,20 +97,24 @@ class TestAttributeMapping:
 
         assert "steampunk" == relationship_instance.get_attribute(["SELF", "colour"])
 
-    @pytest.mark.parametrize("host",
-                             ["HOST", "my_node", "my_collector", "other"])
+    @pytest.mark.parametrize("host", [
+        ("HOST", "HOST as the attribute's 'host' is not yet supported"),
+        ("my_node", "The attribute's 'host' should be set to one of"),
+        ("my_collector", "The attribute's 'host' should be set to one of"),
+        ("other", "The attribute's 'host' should be set to one of")
+    ])
     def test_map_attribute_relationship_bad_host(self, service_template, host):
         node_source = service_template.find_node("my_collector")
         node_source_instance = next(iter(node_source.instances.values()))
         relationship_instance = next(iter(node_source_instance.out_edges["my_target"].values()))
 
-        with pytest.raises(DataError, match="Attribute host should be set to 'SELF'"):
+        with pytest.raises(DataError, match="The attribute's 'host' should be set to one of"):
             relationship_instance.map_attribute([host, "colour"], "ochre")
 
     @pytest.mark.parametrize("host, pattern", [
         ("SELF", "Instance has no 'volume' attribute"),
-        ("SOURCE", "Cannot find attribute 'volume'."),
-        ("TARGET", "Cannot find attribute 'volume'.")
+        ("SOURCE", "Cannot find attribute 'volume' among"),
+        ("TARGET", "Cannot find attribute 'volume' among")
     ])
     def test_map_attr_rel_bad_attr(self, service_template, host, pattern):
         node_source = service_template.find_node("my_collector")

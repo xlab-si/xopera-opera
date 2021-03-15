@@ -1,7 +1,8 @@
-from typing import Dict
+from typing import Dict, Union
 
-from opera.constants import OperationHost as Host
+from opera.constants import OperationHost, StandardInterfaceOperation, ConfigureInterfaceOperation
 from opera.error import DataError
+from opera.instance.base import Base
 from opera.instance.relationship import Relationship as Instance
 from opera.template.topology import Topology
 
@@ -28,8 +29,14 @@ class Relationship:
         self.instances = {relationship_id: Instance(self, relationship_id, source, target)}
         return self.instances.values()
 
-    def run_operation(self, host, interface, operation, instance, verbose, workdir):
-        operation = self.interfaces[interface].operations.get(operation)
+    def run_operation(self,
+                      host: OperationHost,
+                      interface: str,
+                      operation_type: Union[StandardInterfaceOperation, ConfigureInterfaceOperation],
+                      instance: Base,
+                      verbose: bool,
+                      workdir: str):
+        operation = self.interfaces[interface].operations.get(operation_type.value)
         if operation:
             return operation.run(host, instance, verbose, workdir)
         return True, {}, {}
@@ -40,12 +47,13 @@ class Relationship:
     def get_property(self, params):
         host, prop, *_ = params
 
-        if host == Host.TARGET:
-            raise DataError("{} is not yet supported in opera.".format(Host.HOST))
-        if host != Host.SELF:
+        if host == OperationHost.TARGET.value:
+            raise DataError("{} is not yet supported in opera.".format(OperationHost.HOST.value))
+        if host != OperationHost.SELF.value:
             raise DataError(
                 "Property host should be set to '{}' which is the only valid value. This is needed to indicate that "
-                "the property is referenced locally from something in the node itself.".format(Host.SELF)
+                "the property is referenced locally from something in the node itself. "
+                "Was: {}".format(OperationHost.SELF.value, host)
             )
 
         # TODO(@tadeboro): Add support for nested property values once we
@@ -58,12 +66,13 @@ class Relationship:
     def get_attribute(self, params):
         host, attr, *_ = params
 
-        if host == Host.HOST:
-            raise DataError("{} is not yet supported in opera.".format(Host.HOST))
-        if host != Host.SELF:
+        if host == OperationHost.HOST.value:
+            raise DataError("{} is not yet supported in opera.".format(OperationHost.HOST.value))
+        if host != OperationHost.SELF.value:
             raise DataError(
-                "Attribute host should be set to '{}' which is the only valid value. This is needed to indicate that "
-                "the attribute is referenced locally from something in the node itself.".format(Host.SELF)
+                "The attribute's 'host' should be set to '{}' which is the only valid value."
+                "This is needed to indicate that the attribute is referenced locally from something in the node itself."
+                " Was: {}".format(OperationHost.SELF.value, host)
             )
 
         if attr not in self.attributes:
@@ -85,9 +94,9 @@ class Relationship:
     def map_attribute(self, params, value):
         host, *_ = params
 
-        valid_hosts = [i.value for i in Host]
+        valid_hosts = [i.value for i in OperationHost]
         if host not in valid_hosts:
-            raise DataError("Attribute host should be set to one of {}.".format(", ".join(valid_hosts)))
+            raise DataError("The attribute's 'host' should be set to one of {}.".format(", ".join(valid_hosts)))
 
         if len(self.instances) != 1:
             raise DataError("Mapping an attribute for multiple instances not supported")

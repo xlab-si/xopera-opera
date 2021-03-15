@@ -1,4 +1,4 @@
-from opera.constants import OperationHost as Host
+from opera.constants import OperationHost
 from opera.error import DataError
 from opera.instance.base import Base
 
@@ -16,32 +16,33 @@ class Relationship(Base):
     def get_attribute(self, params):
         host, attr, *rest = params
 
-        valid_hosts = [i.value for i in Host]
+        valid_hosts = [i.value for i in OperationHost]
         if host not in valid_hosts:
-            raise DataError("Attribute host should be set to one of {}.".format(", ".join(valid_hosts)))
+            raise DataError("The attribute's 'host' should be set to one of {}.".format(", ".join(valid_hosts)))
 
-        if host == Host.SOURCE:
-            return self.source.get_attribute([Host.SELF, attr] + rest)
-        elif host == Host.TARGET:
-            return self.target.get_attribute([Host.SELF, attr] + rest)
+        if host == OperationHost.SOURCE.value:
+            return self.source.get_attribute([OperationHost.SELF.value, attr] + rest)
+        elif host == OperationHost.TARGET.value:
+            return self.target.get_attribute([OperationHost.SELF.value, attr] + rest)
 
         # TODO(@tadeboro): Add support for nested attribute values once we
         # have data type support.
         if attr not in self.attributes:
-            raise DataError("Instance has no '{}' attribute".format(attr))
+            raise DataError(
+                "Instance has no '{}' attribute. Available attributes: {}".format(attr, ", ".join(self.attributes)))
         return self.attributes[attr].eval(self, attr)
 
     def get_property(self, params):
         host, prop, *rest = params
 
-        valid_hosts = [i.value for i in Host]
+        valid_hosts = [i.value for i in OperationHost]
         if host not in valid_hosts:
-            raise DataError("Property host should be set to one of {}.".format(", ".join(valid_hosts)))
+            raise DataError("Property host should be set to one of {}. Was: {}".format(", ".join(valid_hosts), host))
 
-        if host == Host.SOURCE:
-            return self.source.get_property([Host.SELF, prop] + rest)
-        if host == Host.TARGET:
-            return self.target.get_property([Host.SELF, prop] + rest)
+        if host == OperationHost.SOURCE.value:
+            return self.source.get_property([OperationHost.SELF.value, prop] + rest)
+        if host == OperationHost.TARGET.value:
+            return self.target.get_property([OperationHost.SELF.value, prop] + rest)
         return self.template.get_property(params)
 
     def get_input(self, params):
@@ -50,28 +51,32 @@ class Relationship(Base):
     def map_attribute(self, params, value):
         host, attr, *rest = params
 
-        valid_hosts = [i.value for i in Host]
+        valid_hosts = [i.value for i in OperationHost]
+        if host == OperationHost.HOST.value:
+            raise DataError(
+                "{} as the attribute's 'host' is not yet supported in opera.".format(OperationHost.HOST.value))
         if host not in valid_hosts:
-            raise DataError("Attribute host should be set to one of {}.".format(", ".join(valid_hosts)))
+            raise DataError("The attribute's 'host' should be set to one of {}. Was: "
+                            "{}".format(", ".join(valid_hosts), host))
 
-        if host == Host.SOURCE:
-            self.source.map_attribute([Host.SELF, attr] + rest, value)
-        elif host == Host.TARGET:
-            self.target.map_attribute([Host.SELF, attr] + rest, value)
+        if host == OperationHost.SOURCE.value:
+            self.source.map_attribute([OperationHost.SELF.value, attr] + rest, value)
+        elif host == OperationHost.TARGET.value:
+            self.target.map_attribute([OperationHost.SELF.value, attr] + rest, value)
         else:
             self.set_attribute(attr, value)
 
     def get_artifact(self, params):
         host, prop, *rest = params
 
-        valid_hosts = [i.value for i in Host]
+        valid_hosts = [i.value for i in OperationHost]
         if host not in valid_hosts:
-            raise DataError("Artifact host should be set to one of {}.".format(", ".join(valid_hosts)))
+            raise DataError("Artifact host should be set to one of {}. Was: {}".format(", ".join(valid_hosts), host))
 
-        if host == Host.SOURCE:
-            return self.source.get_property([Host.SELF, prop] + rest)
-        if host == Host.TARGET:
-            return self.target.get_property([Host.SELF, prop] + rest)
+        if host == OperationHost.SOURCE.value:
+            return self.source.get_property([OperationHost.SELF.value, prop] + rest)
+        if host == OperationHost.TARGET.value:
+            return self.target.get_property([OperationHost.SELF.value, prop] + rest)
         return self.template.get_artifact(params)
 
     def concat(self, params):
