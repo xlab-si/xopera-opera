@@ -127,7 +127,7 @@ class PolicyDefinition(CollectorMixin, Entity):
         actions = []
         action_definitions = definition.get("action", [])
         for action in action_definitions:
-            # TODO(@tadeboro): implement support for other types of trigger activity definitions.
+            # TODO: implement support for other types of trigger activity definitions.
             if list(action)[0] != "call_operation":
                 self.abort("Unsupported trigger activity definitions: {}. Only call_operation is supported."
                            .format(list(action)[0]), self.loc)
@@ -174,7 +174,7 @@ class PolicyDefinition(CollectorMixin, Entity):
 
         definitions.update(assignments)
 
-        # TODO(@tadeboro): optimize this code which is now nasty with a lot of parsing, looping and everything else.
+        # TODO: optimize this code which is now nasty with a lot of parsing, looping and everything else.
         triggers = dict()
         for name, definition in definitions.items():
             # collect and resolve target filter definition
