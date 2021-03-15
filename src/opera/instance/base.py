@@ -1,6 +1,7 @@
 import itertools
+from typing import Union
 
-from opera.constants import NodeState as State
+from opera.constants import NodeState, OperationHost, StandardInterfaceOperation, ConfigureInterfaceOperation
 from opera.error import DataError, OperationError
 from opera.instance.topology import Topology
 from opera.value import Value
@@ -17,7 +18,7 @@ class Base:
         self.attributes = dict(
             tosca_name=Value(None, True, template.name),
             tosca_id=Value(None, True, instance_id),
-            state=Value(None, True, State.INITIAL),
+            state=Value(None, True, NodeState.INITIAL.value),
         )
 
         self.reset_attributes()
@@ -58,15 +59,25 @@ class Base:
 
     @property
     def state(self):
-        return self.attributes["state"].data
+        state_value = self.attributes["state"].data
+        try:
+            return next(s for s in NodeState if s.value == state_value)
+        except StopIteration as e:
+            raise DataError("Could not find state {} in {}".format(state_value, list(NodeState))) from e
 
-    def set_state(self, state, write=True):
-        self.set_attribute("state", state)
+    def set_state(self, state: NodeState, write=True):
+        self.set_attribute("state", state.value)
         if write:
             self.write()
 
-    def run_operation(self, host, interface, operation, verbose, workdir):
-        success, outputs, attributes = self.template.run_operation(host, interface, operation, self, verbose, workdir)
+    def run_operation(self,
+                      host: OperationHost,
+                      interface: str,
+                      operation_type: Union[StandardInterfaceOperation, ConfigureInterfaceOperation],
+                      verbose: bool,
+                      workdir: str):
+        success, outputs, attributes = \
+            self.template.run_operation(host, interface, operation_type, self, verbose, workdir)
 
         if not success:
             raise OperationError("Failed")
@@ -83,5 +94,7 @@ class Base:
     def set_attribute(self, name, value):
         # TODO(@tadeboro): Add type validation.
         if name not in self.attributes:
-            raise DataError("Instance has no '{}' attribute".format(name))
+            raise DataError(
+                "Instance has no '{}' attribute. Available attributes: "
+                "{}".format(name, ", ".join(self.attributes.keys())))
         self.attributes[name].set(value)

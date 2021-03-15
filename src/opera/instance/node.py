@@ -1,7 +1,6 @@
 from typing import Optional
 
-from opera.constants import StandardInterfaceOperation as Standard, ConfigureInterfaceOperation as Configure, \
-    NodeState as State, OperationHost as Host
+from opera.constants import StandardInterfaceOperation, ConfigureInterfaceOperation, NodeState, OperationHost
 from opera.error import DataError
 from opera.error import ToscaDeviationError
 from opera.template.trigger import Trigger
@@ -39,11 +38,11 @@ class Node(Base):
 
     @property
     def deployed(self):
-        return self.state == State.STARTED
+        return self.state == NodeState.STARTED
 
     @property
     def undeployed(self):
-        return self.state == State.INITIAL
+        return self.state == NodeState.INITIAL
 
     @property
     def ready_for_deploy(self):
@@ -66,40 +65,47 @@ class Node(Base):
         # localhost if nothing suitable is found.
         return self.template.get_host() or "localhost"
 
+    def _configure_requirements(self,
+                                source_operation: ConfigureInterfaceOperation,
+                                target_operation: ConfigureInterfaceOperation,
+                                verbose: bool, workdir: str):
+        for requirement in set(r.name for r in self.template.requirements):
+            for relationship in self.out_edges[requirement].values():
+                relationship.run_operation(OperationHost.SOURCE, ConfigureInterfaceOperation.shorthand_name(),
+                                           source_operation, verbose, workdir)
+
+        for requirement_dependants in self.in_edges.values():
+            for relationship in requirement_dependants.values():
+                relationship.run_operation(OperationHost.TARGET, ConfigureInterfaceOperation.shorthand_name(),
+                                           target_operation, verbose, workdir)
+
     def deploy(self, verbose, workdir):
         thread_utils.print_thread("  Deploying {}".format(self.tosca_id))
 
-        self.set_state(State.CREATING)
-        self.run_operation(Host.HOST, Standard.shorthand_name(), Standard.CREATE, verbose, workdir)
-        self.set_state(State.CREATED)
-        self.set_state(State.CONFIGURING)
+        self.set_state(NodeState.CREATING)
+        self.run_operation(OperationHost.HOST, StandardInterfaceOperation.shorthand_name(),
+                           StandardInterfaceOperation.CREATE, verbose, workdir)
+        self.set_state(NodeState.CREATED)
+        self.set_state(NodeState.CONFIGURING)
 
-        for requirement in set(r.name for r in self.template.requirements):
-            for relationship in self.out_edges[requirement].values():
-                relationship.run_operation(Host.SOURCE, Configure.shorthand_name(), Configure.PRE_CONFIGURE_SOURCE,
-                                           verbose, workdir)
+        self._configure_requirements(ConfigureInterfaceOperation.PRE_CONFIGURE_SOURCE,
+                                     ConfigureInterfaceOperation.PRE_CONFIGURE_TARGET,
+                                     verbose, workdir)
 
-        for requirement_dependants in self.in_edges.values():
-            for relationship in requirement_dependants.values():
-                relationship.run_operation(Host.TARGET, Configure.shorthand_name(), Configure.PRE_CONFIGURE_TARGET,
-                                           verbose, workdir)
+        self.run_operation(OperationHost.HOST,
+                           StandardInterfaceOperation.shorthand_name(),
+                           StandardInterfaceOperation.CONFIGURE,
+                           verbose, workdir)
 
-        self.run_operation(Host.HOST, Standard.shorthand_name(), Standard.CONFIGURE, verbose, workdir)
+        self._configure_requirements(ConfigureInterfaceOperation.POST_CONFIGURE_SOURCE,
+                                     ConfigureInterfaceOperation.POST_CONFIGURE_TARGET,
+                                     verbose, workdir)
 
-        for requirement in set(r.name for r in self.template.requirements):
-            for relationship in self.out_edges[requirement].values():
-                relationship.run_operation(Host.SOURCE, Configure.shorthand_name(), Configure.POST_CONFIGURE_SOURCE,
-                                           verbose, workdir)
-
-        for requirement_dependants in self.in_edges.values():
-            for relationship in requirement_dependants.values():
-                relationship.run_operation(Host.TARGET, Configure.shorthand_name(), Configure.POST_CONFIGURE_TARGET,
-                                           verbose, workdir)
-
-        self.set_state(State.CONFIGURED)
-        self.set_state(State.STARTING)
-        self.run_operation(Host.HOST, Standard.shorthand_name(), Standard.START, verbose, workdir)
-        self.set_state(State.STARTED)
+        self.set_state(NodeState.CONFIGURED)
+        self.set_state(NodeState.STARTING)
+        self.run_operation(OperationHost.HOST, StandardInterfaceOperation.shorthand_name(),
+                           StandardInterfaceOperation.START, verbose, workdir)
+        self.set_state(NodeState.STARTED)
 
         # TODO(@tadeboro): Execute various add hooks
         thread_utils.print_thread("  Deployment of {} complete".format(self.tosca_id))
@@ -107,13 +113,15 @@ class Node(Base):
     def undeploy(self, verbose, workdir):
         thread_utils.print_thread("  Undeploying {}".format(self.tosca_id))
 
-        self.set_state(State.STOPPING)
-        self.run_operation(Host.HOST, Standard.shorthand_name(), Standard.STOP, verbose, workdir)
-        self.set_state(State.CONFIGURED)
+        self.set_state(NodeState.STOPPING)
+        self.run_operation(OperationHost.HOST, StandardInterfaceOperation.shorthand_name(),
+                           StandardInterfaceOperation.STOP, verbose, workdir)
+        self.set_state(NodeState.CONFIGURED)
 
-        self.set_state(State.DELETING)
-        self.run_operation(Host.HOST, Standard.shorthand_name(), Standard.DELETE, verbose, workdir)
-        self.set_state(State.INITIAL)
+        self.set_state(NodeState.DELETING)
+        self.run_operation(OperationHost.HOST, StandardInterfaceOperation.shorthand_name(),
+                           StandardInterfaceOperation.DELETE, verbose, workdir)
+        self.set_state(NodeState.INITIAL)
 
         # TODO(@tadeboro): Execute various remove hooks
 
@@ -140,7 +148,7 @@ class Node(Base):
                     notification_value = Value(None, True, notification_file_contents)
                     operation.inputs.update({"notification": notification_value})
 
-                self.run_operation(Host.HOST, interface_name, operation_name, verbose, workdir)
+                self.run_operation(OperationHost.HOST, interface_name, operation_name, verbose, workdir)
 
     def notify(self, verbose: bool, workdir: str, trigger_name_or_event: Optional[str],
                notification_file_contents: Optional[str]):
@@ -172,12 +180,13 @@ class Node(Base):
     def get_attribute(self, params):
         host, attr, *rest = params
 
-        if host == Host.HOST:
-            raise DataError("{} is not yet supported in opera.".format(Host.HOST))
-        if host != Host.SELF:
-            raise DataError("Attribute host should be set to '{}' which is the only valid value. "
+        if host == OperationHost.HOST.value:
+            raise DataError(
+                "{} as the attribute's 'host' is not yet supported in opera.".format(OperationHost.HOST.value))
+        if host != OperationHost.SELF.value:
+            raise DataError("The attribute's 'host' should be set to '{}' which is the only valid value. "
                             "This is needed to indicate that the attribute is referenced locally from something "
-                            "in the node itself.".format(Host.SELF))
+                            "in the node itself. Was: {}".format(OperationHost.SELF.value, host))
 
         # TODO(@tadeboro): Add support for nested attribute values once we
         # have data type support.
@@ -199,10 +208,10 @@ class Node(Base):
         # If we have no attribute, try searching for requirement.
         relationships = self.out_edges.get(attr, {})
         if len(relationships) == 0:
-            raise DataError("Cannot find attribute '{}'.".format(attr))
+            raise DataError("Cannot find attribute '{}' among {}.".format(attr, ", ".join(self.out_edges.keys())))
         if len(relationships) > 1:
             raise DataError("Targeting more than one instance via '{}'.".format(attr))
-        return next(iter(relationships.values())).target.get_attribute([Host.SELF] + rest)
+        return next(iter(relationships.values())).target.get_attribute([OperationHost.SELF.value] + rest)
 
     def get_property(self, params):
         return self.template.get_property(params)
@@ -213,17 +222,18 @@ class Node(Base):
     def map_attribute(self, params, value):
         host, attr, *_ = params
 
-        if host == Host.HOST:
-            raise DataError("{} is not yet supported in opera.".format(Host.HOST))
-        if host != Host.SELF:
-            raise DataError("Attribute host should be set to '{}' which is the only valid value. "
+        if host == OperationHost.HOST.value:
+            raise DataError(
+                "{} as the attribute's 'host' is not yet supported in opera.".format(OperationHost.HOST.value))
+        if host != OperationHost.SELF.value:
+            raise DataError("The attribute's 'host' should be set to '{}' which is the only valid value. "
                             "This is needed to indicate that the attribute is referenced locally from something "
-                            "in the node itself.".format(Host.SELF))
+                            "in the node itself. Was: {}".format(OperationHost.SELF.value, host))
 
         # TODO(@tadeboro): Add support for nested attribute values once we
         # have data type support.
         if attr not in self.attributes:
-            raise DataError("Cannot find attribute '{}'.".format(attr))
+            raise DataError("Cannot find attribute '{}' among {}.".format(attr, ", ".join(self.attributes.keys())))
 
         self.set_attribute(attr, value)
 

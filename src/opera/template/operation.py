@@ -1,11 +1,11 @@
-from opera.constants import OperationHost as Host
+from opera.constants import OperationHost
 from opera.error import DataError
 from opera.executor import ansible
 from opera.threading import utils as thread_utils
 
 
 class Operation:
-    def __init__(self, name, primary, dependencies, artifacts, inputs, outputs, timeout, host):
+    def __init__(self, name, primary, dependencies, artifacts, inputs, outputs, timeout, host: OperationHost):
         self.name = name
         self.primary = primary
         self.dependencies = dependencies
@@ -15,7 +15,7 @@ class Operation:
         self.timeout = timeout
         self.host = host
 
-    def run(self, host, instance, verbose, workdir):
+    def run(self, host: OperationHost, instance, verbose, workdir):
         thread_utils.print_thread("    Executing {} on {}".format(self.name, instance.tosca_id))
 
         # TODO(@tadeboro): Respect the timeout option.
@@ -23,11 +23,11 @@ class Operation:
         # TODO(@tadeboro): Properly handle SELF - not even sure what this
         # proper way would be at this time.
         host = self.host or host
-        if host in (Host.SELF, Host.HOST):
+        if host in (OperationHost.SELF, OperationHost.HOST):
             actual_host = instance.get_host()
-        elif host == Host.SOURCE:
+        elif host == OperationHost.SOURCE:
             actual_host = instance.source.get_host()
-        elif host == Host.TARGET:
+        elif host == OperationHost.TARGET:
             actual_host = instance.target.get_host()
         else:  # ORCHESTRATOR
             actual_host = "localhost"

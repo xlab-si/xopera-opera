@@ -2,7 +2,7 @@ from enum import Enum
 
 
 # enum for tosca.interfaces.node.lifecycle.Standard operations
-class StandardInterfaceOperation(str, Enum):
+class StandardInterfaceOperation(Enum):
     CREATE = "create"
     CONFIGURE = "configure"
     START = "start"
@@ -19,7 +19,7 @@ class StandardInterfaceOperation(str, Enum):
 
 
 # enum for tosca.interfaces.relationship.Configure operations
-class ConfigureInterfaceOperation(str, Enum):
+class ConfigureInterfaceOperation(Enum):
     PRE_CONFIGURE_SOURCE = "pre_configure_source"
     PRE_CONFIGURE_TARGET = "pre_configure_target"
     POST_CONFIGURE_SOURCE = "post_configure_source"
@@ -39,7 +39,7 @@ class ConfigureInterfaceOperation(str, Enum):
 
 
 # enum for TOSCA node orchestration states
-class NodeState(str, Enum):
+class NodeState(Enum):
     INITIAL = "initial"
     CREATING = "creating"
     CREATED = "created"
@@ -53,12 +53,12 @@ class NodeState(str, Enum):
 
 
 # enum for TOSCA relationship orchestration states
-class RelationshipState(str, Enum):
+class RelationshipState(Enum):
     INITIAL = "initial"
 
 
 # enum for TOSCA operation hosts and reserved TOSCA functions keywords
-class OperationHost(str, Enum):
+class OperationHost(Enum):
     SELF = "SELF"
     SOURCE = "SOURCE"
     TARGET = "TARGET"
