@@ -123,7 +123,7 @@ class CollectorMixin:
 
                 # Operation implementation details
                 impl = op_assignment.get("implementation") or op_definition.get("implementation")
-                # TODO(@tadeboro): when impl is None we also pass that forward to operation objects. Fix this if needed.
+                # TODO: when impl is None we also pass that forward to operation objects. Fix this if needed.
                 timeout, operation_host = 0, None
                 if impl and "timeout" in impl:
                     timeout = impl.timeout.data

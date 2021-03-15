@@ -110,7 +110,7 @@ class Node:
             # try to find the property within connected TOSCA polices
             for policy in self.policies:
                 if host == policy.name or host in policy.types:
-                    # TODO(@tadeboro): Add support for nested property values.
+                    # TODO: Add support for nested property values.
                     if prop in policy.properties:
                         return policy.properties[prop].eval(self, prop)
 
