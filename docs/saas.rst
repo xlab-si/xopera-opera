@@ -153,6 +153,9 @@ The following is a complete example of using the xOpera SaaS API through ``curl`
     # final login step, sets cookies and automatically completes the /secret request
     cookiecurl "$redirect_url" -d "username=$your_username" -d "password=$your_password" -d credentialId=""
 
+    # xopera-saas requires you to be mindful
+    cookiecurl "$api/auth/consent" -XPOST -d "{\"iAcknowledgePotentialDataLossAndAmAwareOfAllRisks\": true}"
+
     # normal usage
     cookiecurl "$api/secret"
     cookiecurl "$api/secret" -XPOST -d "{\"name\": \"credential1\", \"path\": \"/tmp/credential.txt\", \"contents\": \"$secret_base64\"}"
@@ -191,6 +194,8 @@ Warnings about your secrets and general security
 Your secrets - not for xOpera SaaS, but those you add for services you access in CSARs etc - are stored in
 plaintext on the server xOpera SaaS is running on, and retrieved on request.
 This is necessary for the execution of your orchestration actions.
+
+All user interfaces of xOpera SaaS include a consent barrier that you must agree to in order to use the software.
 
 You need to use caution with the secrets you submit and with whom you share your workspaces.
 
