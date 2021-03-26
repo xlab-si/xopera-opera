@@ -42,12 +42,12 @@ class DefinitionCollectorMixin:
                 defs[name]["inputs"].update(definition["inputs"])
                 defs[name]["operations"].update(definition["operations"])
 
-        for name, definition in self.get("interfaces", {}).items():
-            standard_interface_names = [StandardInterfaceOperation.shorthand_name(),
-                                        StandardInterfaceOperation.type_uri()]
-            configure_interface_names = [ConfigureInterfaceOperation.shorthand_name(),
-                                         ConfigureInterfaceOperation.type_uri()]
+        standard_interface_names = [StandardInterfaceOperation.shorthand_name(),
+                                    StandardInterfaceOperation.type_uri()]
+        configure_interface_names = [ConfigureInterfaceOperation.shorthand_name(),
+                                     ConfigureInterfaceOperation.type_uri()]
 
+        for name, definition in self.get("interfaces", {}).items():
             if name in standard_interface_names:
                 valid_standard_interface_operation_names = [i.value for i in StandardInterfaceOperation]
                 for operation in definition.get("operations", {}):
