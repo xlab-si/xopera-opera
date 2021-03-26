@@ -86,7 +86,7 @@ def get_workdir(storage):
         return str(Path.cwd())
 
 
-def get_template(storage):
+def get_template(storage, workdir):
     if storage.exists("inputs"):
         inputs = storage.read_json("inputs")
     else:
@@ -99,7 +99,7 @@ def get_template(storage):
             csar_dir = Path(storage.path) / "csars" / "csar"
             ast = tosca.load(Path(csar_dir), PurePath(service_template).relative_to(csar_dir))
         else:
-            ast = tosca.load(Path.cwd(), PurePath(service_template))
+            ast = tosca.load(Path(workdir), PurePath(service_template))
 
         template = ast.get_template(inputs)
         return template

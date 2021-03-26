@@ -163,8 +163,8 @@ def diff_instances(
         instance_comparer: InstanceComparer,
         verbose_mode: bool
 ):
-    template_old = get_template(storage_old)
-    template_new = get_template(storage_new)
+    template_old = get_template(storage_old, workdir_old)
+    template_new = get_template(storage_new, workdir_new)
     topology_old = template_old.instantiate(storage_old)
     topology_new = template_new.instantiate(storage_new)
 

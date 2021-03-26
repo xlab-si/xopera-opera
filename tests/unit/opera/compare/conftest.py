@@ -106,7 +106,7 @@ def prepare_template(path, yaml_text, template):
     ast = tosca.load(path, name)
     template = ast.get_template({})
     topology = template.instantiate(storage)
-    return template, topology, path
+    return template, topology, path, storage
 
 
 @pytest.fixture
