@@ -1,5 +1,5 @@
 # type: ignore
-from opera.constants import OperationHost
+from opera.constants import OperationHost, StandardInterfaceOperation, ConfigureInterfaceOperation
 from opera.error import DataError
 from opera.template.capability import Capability
 from opera.template.interface import Interface
@@ -146,6 +146,12 @@ class CollectorMixin:
                     timeout=timeout,
                     host=operation_host,
                 )
+
+            # unify Standard and Configure interfaces with type_uri to use only shorthand_name
+            if name == StandardInterfaceOperation.type_uri():
+                name = StandardInterfaceOperation.shorthand_name()
+            if name == ConfigureInterfaceOperation.type_uri():
+                name = ConfigureInterfaceOperation.shorthand_name()
 
             interfaces[name] = Interface(name, operations)
 
