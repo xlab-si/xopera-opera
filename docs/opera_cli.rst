@@ -40,32 +40,35 @@ So the simplest way to test ``opera`` is to install it into virtual environment:
 CLI commands reference
 ==========================
 
-``opera`` was  originally meant to be used in a terminal as a client and it
+``opera`` was originally meant to be used in a terminal as a client and it
 currently allows users to execute the following commands:
 
-+---------------------+----------------------------------------------+
-| CLI command         | Purpose and description                      |
-+=====================+==============================================+
-| ``opera deploy``    | deploy TOSCA service template or CSAR        |
-+---------------------+----------------------------------------------+
-| ``opera undeploy``  | undeploy TOSCA service template or CSAR      |
-+---------------------+----------------------------------------------+
-| ``opera validate``  | validate TOSCA service template or CSAR      |
-+---------------------+----------------------------------------------+
-| ``opera outputs``   | retrieve outputs from service template       |
-+---------------------+----------------------------------------------+
-| ``opera info``      | show information about the current project   |
-+---------------------+----------------------------------------------+
-| ``opera package``   | retrieve outputs from service template       |
-+---------------------+----------------------------------------------+
-| ``opera unpackage`` | retrieve outputs from service template       |
-+---------------------+----------------------------------------------+
-| ``opera diff``      | compare service templates and instances      |
-+---------------------+----------------------------------------------+
-| ``opera update``    | update/redeploy template and instances       |
-+---------------------+----------------------------------------------+
-| ``opera init``      | initialize the service template or CSAR      |
-+---------------------+----------------------------------------------+
++---------------------+--------------------------------------------------------+
+| CLI command         | Purpose and description                                |
++=====================+========================================================+
+| ``opera deploy``    | deploy TOSCA service template or CSAR                  |
++---------------------+--------------------------------------------------------+
+| ``opera undeploy``  | undeploy TOSCA service template or CSAR                |
++---------------------+--------------------------------------------------------+
+| ``opera validate``  | validate TOSCA service template or CSAR                |
++---------------------+--------------------------------------------------------+
+| ``opera outputs``   | retrieve outputs from service template                 |
++---------------------+--------------------------------------------------------+
+| ``opera info``      | show information about the current project             |
++---------------------+--------------------------------------------------------+
+| ``opera package``   | retrieve outputs from service template                 |
++---------------------+--------------------------------------------------------+
+| ``opera unpackage`` | retrieve outputs from service template                 |
++---------------------+--------------------------------------------------------+
+| ``opera diff``      | compare service templates and instances                |
++---------------------+--------------------------------------------------------+
+| ``opera update``    | update/redeploy template and instances                 |
++---------------------+--------------------------------------------------------+
+|| ``opera notify``   || notify the orchestrator about changes after the       |
+||                    || deployment and run triggers defined in TOSCA policies |
++---------------------+--------------------------------------------------------+
+| ``opera init``      | initialize the service template or CSAR (*deprecated*) |
++---------------------+--------------------------------------------------------+
 
 The commands can be executed in a random order and the orchestrator will warn and the orchestrator will warn you
 in case if any problems. Each CLI command is described more in detail in the following sections.
@@ -788,7 +791,7 @@ diff
       .. code-block:: console
          :emphasize-lines: 21
 
-         (venv) $ cd tosca/compare-templates
+         (venv) $ cd misc/compare-templates
          (venv) misc/compare-templates$ opera deploy -i inputs1.yaml service1.yaml
          [Worker_0]   Deploying my-workstation_0
          [Worker_0]   Deployment of my-workstation_0 complete
@@ -969,7 +972,7 @@ update
       .. code-block:: console
          :emphasize-lines: 21
 
-         (venv) $ cd tosca/compare-templates
+         (venv) $ cd misc/compare-templates
          (venv) misc/compare-templates$ opera deploy -i inputs1.yaml service1.yaml
          [Worker_0]   Deploying my-workstation_0
          [Worker_0]   Deployment of my-workstation_0 complete
@@ -1023,8 +1026,143 @@ update
 
 ------------------------------------------------------------------------------------------------------------------------
 
-init (deprecated since 0.6.1)
-#############################
+notify
+######
+
+**Name**
+
+``opera notify`` - notify the orchestrator about changes after deployment and run triggers defined in TOSCA policies.
+
+**Usage**
+      .. argparse::
+         :filename: src/opera/cli.py
+         :func: create_parser
+         :prog: opera
+         :path: notify
+
+.. tabs::
+
+   .. tab:: Details
+
+      There are cases when the user would want to execute some tasks after the deployment based on the changes that
+      occur on already deployed instances at runtime. With ``opera notify`` command, the user can inform the
+      orchestrator about the changes (e.g. CPU load has increased) and the orchestrator will invoke the operations that
+      are needed to make necessary actions (e.g. horizontal or vertical scaling of the instances).
+
+      In general ``opera notify`` is meant to be used after the deployment (after running ``opera deploy``) to notify
+      the orchestrator about some changes after the deployment. According to these changes (metrics) that can be
+      specified in the notification file, the orchestrator can the execute the desired actions. In other words,
+      ``opera notify`` introduces a use case for TOSCA policies and their TOSCA triggers as it enables running TOSCA
+      policy trigger actions (these are basically just pointing to TOSCA interface operations from TOSCA nodes).
+      Notification process is invoked on every node similar to deploy or undeploy workflows.
+
+      As mentioned above the commands should be used after the deployment but this is not the limit as it can also be
+      used during other stages of orchestration (at the beginning, before deployment, after undeployment and so on).
+      The orchestrator will warn users in these non-standard scenarios because the consequences of notify can be
+      crucial.
+
+      For the CLI command, there is one mandatory positional argument called ``--trigger/-t`` (you can also use the
+      ``--event/-e`` alias for this option), which stands for trigger or event name. So, the CLI command cannot be
+      invoked just with ``opera notify`` and this is because you probably won't need to use all policy triggers, but
+      just one or two, which you can specify with by trigger's full name or its event using ``--trigger/-t`` option.
+      It is also recommended that you use the ``--notification/-n`` switch for the path to the notification file
+      (usually a JSON file) that includes changes (e.g. metrics from monitoring tool) that will be exposed to TOSCA
+      interfaces as ``notification`` variable (for example in Ansible playbooks you can use Jinja2
+      ``{{ notification }}`` template to retrieve and parse the notification file contents).
+
+   .. tab:: Example
+
+      With ``opera notify`` and by empowering the orchestrator with the practical usage of TOSCA policies and triggers
+      we wanted to enable scaling and other similar use cases that are based on policies and triggers. Many
+      applications and services (e.g. AWS Lambda, Docker containers, Kubernetes solutions etc.) that are deployed with
+      xOpera orchestrator often include the configuration of monitoring tool (e.g. Prometheus) that is able to collect
+      certain metrics like CPU load or memory usage. We wanted to ensure scaling of the solutions when certain limits
+      (from TOSCA policies) are reached (like too high CPU usage). By running opera notify the scaling scripts
+      (e.g Ansible playbooks) are invoked and scaling can be performed (the metrics from monitoring tool can also be
+      provided as a notification file).
+
+      Follow the next CLI instructions and results for the `scaling`_ example.
+
+      .. code-block:: console
+         :emphasize-lines: 11, 21
+
+         (venv) $ cd misc/scaling
+         (venv) misc/scaling$ opera deploy service.yaml
+         [Worker_0]   Deploying aws_lambda_0
+         [Worker_0]     Executing create on aws_lambda_0
+         [Worker_0]   Deployment of aws_lambda_0 complete
+         [Worker_0]   Deploying configure_monitoring_0
+         [Worker_0]     Executing configure on configure_monitoring_0
+         [Worker_0]   Deployment of configure_monitoring_0 complete
+
+         # scale down by calling scale_down_trigger event with notification_scale_down.json notification file
+         (venv) misc/scaling$ opera notify -e scale_down_trigger -n files/notification_scale_down.json
+         [Worker_0]   Notifying aws_lambda_0
+         [Worker_0]    Calling trigger radon.triggers.scaling.ScaleDown with event scale_down_trigger
+         [Worker_0]     Executing scale_down on aws_lambda_0
+         [Worker_0]    Calling trigger actions with event scale_down_trigger complete
+         [Worker_0]   Notification on aws_lambda_0 complete
+         [Worker_0]   Notifying configure_monitoring_0
+         [Worker_0]   Notification on configure_monitoring_0 complete
+
+         # scale up by calling scale_up_trigger event with notification_scale_up.json notification file
+         (venv) misc/scaling$ opera notify -e scale_up_trigger -n files/notification_scale_up.json
+         [Worker_0]   Notifying aws_lambda_0
+         [Worker_0]    Calling trigger radon.triggers.scaling.ScaleUp with event scale_up_trigger
+         [Worker_0]     Executing scale_up on aws_lambda_0
+         [Worker_0]    Calling trigger actions with event scale_up_trigger complete
+         [Worker_0]   Notification on aws_lambda_0 complete
+         [Worker_0]   Notifying configure_monitoring_0
+         [Worker_0]   Notification on configure_monitoring_0 complete
+
+      You can also try to deploy the `policy-triggers`_ example with the CLI instructions below.
+
+      .. code-block:: console
+         :emphasize-lines: 10, 20, 30
+
+         (venv) $ cd tosca/policy-triggers
+         (venv) tosca/policy-triggers$ opera deploy service.yaml
+         [Worker_0]   Deploying workstation_0
+         [Worker_0]   Deployment of workstation_0 complete
+         [Worker_0]   Deploying openstack_vm_0
+         [Worker_0]     Executing create on openstack_vm_0
+         [Worker_0]   Deployment of openstack_vm_0 complete
+
+         # invoke TOSCA policy scale down trigger interface operations with opera notify
+         (venv) tosca/policy-triggers$ opera notify -t radon.triggers.scaling.ScaleDown
+         [Worker_0]   Notifying workstation_0
+         [Worker_0]   Notification on workstation_0 complete
+         [Worker_0]   Notifying openstack_vm_0
+         [Worker_0]    Calling trigger radon.triggers.scaling.ScaleDown with event scale_down_trigger
+         [Worker_0]     Executing scale_down on openstack_vm_0
+         [Worker_0]    Calling trigger actions with event scale_down_trigger complete
+         [Worker_0]   Notification on openstack_vm_0 complete
+
+         # invoke TOSCA policy scale up trigger interface operations with opera notify
+         (venv) tosca/policy-triggers$ opera notify -t radon.triggers.scaling.ScaleUp
+         [Worker_0]   Notifying workstation_0
+         [Worker_0]   Notification on workstation_0 complete
+         [Worker_0]   Notifying openstack_vm_0
+         [Worker_0]    Calling trigger radon.triggers.scaling.ScaleUp with event scale_up_trigger
+         [Worker_0]     Executing scale_up on openstack_vm_0
+         [Worker_0]    Calling trigger actions with event scale_up_trigger complete
+         [Worker_0]   Notification on openstack_vm_0 complete
+
+         # invoke TOSCA policy auto-scale trigger interface operations with opera notify
+         (venv) tosca/policy-triggers$ opera notify -t radon.triggers.scaling.AutoScale
+         [Worker_0]   Notifying workstation_0
+         [Worker_0]   Notification on workstation_0 complete
+         [Worker_0]   Notifying openstack_vm_0
+         [Worker_0]    Calling trigger radon.triggers.scaling.AutoScale with event auto_scale_trigger
+         [Worker_0]     Executing retrieve_info on openstack_vm_0
+         [Worker_0]     Executing autoscale on openstack_vm_0
+         [Worker_0]    Calling trigger actions with event auto_scale_trigger complete
+         [Worker_0]   Notification on openstack_vm_0 complete
+
+------------------------------------------------------------------------------------------------------------------------
+
+init (deprecated)
+#################
 
 **Name**
 
@@ -1108,9 +1246,8 @@ init (deprecated since 0.6.1)
 
 .. note::
 
-   The ``opera init`` command is deprecated and will probably be removed
-   within one of the next releases. Please use ``opera deploy`` to initialize
-   and deploy service templates or compressed CSARs.
+   The ``opera init`` command is deprecated (since version *0.6.1*) and will probably be removed within one of the next
+   releases. Please use ``opera deploy`` to initialize and deploy service templates or compressed CSARs.
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -1206,7 +1343,7 @@ have a look at the existing `opera issues`_ or open a new one yourself.
 .. _TOSCA interface operations: https://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.3/cos01/TOSCA-Simple-Profile-YAML-v1.3-cos01.html#_Toc26969470
 .. _misc-tosca-types-csar: https://github.com/xlab-si/xopera-examples/tree/master/csars/misc-tosca-types
 .. _small-csar: https://github.com/xlab-si/xopera-examples/tree/master/csars/small
-.. _hello-world: https://github.com/xlab-si/xopera-examples/tree/csar-examples/misc/hello-world
+.. _hello-world: https://github.com/xlab-si/xopera-examples/tree/master/misc/hello-world
 .. _outputs: https://github.com/xlab-si/xopera-examples/tree/master/tosca/outputs
 .. _attribute-mapping: https://github.com/xlab-si/xopera-examples/tree/master/tosca/attribute-mapping
 .. _capability-attributes-properties: https://github.com/xlab-si/xopera-examples/tree/master/tosca/capability-attributes-properties
@@ -1214,5 +1351,6 @@ have a look at the existing `opera issues`_ or open a new one yourself.
 .. _policy-triggers: https://github.com/xlab-si/xopera-examples/tree/master/tosca/policy-triggers
 .. _opera integration tests CSAR examples: https://github.com/xlab-si/xopera-opera/tree/master/tests/integration
 .. _artifacts: https://github.com/xlab-si/xopera-examples/tree/master/tosca/artifacts
-.. _compare-templates: https://github.com/xlab-si/xopera-examples/tree/csar-examples/misc/compare-templates
+.. _compare-templates: https://github.com/xlab-si/xopera-examples/tree/master/misc/compare-templates
+.. _scaling: https://github.com/xlab-si/xopera-examples/tree/master/misc/scaling
 .. _shtab: https://github.com/iterative/shtab
