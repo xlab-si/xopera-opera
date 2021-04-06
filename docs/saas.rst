@@ -38,7 +38,7 @@ Let's go through the basic workflow, where you:
     :width: 95%
     :align: center
 
-    The secrets screen.
+    The secret creation screen.
 
 The first thing we need to do is create whatever secrets are necessary for your deployment to run.
 For example, these are your cloud provider secrets, SSH public keys, among others.
