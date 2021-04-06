@@ -106,7 +106,73 @@ To undeploy or delete the project, press the corresponding button.
 Eclipse Che plugin for xOpera SaaS
 ===================================
 
-*TBD*
+Most operations can be performed directly from an Eclipse Che/Visual Studio Code plugin.
+
+.. _xopera_saas_ide_fileselector:
+
+.. figure:: /images/xopera-saas-ide-fileselector.png
+    :target: _images/xopera-saas-ide-fileselector.png
+    :width: 95%
+    :align: center
+
+    The file selector, activated on CSAR files.
+
+Right clicking a CSAR brings up the option to create an xOpera SaaS project based on it.
+
+.. _xopera_saas_ide_login:
+
+.. figure:: /images/xopera-saas-ide-login.png
+    :target: _images/xopera-saas-ide-login.png
+    :width: 95%
+    :align: center
+
+    The Che plugin login dialog.
+
+Upon logging in, you are presented with a choice of workspaces, where you can decide between using a new workspace
+or choosing an existing one.
+After that, you enter the name of the project, and CSAR upload and project creation begins.
+
+.. _xopera_saas_ide_workspaces:
+
+.. figure:: /images/xopera-saas-ide-workspaces.png
+    :target: _images/xopera-saas-ide-workspaces.png
+    :width: 95%
+    :align: center
+
+    Che plugin workspace selection.
+
+.. _xopera_saas_ide_project:
+
+.. figure:: /images/xopera-saas-ide-project.png
+    :target: _images/xopera-saas-ide-project.png
+    :width: 95%
+    :align: center
+
+    Enter your project name in this dialog.
+
+Project creation progress is shown in the bottom right corner along with all other Che notifications.
+
+.. _xopera_saas_ide_progress:
+
+.. figure:: /images/xopera-saas-ide-progress.png
+    :target: _images/xopera-saas-ide-progress.png
+    :width: 95%
+    :align: center
+
+    The start and finish notifications for project creation.
+
+As a final step, you can choose to deploy the project immediately, or postpone it.
+
+.. _xopera_saas_ide_deployment:
+
+.. figure:: /images/xopera-saas-ide-deployment.png
+    :target: _images/xopera-saas-ide-deployment.png
+    :width: 95%
+    :align: center
+
+    Choose whether or not to deploy the new project immediately.
+
+Finally, you are redirected to the xOpera SaaS dashboard for finer control over your project.
 
 =======
 The API
