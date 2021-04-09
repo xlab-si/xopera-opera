@@ -2,6 +2,7 @@
 xOpera orchestration tool compliant with TOSCA YAML v1.3 in the making.
 
 [![CircleCI](https://img.shields.io/circleci/build/github/xlab-si/xopera-opera?label=circleci)](https://app.circleci.com/pipelines/github/xlab-si/xopera-opera)
+[![Code Climate coverage](https://img.shields.io/codeclimate/coverage/xlab-si/xopera-opera)](https://codeclimate.com/github/xlab-si/xopera-opera)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/xlab-si/xopera-opera)](https://github.com/xlab-si/xopera-opera/releases)
 [![GitHub contributors](https://img.shields.io/github/contributors/xlab-si/xopera-opera)](https://github.com/xlab-si/xopera-opera/graphs/contributors)
 [![GitHub top language](https://img.shields.io/github/languages/top/xlab-si/xopera-opera)](https://github.com/xlab-si/xopera-opera)
