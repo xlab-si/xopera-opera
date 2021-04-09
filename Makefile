@@ -22,6 +22,10 @@ init:
 unit_test:
 	pipenv run pytest tests/unit
 
+.PHONY: code_coverage
+code_coverage:
+	pipenv run pytest --cov=opera --cov-report=xml tests/unit/
+
 .PHONY: fix
 fix:
 	pipenv run pytest -x tests
