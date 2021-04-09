@@ -18,6 +18,21 @@ commands:
       - run: make integration_test
       - run: make examples_test
 
+  run_code_coverage:
+    description: Calculate code coverage, push results to CodeClimate and store artifacts
+    steps:
+      - common_setup
+      - run:
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+      - run: ./cc-test-reporter before-build
+      - run: make code_coverage
+      - run: ./cc-test-reporter after-build
+      - store_artifacts:
+          path: coverage.xml
+          destination: coverage-report
+
   run_integration_tests_using_released_opera_version:
     description: Test xOpera CLI commands with testing service template
     steps:
@@ -82,6 +97,10 @@ jobs:
     executor: python38
     steps:
       - run_tests
+  code_coverage:
+    executor: python37
+    steps:
+      - run_code_coverage
   nightly_xopera_test:
     executor: python37
     steps:
@@ -106,11 +125,14 @@ workflows:
       - test36
       - test37
       - test38
+      - code_coverage:
+          context: opera-code-climate
       - pypi_test_deploy:
           requires:
             - test36
             - test37
             - test38
+            - code_coverage
           context: opera-test-pypi
           filters:
             branches:
