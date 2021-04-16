@@ -102,10 +102,6 @@ run_sanity() {
     output_bandit=$(bandit --recursive --aggregate file --format txt src/opera/ 2>&1)
     code_bandit="$?"
 
-    echo "Running doc8"
-    output_doc8=$(doc8 --config .sanity-config.ini docs/)
-    code_doc8="$?"
-
     echo "Running pydocstyle"
     output_pydocstyle=$(pydocstyle --count --explain --config .sanity-config.ini src/opera/)
     code_pydocstyle="$?"
@@ -138,9 +134,6 @@ run_sanity() {
     echo "### bandit output ###"
     echo "exit code: $code_bandit"
     echo "$output_bandit"
-    echo "### doc8 output ###"
-    echo "exit code: $code_doc8"
-    echo "$output_doc8"
     echo "### pydocstyle output ###"
     echo "exit code: $code_pydocstyle"
     echo "$output_pydocstyle"
@@ -166,7 +159,6 @@ run_sanity() {
         + code_flake8
         + code_mypy
         + code_bandit
-        + code_doc8
         + code_pydocstyle
         + code_shellcheck
         + code_commit_messages

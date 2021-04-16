@@ -6,7 +6,6 @@ verify_ssl = true
 [dev-packages]
 bandit = "==1.7.0"
 docutils = "==0.16"
-doc8 = "==0.8.1"
 flake8 = "==3.8.4"
 flake8-import-order = "==0.18.1"
 mypy = "==0.790"
@@ -17,11 +16,6 @@ selinux = "==0.2.1"
 setuptools = "*"
 wheel = "*"
 twine = ">=3.0.0"
-sphinx = "==3.5.3"
-sphinx-rtd-theme = "==0.5.2"
-sphinx-tabs = "==2.1.0"
-sphinx-argparse = "==0.2.5"
-sphinx-copybutton = "==0.3.1"
 
 [packages]
 opera = {editable = true, extras = ["openstack"], path = "."}

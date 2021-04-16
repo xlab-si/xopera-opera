@@ -2,7 +2,6 @@
 xOpera orchestration tool compliant with TOSCA YAML v1.3 in the making.
 
 [![CircleCI](https://img.shields.io/circleci/build/github/xlab-si/xopera-opera?label=circleci)](https://app.circleci.com/pipelines/github/xlab-si/xopera-opera)
-[![GitHub deployments](https://img.shields.io/github/deployments/xlab-si/xopera-opera/github-pages?label=documentation)](https://xlab-si.github.io/xopera-opera/)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/xlab-si/xopera-opera)](https://github.com/xlab-si/xopera-opera/releases)
 [![GitHub contributors](https://img.shields.io/github/contributors/xlab-si/xopera-opera)](https://github.com/xlab-si/xopera-opera/graphs/contributors)
 [![GitHub top language](https://img.shields.io/github/languages/top/xlab-si/xopera-opera)](https://github.com/xlab-si/xopera-opera)
@@ -87,7 +86,7 @@ Agreements No. 825040 ([RADON]) and No. 825480 ([SODALITE]).
 [OASIS TOSCA]: https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=tosca
 [OASIS TOSCA Simple Profile in YAML v1.3]: https://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.3/TOSCA-Simple-Profile-YAML-v1.3.html
 [xOpera documentation]: https://xlab-si.github.io/xopera-docs/
-[opera CLI documentation]: https://xlab-si.github.io/xopera-opera/
+[opera CLI documentation]: https://xlab-si.github.io/xopera-docs/
 [Ansible]: https://www.ansible.com/ 
 [opera]: https://pypi.org/project/opera/
 [PyPI production]: https://pypi.org/project/opera/#history

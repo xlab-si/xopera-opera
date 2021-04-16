@@ -55,7 +55,3 @@ env-guard-%:
 	  echo "Environment variable $* not set"; \
 	  exit 1; \
 	fi
-
-.PHONY: docs
-docs:
-	pipenv run sphinx-build docs docs/_build
