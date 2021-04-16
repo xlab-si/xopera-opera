@@ -48,16 +48,40 @@ class Value:
             raise DataError("Cannot use an unset value: {}".format(key))
 
         if self.is_function:
-            return self.eval_function(instance)
+            return Value.eval_function(self.data, instance)
+
+        if isinstance(self.data, dict):
+            result_map = {}
+            for map_key, value in self.data.items():
+                result_map[map_key] = Value.check_eval_function(value, instance)
+            return result_map
+
+        if isinstance(self.data, list):
+            result_list = []
+            for value in self.data:
+                result_list.append(Value.check_eval_function(value, instance))
+            return result_list
+
         return self.data
 
     @property
     def is_function(self):
-        return isinstance(self.data, dict) and len(self.data) == 1 and tuple(self.data.keys())[0] in self.FUNCTIONS
+        return Value.check_function(self.data)
 
-    def eval_function(self, instance):
-        (function_name, params), = self.data.items()
+    @staticmethod
+    def check_function(data):
+        return isinstance(data, dict) and len(data) == 1 and tuple(data.keys())[0] in Value.FUNCTIONS
+
+    @staticmethod
+    def eval_function(data, instance):
+        (function_name, params), = data.items()
         return getattr(instance, function_name)(params)
+
+    @staticmethod
+    def check_eval_function(data, instance):
+        if Value.check_function(data):
+            return Value.eval_function(data, instance)
+        return data
 
     def __str__(self):
         return "Value({})[{}]".format(self.present, self._data)
