@@ -1,17 +1,15 @@
 # xOpera TOSCA orchestrator
 xOpera orchestration tool compliant with TOSCA YAML v1.3 in the making.
 
+[![PyPI](https://img.shields.io/pypi/v/opera)](https://pypi.org/project/opera/)
+[![Test PyPI](https://img.shields.io/badge/test%20pypi-dev%20version-blueviolet)](https://test.pypi.org/project/opera/)
 [![CircleCI](https://img.shields.io/circleci/build/github/xlab-si/xopera-opera?label=circleci)](https://app.circleci.com/pipelines/github/xlab-si/xopera-opera)
 [![Code Climate coverage](https://img.shields.io/codeclimate/coverage/xlab-si/xopera-opera)](https://codeclimate.com/github/xlab-si/xopera-opera)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/xlab-si/xopera-opera)](https://github.com/xlab-si/xopera-opera/releases)
 [![GitHub contributors](https://img.shields.io/github/contributors/xlab-si/xopera-opera)](https://github.com/xlab-si/xopera-opera/graphs/contributors)
 [![GitHub top language](https://img.shields.io/github/languages/top/xlab-si/xopera-opera)](https://github.com/xlab-si/xopera-opera)
 [![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/xlab-si/xopera-opera)](https://github.com/xlab-si/xopera-opera)
-[![PyPI](https://img.shields.io/pypi/v/opera)](https://pypi.org/project/opera/)
-[![Test PyPI](https://img.shields.io/badge/test%20pypi-dev%20version-blueviolet)](https://test.pypi.org/project/opera/)
 [![PyPI - License](https://img.shields.io/pypi/l/opera)](https://github.com/xlab-si/xopera-opera/blob/master/LICENSE)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/opera)](https://pypi.org/project/opera/)
-[![PyPI - Wheel](https://img.shields.io/pypi/wheel/opera)](https://pypi.org/project/opera/)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/opera)](https://pypi.org/project/opera/)
 
 | Aspect                         | Information                               |
@@ -43,10 +41,6 @@ $ sudo apt install -y python3-venv python3-wheel python-wheel-common
 ```
 
 ## Installation and Quickstart
-<p align="center">
-  <img src="https://raw.githubusercontent.com/xlab-si/xopera-opera/master/docs/images/opera_cli.svg?sanitize=true" alt="opera in action">
-</p>
-
 The orchestration tool is available on PyPI as a package named [opera]. Apart from the latest [PyPI production] 
 version, you can also find the latest opera [PyPI development] version, which includes pre-releases so that you will be 
 able to test the latest features before they are officially released.
@@ -66,6 +60,11 @@ GitHub repository and try to deploy a hello-world service:
 (.venv) $ git clone git@github.com:xlab-si/xopera-opera.git
 (.venv) $ cd xopera-opera/examples/hello
 (.venv) $ opera deploy service.yaml
+[Worker_0]   Deploying my-workstation_0
+[Worker_0]   Deployment of my-workstation_0 complete
+[Worker_0]   Deploying hello_0
+[Worker_0]     Executing create on hello_0
+[Worker_0]   Deployment of hello_0 complete
 ```
 
 If nothing went wrong, new empty file has been created at `/tmp/playing-opera/hello/hello.txt`.
@@ -74,6 +73,11 @@ To delete the created directory, we can undeploy our stuff by running:
 
 ```console
 (.venv) $ opera undeploy
+[Worker_0]   Undeploying hello_0
+[Worker_0]     Executing delete on hello_0
+[Worker_0]   Undeployment of hello_0 complete
+[Worker_0]   Undeploying my-workstation_0
+[Worker_0]   Undeployment of my-workstation_0 complete
 ```
 
 And that is it. For more startup examples please visit [examples folder](examples), or go to [xopera-examples] 
