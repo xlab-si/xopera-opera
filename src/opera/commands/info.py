@@ -89,10 +89,10 @@ def info(csar_or_rootdir: Optional[PurePath], storage: Storage) -> dict:
         info_dict["service_template"] = service_template
 
         if storage.exists("inputs"):
-            info_dict["inputs"] = str(storage.path / "inputs")
             inputs = yaml.safe_load(storage.read("inputs"))
         else:
             inputs = {}
+        info_dict["inputs"] = inputs
 
         if storage.exists("csars/csar"):
             csar_dir = Path(storage.path) / "csars" / "csar"
