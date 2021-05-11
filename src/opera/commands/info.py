@@ -1,8 +1,7 @@
 import argparse
 from os import path
 from pathlib import Path, PurePath
-from typing import Dict
-from typing import Optional
+from typing import Dict, Optional, Union
 
 import shtab
 import yaml
@@ -48,7 +47,12 @@ def _parser_callback(args):
 
     storage = Storage.create(args.instance_path)
     try:
-        outs = info(args.csar_or_rootdir, storage)
+        if args.csar_or_rootdir is None:
+            csar_path = "."
+        else:
+            csar_path = args.csar_or_rootdir
+
+        outs = info(PurePath(csar_path), storage)
         if args.output:
             save_outputs(outs, args.format, args.output)
         else:
@@ -63,11 +67,14 @@ def _parser_callback(args):
 
 
 def info(csar_or_rootdir: Optional[PurePath], storage: Storage) -> dict:
-    info_dict: Dict[str, Optional[str]] = dict(
+    info_dict: Dict[str, Optional[Union[str, dict, bool]]] = dict(
         service_template=None,
         content_root=None,
         inputs=None,
-        status=None
+        status=None,
+        csar_metadata=None,
+        service_template_metadata=None,
+        csar_valid=None
     )
 
     # stateless autodetect first if possible,
@@ -75,15 +82,25 @@ def info(csar_or_rootdir: Optional[PurePath], storage: Storage) -> dict:
     if csar_or_rootdir is not None:
         csar = CloudServiceArchive.create(csar_or_rootdir)
         try:
+            # this validates CSAR and the entrypoint's (if it exists) metadata
+            # failure to validate here means no static information will be available at all
             csar.validate_csar()
-            info_dict["content_root"] = str(csar_or_rootdir)
 
-            meta = csar.parse_csar_meta()
-            if meta is not None:
-                info_dict["service_template"] = meta.entry_definitions
+            info_dict["content_root"] = str(csar_or_rootdir)
+            if csar.get_entrypoint() is not None:
+                info_dict["service_template"] = str(csar.get_entrypoint())
+
+                service_template_meta = csar.parse_service_template_meta(csar.get_entrypoint())
+                info_dict["service_template_metadata"] = service_template_meta
+
+            csar_meta = csar.parse_csar_meta()
+            info_dict["csar_metadata"] = csar_meta.to_dict()
         except OperaError:
+            # anything that fails because of validation can be ignored, we can use state
+            # we mark the CSAR as invalid because it's useful to know
             pass
 
+    # detection from state, overrides stateless
     if storage.exists("root_file"):
         service_template = storage.read("root_file")
         info_dict["service_template"] = service_template
