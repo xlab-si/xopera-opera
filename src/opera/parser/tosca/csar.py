@@ -86,6 +86,16 @@ class CsarMeta:
 
         return "\n".join("{}: {}".format(k, v) for k, v in ordered_fields if v is not None)
 
+    def to_dict(self) -> dict:
+        return {
+            CsarMeta.KEY_NAME: self.name,
+            CsarMeta.KEY_CONTENT_TYPE: self.content_type,
+            CsarMeta.KEY_TOSCA_META_FILE_VERSION: self.tosca_meta_file_version,
+            CsarMeta.KEY_CSAR_VERSION: self.csar_version,
+            CsarMeta.KEY_CREATED_BY: self.created_by,
+            CsarMeta.KEY_ENTRY_DEFINITIONS: self.entry_definitions
+        }
+
 
 class ServiceTemplateMeta:
     KEY_NAME = "template_name"
@@ -115,6 +125,13 @@ class ServiceTemplateMeta:
             author=parsed["metadata"].get(ServiceTemplateMeta.KEY_AUTHOR),
             version=parsed["metadata"][ServiceTemplateMeta.KEY_VERSION],
         )
+
+    def to_dict(self) -> dict:
+        return {
+            ServiceTemplateMeta.KEY_NAME: self.name,
+            ServiceTemplateMeta.KEY_AUTHOR: self.author,
+            ServiceTemplateMeta.KEY_VERSION: self.version
+        }
 
 
 class CloudServiceArchive(ABC):
@@ -184,13 +201,13 @@ class CloudServiceArchive(ABC):
 
         if not contains_meta:
             if not contains_single_root_yaml:
-                raise OperaError("When metadata is not present, there should be exactly one root level YAML file in "
-                                 "the root of the CSAR. Files found: {}.".format(str(root_yaml_files)))
+                raise OperaError("When CSAR metadata is not present, there should be exactly one root level YAML file "
+                                 "in the root of the CSAR. Files found: {}.".format(str(root_yaml_files)))
 
             try:
                 self.parse_service_template_meta(root_yaml_files[0])
             except ParseError as e:
-                raise OperaError("When metadata is not present, the single root level YAML file must contain "
+                raise OperaError("When CSAR metadata is not present, the single root level YAML file must contain "
                                  "metadata: {}".format(str(e))) from e
 
         meta = self.parse_csar_meta()
