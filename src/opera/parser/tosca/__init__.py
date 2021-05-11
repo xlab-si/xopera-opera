@@ -1,5 +1,5 @@
 import importlib
-from pathlib import PurePath
+from pathlib import PurePath, Path
 
 from opera import stdlib
 from opera.error import ParseError
@@ -10,9 +10,9 @@ SUPPORTED_VERSIONS = dict(
 )
 
 
-def load(base_path, template_name):
-    with (base_path / template_name).open() as input_fd:
-        input_yaml = yaml.load(input_fd, str(template_name))
+def load(base_path: Path, service_template: PurePath):
+    with (base_path / service_template).open() as input_fd:
+        input_yaml = yaml.load(input_fd, str(service_template))
     if not isinstance(input_yaml.value, dict):
         raise ParseError("Top level structure should be a map.", "0:0")
 
@@ -21,7 +21,7 @@ def load(base_path, template_name):
 
     stdlib_yaml = stdlib.load(tosca_version)
     service = parser.parse_service_template(stdlib_yaml, base_path, PurePath("STDLIB"), set())[0]
-    service.merge(parser.parse_service_template(input_yaml, base_path, template_name, set())[0])
+    service.merge(parser.parse_service_template(input_yaml, base_path, service_template, set())[0])
     service.visit("resolve_path", base_path)
     service.visit("resolve_reference", service)
 
