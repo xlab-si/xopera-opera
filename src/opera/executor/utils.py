@@ -16,17 +16,14 @@ def copy(source, target):
 
 
 def write(dest_dir, content, suffix=None):
-    dest = tempfile.NamedTemporaryFile(dir=dest_dir, delete=False, suffix=suffix)
-    dest.write(content.encode("utf-8"))
-    dest.close()
-    return dest.name
+    with tempfile.NamedTemporaryFile(dir=dest_dir, delete=False, suffix=suffix) as dest:
+        dest.write(content.encode("utf-8"))
+        return dest.name
 
 
 def run_in_directory(dest_dir, cmd, env):
-    fstdout = tempfile.NamedTemporaryFile(dir=dest_dir, delete=False, suffix=".stdout")
-    fstderr = tempfile.NamedTemporaryFile(dir=dest_dir, delete=False, suffix=".stderr")
-    result = subprocess.run(cmd, cwd=dest_dir, stdout=fstdout, stderr=fstderr,  # nosec
-                            env=dict(os.environ, **env), check=False)
-    fstdout.close()
-    fstderr.close()
-    return result.returncode, fstdout.name, fstderr.name
+    with tempfile.NamedTemporaryFile(dir=dest_dir, delete=False, suffix=".stdout") as fstdout, \
+            tempfile.NamedTemporaryFile(dir=dest_dir, delete=False, suffix=".stderr") as fstderr:
+        result = subprocess.run(cmd, cwd=dest_dir, stdout=fstdout, stderr=fstderr,  # nosec
+                                env=dict(os.environ, **env), check=False)
+        return result.returncode, fstdout.name, fstderr.name

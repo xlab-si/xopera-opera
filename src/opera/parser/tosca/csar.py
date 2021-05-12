@@ -256,7 +256,7 @@ class FileCloudServiceArchive(CloudServiceArchive):
         """csar_file is guaranteed to exist, be absolute, and be a file."""
         super().__init__(str(csar_file.name))
         self.csar_file = csar_file
-        self.backing_zip = ZipFile(csar_file, mode="r")
+        self.backing_zip = ZipFile(csar_file, mode="r")  # pylint: disable=consider-using-with
 
     def package_csar(self, output_file, service_template=None, csar_format="zip") -> str:
         raise NotImplementedError("Repackaging a packaged CSAR is not implemented.")
@@ -269,7 +269,7 @@ class FileCloudServiceArchive(CloudServiceArchive):
         return [PurePath(zi.filename) for zi in self.backing_zip.infolist()]
 
     def open_member(self, path: PurePath) -> IO:
-        return self.backing_zip.open(str(path), mode="r")
+        return self.backing_zip.open(str(path), mode="r")  # pylint: disable=consider-using-with
 
     def _member_exists(self, member: PurePath) -> bool:
         try:
