@@ -316,3 +316,29 @@ class TestExecute:
         ast = tosca.load(tmp_path, name)
         with pytest.raises(ParseError, match="Missing a required property: property3"):
             ast.get_template({})
+
+    def test_undeclared_requirements(self, tmp_path, yaml_text):
+        name = pathlib.PurePath("template.yaml")
+        (tmp_path / name).write_text(yaml_text(
+            # language=yaml
+            """
+            tosca_definitions_version: tosca_simple_yaml_1_3
+            topology_template:
+              node_templates:
+                node_1:
+                  type: tosca.nodes.SoftwareComponent
+                node_2:
+                  type: tosca.nodes.SoftwareComponent
+                  requirements:
+                    - dependency: node_1
+                node_3:
+                  type: tosca.nodes.SoftwareComponent
+                  requirements:
+                    - dependency_not_defined1: node_1
+        """
+        ))
+        storage = Storage(tmp_path / pathlib.Path(".opera"))
+        storage.write("template.yaml", "root_file")
+        ast = tosca.load(tmp_path, name)
+        with pytest.raises(ParseError, match="Undeclared requirements: dependency_not_defined1"):
+            ast.get_template({})

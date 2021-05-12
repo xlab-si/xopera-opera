@@ -86,4 +86,7 @@ class NodeTemplate(CollectorMixin, Entity):
                 )
             )
 
+        if undeclared_requirements:
+            self.abort("Undeclared requirements: {}.".format(", ".join(undeclared_requirements)), self.loc)
+
         return requirements
