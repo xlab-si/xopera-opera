@@ -137,6 +137,9 @@ workflows:
       - test39
       - code_coverage:
           context: opera-code-climate
+          filters:
+            branches:
+              only: master
       - pypi_test_deploy:
           requires:
             - test36
