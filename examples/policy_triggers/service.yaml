@@ -33,6 +33,10 @@ node_types:
         type: radon.interfaces.scaling.ScaleDown
       autoscaling:
         type: radon.interfaces.scaling.AutoScale
+    requirements:
+      - host:
+          capability: tosca.capabilities.Compute
+          relationship: tosca.relationships.HostedOn
 
 interface_types:
   radon.interfaces.scaling.ScaleDown:

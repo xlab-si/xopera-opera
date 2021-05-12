@@ -40,10 +40,7 @@ node_types:
       test_capability:
         type: daily_test.capabilities.test
     requirements:
-      - host1:
+      - host:
           capability: tosca.capabilities.Compute
           relationship: daily_test.relationships.test
-      - host2:
-          capability: tosca.capabilities.Compute
-          relationship: daily_test.relationships.interfaces
 ...
