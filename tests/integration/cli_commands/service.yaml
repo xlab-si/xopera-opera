@@ -2,7 +2,7 @@
 tosca_definitions_version: tosca_simple_yaml_1_3
 
 node_types:
-  cli_commands_test.nodes.hello:
+  cli_commands_test.nodes.tokio:
     derived_from: tosca.nodes.SoftwareComponent
     attributes:
       attribute:
@@ -15,13 +15,13 @@ node_types:
     interfaces:
       Standard:
         inputs:
-          my_attribute_input: { default: { get_attribute: [SELF, attribute] }, type: string }
-          my_property_input: { default: { get_property: [SELF, property] }, type: string }
+          my_attribute_input: { default: { get_attribute: [ SELF, attribute ] }, type: string }
+          my_property_input: { default: { get_property: [ SELF, property ] }, type: string }
         operations:
           create: playbooks/create.yaml
           delete: playbooks/delete.yaml
 
-  cli_commands_test.nodes.bye:
+  cli_commands_test.nodes.berlin:
     derived_from: tosca.nodes.SoftwareComponent
     interfaces:
       Standard:
@@ -29,13 +29,13 @@ node_types:
           start: playbooks/start.yaml
           stop: playbooks/stop.yaml
 
-  cli_commands_test.nodes.node1:
+  cli_commands_test.nodes.denver:
     derived_from: tosca.nodes.SoftwareComponent
 
-  cli_commands_test.nodes.node2:
+  cli_commands_test.nodes.nairobi:
     derived_from: tosca.nodes.SoftwareComponent
 
-  cli_commands_test.nodes.node3:
+  cli_commands_test.nodes.rio:
     derived_from: tosca.nodes.SoftwareComponent
 
 topology_template:
@@ -48,29 +48,26 @@ topology_template:
       default: false
 
   node_templates:
-    test:
-      type: cli_commands_test.nodes.hello
+    tokio:
+      type: cli_commands_test.nodes.tokio
       attributes:
         attribute: { get_input: test_attribute_input }
       properties:
         property: { get_input: test_property_input }
 
-    bye:
-      type: cli_commands_test.nodes.bye
+    berlin:
+      type: cli_commands_test.nodes.berlin
 
-    node1:
-      type: cli_commands_test.nodes.node1
+    denver:
+      type: cli_commands_test.nodes.denver
 
-    node2:
-      type: cli_commands_test.nodes.node2
-
-    node3:
-      type: cli_commands_test.nodes.node3
+    nairobi:
+      type: cli_commands_test.nodes.nairobi
 
   outputs:
     output_attr:
       description: Example of attribute output
-      value: { get_attribute: [ test, attribute ] }
+      value: { get_attribute: [ tokio, attribute ] }
     output_prop:
       description: Example of property output
-      value: { get_property: [ test, property ] }
+      value: { get_property: [ tokio, property ] }

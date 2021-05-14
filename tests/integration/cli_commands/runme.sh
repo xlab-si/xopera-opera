@@ -4,7 +4,7 @@ set -euo pipefail
 # get opera executable
 opera_executable="$1"
 
-# perform an integration test for all of opera commands and their options
+# perform an integration test for most important opera CLI commands and their options
 # prepare the CSAR zip file
 zip -r test.csar service.yaml playbooks TOSCA-Metadata
 
