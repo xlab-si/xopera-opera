@@ -9,6 +9,3 @@
     - name: Say hello from node's property
       debug:
         msg: "{{ my_property_input }}"
-
-    - name: Start a long task (needed for the interruption testing)
-      shell: sleep 10
