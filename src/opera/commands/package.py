@@ -54,7 +54,8 @@ def _parser_callback(args):
         csar_output = generate_random_pathname("opera-package-")
 
     try:
-        output_package = package(args.service_template_folder, csar_output, args.service_template, args.format)
+        output_package = package(PurePath(args.service_template_folder), csar_output, PurePath(args.service_template),
+                                 args.format)
         print("CSAR was created and packed to '{}'.".format(output_package))
     except ParseError as e:
         print("{}: {}".format(e.loc, e))
@@ -66,7 +67,7 @@ def _parser_callback(args):
     return 0
 
 
-def package(input_dir: str, csar_output: str, service_template: str, csar_format: str) -> str:
-    csar = CloudServiceArchive.create(PurePath(input_dir))
-    result: str = csar.package_csar(csar_output, service_template, csar_format)
+def package(input_dir: PurePath, csar_output: str, service_template_path: PurePath, csar_format: str) -> str:
+    csar = CloudServiceArchive.create(input_dir)
+    result: str = csar.package_csar(csar_output, service_template_path, csar_format)
     return result

@@ -69,13 +69,13 @@ def outputs(storage: Storage) -> dict:
         inputs = {}
 
     if storage.exists("root_file"):
-        service_template = storage.read("root_file")
+        service_template_path = PurePath(storage.read("root_file"))
 
         if storage.exists("csars"):
             csar_dir = Path(storage.path) / "csars" / "csar"
-            ast = tosca.load(Path(csar_dir), PurePath(service_template).relative_to(csar_dir))
+            ast = tosca.load(Path(csar_dir), service_template_path.relative_to(csar_dir))
         else:
-            ast = tosca.load(Path.cwd(), PurePath(service_template))
+            ast = tosca.load(Path(service_template_path.parent), PurePath(service_template_path.name))
 
         template = ast.get_template(inputs)
         # We need to instantiate the template in order

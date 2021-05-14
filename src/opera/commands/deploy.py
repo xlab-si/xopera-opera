@@ -6,7 +6,6 @@ from zipfile import ZipFile, is_zipfile
 
 import shtab
 import yaml
-from yaml import YAMLError
 
 from opera.commands.info import info
 from opera.error import DataError, ParseError
@@ -104,10 +103,10 @@ def _parser_callback(args):  # pylint: disable=too-many-statements
             return 0
 
     if args.template:
-        service_template = args.template.name
+        csar_or_st_path = PurePath(args.template.name)
     else:
         if storage.exists("root_file"):
-            service_template = storage.read("root_file")
+            csar_or_st_path = PurePath(storage.read("root_file"))
         else:
             print("CSAR or template root file does not exist. Maybe you have forgotten to initialize it.")
             return 1
@@ -117,17 +116,17 @@ def _parser_callback(args):  # pylint: disable=too-many-statements
             inputs = yaml.safe_load(args.inputs)
         else:
             inputs = None
-    except YAMLError as e:
+    except yaml.YAMLError as e:
         print("Invalid inputs: {}".format(e))
         return 1
 
     try:
-        if is_zipfile(service_template):
-            deploy_compressed_csar(service_template, inputs, storage,
+        if is_zipfile(csar_or_st_path):
+            deploy_compressed_csar(csar_or_st_path, inputs, storage,
                                    args.verbose, args.workers,
                                    delete_existing_state)
         else:
-            deploy_service_template(service_template, inputs, storage,
+            deploy_service_template(csar_or_st_path, inputs, storage,
                                     args.verbose, args.workers,
                                     delete_existing_state)
     except ParseError as e:
@@ -141,7 +140,7 @@ def _parser_callback(args):  # pylint: disable=too-many-statements
 
 
 def deploy_service_template(
-        service_template: str,
+        service_template_path: PurePath,
         inputs: typing.Optional[dict],
         storage: Storage,
         verbose_mode: bool,
@@ -157,16 +156,16 @@ def deploy_service_template(
         else:
             inputs = {}
     storage.write_json(inputs, "inputs")
-    storage.write(service_template, "root_file")
+    storage.write(str(service_template_path), "root_file")
 
     # set workdir and check if service template/CSAR has been initialized
-    workdir = str(Path.cwd())
+    workdir = Path(service_template_path.parent)
     if storage.exists("csars"):
         csar_dir = Path(storage.path) / "csars" / "csar"
-        workdir = str(csar_dir)
-        ast = tosca.load(Path(csar_dir), PurePath(service_template).relative_to(csar_dir))
+        workdir = csar_dir
+        ast = tosca.load(workdir, service_template_path.relative_to(csar_dir))
     else:
-        ast = tosca.load(Path.cwd(), PurePath(service_template))
+        ast = tosca.load(workdir, PurePath(service_template_path.name))
 
     # initialize service template and deploy
     template = ast.get_template(inputs)
@@ -175,7 +174,7 @@ def deploy_service_template(
 
 
 def deploy_compressed_csar(
-        csar_name: str,
+        csar_path: PurePath,
         inputs: typing.Optional[dict],
         storage: Storage,
         verbose_mode: bool,
@@ -192,13 +191,13 @@ def deploy_compressed_csar(
     csars_dir = Path(storage.path) / "csars"
     csars_dir.mkdir(exist_ok=True)
 
-    csar = CloudServiceArchive.create(PurePath(csar_name))
+    csar = CloudServiceArchive.create(csar_path)
     csar.validate_csar()
     tosca_service_template = csar.get_entrypoint()
 
     # unzip csar, save the path to storage and set workdir
     csar_dir = csars_dir / Path("csar")
-    ZipFile(csar_name, "r").extractall(csar_dir)
+    ZipFile(csar_path, "r").extractall(csar_dir)
     csar_tosca_service_template_path = csar_dir / tosca_service_template
     storage.write(str(csar_tosca_service_template_path), "root_file")
     workdir = str(csar_dir)

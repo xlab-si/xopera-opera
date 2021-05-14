@@ -6,7 +6,6 @@ from zipfile import ZipFile, is_zipfile
 
 import shtab
 import yaml
-from yaml import YAMLError
 
 from opera.error import DataError, ParseError, OperaError
 from opera.parser import tosca
@@ -51,16 +50,16 @@ def _parser_callback(args):
     storage = Storage.create(args.instance_path)
     try:
         inputs = yaml.safe_load(args.inputs) if args.inputs else {}
-    except YAMLError as e:
+    except yaml.YAMLError as e:
         print("Invalid inputs: {}".format(e))
         return 1
 
     try:
         if is_zipfile(args.csar.name):
-            init_compressed_csar(args.csar.name, inputs, storage, args.clean)
+            init_compressed_csar(PurePath(args.csar.name), inputs, storage, args.clean)
             print("CSAR was initialized")
         else:
-            init_service_template(args.csar.name, inputs, storage, args.clean)
+            init_service_template(PurePath(args.csar.name), inputs, storage, args.clean)
             print("Service template was initialized")
     except ParseError as e:
         print("{}: {}".format(e.loc, e))
@@ -75,7 +74,7 @@ def _parser_callback(args):
     return 0
 
 
-def init_compressed_csar(csar_name: str, inputs: typing.Optional[dict], storage: Storage, clean_storage: bool):
+def init_compressed_csar(csar_path: PurePath, inputs: typing.Optional[dict], storage: Storage, clean_storage: bool):
     if storage.exists("root_file"):
         if clean_storage:
             storage.remove_all()
@@ -91,13 +90,13 @@ def init_compressed_csar(csar_name: str, inputs: typing.Optional[dict], storage:
     csars_dir = Path(storage.path) / "csars"
     csars_dir.mkdir(exist_ok=True)
 
-    csar = CloudServiceArchive.create(PurePath(csar_name))
+    csar = CloudServiceArchive.create(csar_path)
     csar.validate_csar()
     tosca_service_template = csar.get_entrypoint()
 
     # unzip csar and save the path to storage
     csar_dir = csars_dir / Path("csar")
-    ZipFile(csar_name, "r").extractall(csar_dir)
+    ZipFile(csar_path, "r").extractall(csar_dir)
     csar_tosca_service_template_path = csar_dir / tosca_service_template
     storage.write(str(csar_tosca_service_template_path), "root_file")
 
@@ -107,8 +106,8 @@ def init_compressed_csar(csar_name: str, inputs: typing.Optional[dict], storage:
     template.instantiate(storage)
 
 
-def init_service_template(service_template: str, inputs: typing.Optional[dict],
-                          storage: Storage, clean_storage: bool):
+def init_service_template(service_template_path: PurePath, inputs: typing.Optional[dict], storage: Storage,
+                          clean_storage: bool):
     if storage.exists("root_file"):
         if clean_storage:
             storage.remove_all()
@@ -120,8 +119,8 @@ def init_service_template(service_template: str, inputs: typing.Optional[dict],
     if inputs is None:
         inputs = {}
     storage.write_json(inputs, "inputs")
-    storage.write(service_template, "root_file")
+    storage.write(str(service_template_path), "root_file")
 
-    ast = tosca.load(Path.cwd(), PurePath(service_template))
+    ast = tosca.load(Path(service_template_path.parent), PurePath(service_template_path.name))
     template = ast.get_template(inputs)
     template.instantiate(storage)
