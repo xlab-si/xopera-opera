@@ -102,8 +102,8 @@ def info(csar_or_rootdir: Optional[PurePath], storage: Storage) -> dict:
 
     # detection from state, overrides stateless
     if storage.exists("root_file"):
-        service_template = storage.read("root_file")
-        info_dict["service_template"] = service_template
+        service_template_path = PurePath(storage.read("root_file"))
+        info_dict["service_template"] = str(service_template_path)
 
         if storage.exists("inputs"):
             inputs = yaml.safe_load(storage.read("inputs"))
@@ -114,9 +114,9 @@ def info(csar_or_rootdir: Optional[PurePath], storage: Storage) -> dict:
         if storage.exists("csars/csar"):
             csar_dir = Path(storage.path) / "csars" / "csar"
             info_dict["content_root"] = str(csar_dir)
-            ast = tosca.load(Path(csar_dir), PurePath(service_template).relative_to(csar_dir))
+            ast = tosca.load(Path(csar_dir), service_template_path.relative_to(csar_dir))
         else:
-            ast = tosca.load(Path.cwd(), PurePath(service_template))
+            ast = tosca.load(Path(service_template_path.parent), PurePath(service_template_path.name))
 
         if storage.exists("instances"):
             template = ast.get_template(inputs)

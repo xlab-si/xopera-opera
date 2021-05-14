@@ -1,6 +1,7 @@
 import argparse
 import tempfile
 from os import path
+from pathlib import Path
 
 import shtab
 import yaml
@@ -107,15 +108,14 @@ def _parser_callback(args):
 
 
 def update(
-        storage_old: Storage, workdir_old: str,
-        storage_new: Storage, workdir_new: str,
+        storage_old: Storage, workdir_old: Path,
+        storage_new: Storage, workdir_new: Path,
         instance_comparer: InstanceComparer,
         instance_diff: Diff,
         verbose_mode: bool,
         num_workers: int,
         overwrite: bool
 ):
-
     template_old = get_template(storage_old, workdir_old)
     template_new = get_template(storage_new, workdir_new)
     topology_old = template_old.instantiate(storage_old)

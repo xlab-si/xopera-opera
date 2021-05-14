@@ -59,13 +59,13 @@ def _parser_callback(args):
     comparer = TemplateComparer()
 
     if args.template:
-        service_template_new = args.template.name
+        service_template_new_path = Path(args.template.name)
     else:
         print("Template file for comparison was not supplied.")
         return 1
 
     if storage_old.exists("root_file"):
-        service_template_old = storage_old.read("root_file")
+        service_template_old_path = Path(storage_old.read("root_file"))
     else:
         print("There is no root_file in storage.")
         return 1
@@ -85,15 +85,15 @@ def _parser_callback(args):
         return 1
 
     workdir_old = get_workdir(storage_old)
-    workdir_new = str(Path.cwd())
+    workdir_new = Path(service_template_new_path.parent)
 
     try:
         if args.template_only:
             template_diff = diff_templates(
-                service_template_old,
+                service_template_old_path,
                 workdir_old,
                 inputs_old,
-                service_template_new,
+                service_template_new_path,
                 workdir_new,
                 inputs_new,
                 comparer,
@@ -104,7 +104,7 @@ def _parser_callback(args):
             with tempfile.TemporaryDirectory() as temp_path:
                 storage_new = Storage.create(temp_path)
                 storage_new.write_json(inputs_new, "inputs")
-                storage_new.write(service_template_new, "root_file")
+                storage_new.write(str(service_template_new_path), "root_file")
                 template_diff = diff_instances(
                     storage_old, workdir_old,
                     storage_new, workdir_new,
@@ -128,11 +128,11 @@ def _parser_callback(args):
 
 
 def diff_templates(
-        service_template_old: str,
-        workdir_old: str,
+        service_template_old: PurePath,
+        workdir_old: Path,
         inputs_old: typing.Optional[dict],
-        service_template_new: str,
-        workdir_new: str,
+        service_template_new: PurePath,
+        workdir_new: Path,
         inputs_new: typing.Optional[dict],
         template_comparer: TemplateComparer,
         verbose_mode: bool
@@ -143,8 +143,8 @@ def diff_templates(
     if inputs_old is None:
         inputs_old = {}
 
-    ast_old = tosca.load(Path(workdir_old), PurePath(service_template_old))
-    ast_new = tosca.load(Path(workdir_new), PurePath(service_template_new))
+    ast_old = tosca.load(workdir_old, PurePath(service_template_old.name))
+    ast_new = tosca.load(workdir_new, PurePath(service_template_new.name))
 
     template_old = ast_old.get_template(inputs_old)
     template_new = ast_new.get_template(inputs_new)
@@ -156,9 +156,9 @@ def diff_templates(
 
 def diff_instances(
         storage_old: Storage,
-        workdir_old: str,
+        workdir_old: Path,
         storage_new: Storage,
-        workdir_new: str,
+        workdir_new: Path,
         template_comparer: TemplateComparer,
         instance_comparer: InstanceComparer,
         verbose_mode: bool

@@ -42,8 +42,8 @@ def _parser_callback(args):
         extracted_folder = Path(generate_random_pathname("opera-unpackage-"))
 
     try:
-        abs_csar_path = str(csar_path.resolve())
-        abs_dest_path = str(extracted_folder.resolve())
+        abs_csar_path = PurePath(csar_path.resolve())
+        abs_dest_path = PurePath(extracted_folder.resolve())
 
         unpackage(abs_csar_path, abs_dest_path)
         print("The CSAR was unpackaged to '{}'.".format(abs_dest_path))
@@ -57,8 +57,8 @@ def _parser_callback(args):
     return 0
 
 
-def unpackage(csar_input: str, output_dir: str):
-    csar = CloudServiceArchive.create(PurePath(csar_input))
+def unpackage(csar_input: PurePath, output_dir: PurePath):
+    csar = CloudServiceArchive.create(csar_input)
     # validate CSAR before unpacking it
     csar.validate_csar()
     # unpack the CSAR to the specified location

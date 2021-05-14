@@ -98,15 +98,15 @@ def notify(storage: Storage, verbose_mode: bool, trigger_name_or_event: str,
         inputs = {}
 
     if storage.exists("root_file"):
-        service_template = storage.read("root_file")
-        workdir = str(Path.cwd())
+        service_template_path = PurePath(storage.read("root_file"))
 
+        workdir = Path(service_template_path.parent)
         if storage.exists("csars"):
             csar_dir = Path(storage.path) / "csars" / "csar"
-            workdir = str(csar_dir)
-            ast = tosca.load(Path(csar_dir), PurePath(service_template).relative_to(csar_dir))
+            workdir = csar_dir
+            ast = tosca.load(workdir, service_template_path.relative_to(csar_dir))
         else:
-            ast = tosca.load(Path.cwd(), PurePath(service_template))
+            ast = tosca.load(workdir, PurePath(service_template_path.name))
 
         template = ast.get_template(inputs)
 

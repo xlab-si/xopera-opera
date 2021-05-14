@@ -6,7 +6,6 @@ from zipfile import is_zipfile
 
 import shtab
 import yaml
-from yaml import YAMLError
 
 from opera.error import OperaError, ParseError
 from opera.parser import tosca
@@ -36,7 +35,7 @@ def add_parser(subparsers):
 def _parser_callback(args):
     try:
         inputs = yaml.safe_load(args.inputs) if args.inputs else {}
-    except YAMLError as e:
+    except yaml.YAMLError as e:
         print("Invalid inputs: {}".format(e))
         return 1
 
@@ -80,8 +79,8 @@ def validate_csar(csar_path: PurePath, inputs: typing.Optional[dict]):
                 validate_service_template(PurePath(csar_validation_dir) / entrypoint, inputs)
 
 
-def validate_service_template(service_template: PurePath, inputs: typing.Optional[dict]):
+def validate_service_template(service_template_path: PurePath, inputs: typing.Optional[dict]):
     if inputs is None:
         inputs = {}
-    ast = tosca.load(Path(service_template.parent), PurePath(service_template.name))
+    ast = tosca.load(Path(service_template_path.parent), PurePath(service_template_path.name))
     ast.get_template(inputs)

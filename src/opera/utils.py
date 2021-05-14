@@ -83,7 +83,8 @@ def get_workdir(storage):
         csar_dir = Path(storage.path) / "csars" / "csar"
         return str(csar_dir)
     else:
-        return str(Path.cwd())
+        service_template_path = PurePath(storage.read("root_file"))
+        return str(Path(service_template_path.parent))
 
 
 def get_template(storage, workdir):
@@ -93,13 +94,13 @@ def get_template(storage, workdir):
         inputs = {}
 
     if storage.exists("root_file"):
-        service_template = storage.read("root_file")
+        service_template_path = PurePath(storage.read("root_file"))
 
         if storage.exists("csars"):
             csar_dir = Path(storage.path) / "csars" / "csar"
-            ast = tosca.load(Path(csar_dir), PurePath(service_template).relative_to(csar_dir))
+            ast = tosca.load(Path(csar_dir), service_template_path.relative_to(csar_dir))
         else:
-            ast = tosca.load(Path(workdir), PurePath(service_template))
+            ast = tosca.load(Path(workdir), PurePath(service_template_path.name))
 
         template = ast.get_template(inputs)
         return template
