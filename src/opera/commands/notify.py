@@ -54,13 +54,16 @@ def _parser_callback(args):
             question = prompt_yes_no_question()
             if not question:
                 return 0
-        if status == "interrupted":
-            print("Running notify after an interrupted deployment might have unexpected consequences.")
+        elif status in ("deploying", "undeploying"):
+            print("The project is in the middle of some other operation. Please try again after some time.")
+            return 0
+        elif status == "undeployed":
+            print("Running notify in an undeployed project might have unexpected consequences.")
             question = prompt_yes_no_question()
             if not question:
                 return 0
-        if status == "undeployed":
-            print("Running notify in an undeployed project might have unexpected consequences.")
+        elif status == "error":
+            print("Running notify after a deployment with an error might have unexpected consequences.")
             question = prompt_yes_no_question()
             if not question:
                 return 0

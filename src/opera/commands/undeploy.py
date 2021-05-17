@@ -51,18 +51,24 @@ def _parser_callback(args):
     status = info(None, storage)["status"]
 
     if storage.exists("instances"):
-        if args.resume and status == "interrupted":
+        if args.resume and status == "error":
             if not args.force:
                 print("The resume undeploy option might have unexpected consequences on the already "
                       "undeployed blueprint.")
                 question = prompt_yes_no_question()
                 if not question:
                     return 0
-        elif status == "interrupted":
-            print("The instance model already exists. Use --resume/-r option to continue current undeployment process.")
+        elif status == "initialized":
+            print("The project is initialized. You have to deploy it first to be able to run undeploy.")
+            return 0
+        elif status == "deploying":
+            print("The project is currently deploying. Please try again after the deployment.")
             return 0
         elif status == "undeployed":
             print("All instances have already been undeployed.")
+            return 0
+        elif status == "error":
+            print("The instance model already exists. Use --resume/-r option to continue current undeployment process.")
             return 0
 
     try:

@@ -76,10 +76,11 @@ class Base:
                       operation_type: Union[StandardInterfaceOperation, ConfigureInterfaceOperation],
                       verbose: bool,
                       workdir: str):
-        success, outputs, attributes = \
-            self.template.run_operation(host, interface, operation_type, self, verbose, workdir)
+        success, outputs, attributes = self.template.run_operation(host, interface, operation_type, self, verbose,
+                                                                   workdir)
 
         if not success:
+            self.set_state(NodeState.ERROR)
             raise OperationError("Failed")
 
         for params, value in outputs:

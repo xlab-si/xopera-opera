@@ -123,7 +123,7 @@ def info(csar_or_rootdir: Optional[PurePath], storage: Storage) -> dict:
             # We need to instantiate the template in order
             # to get access to the instance state.
             topology = template.instantiate(storage)
-            info_dict["status"] = topology.get_info()
+            info_dict["status"] = topology.status()
         else:
             info_dict["status"] = "initialized"
 

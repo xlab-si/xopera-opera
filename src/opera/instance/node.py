@@ -9,7 +9,7 @@ from opera.value import Value
 from .base import Base
 
 
-class Node(Base):
+class Node(Base):  # pylint: disable=too-many-public-methods
     def __init__(self, template, instance_id):
         super().__init__(template, instance_id)
 
@@ -37,12 +37,24 @@ class Node(Base):
                     rel.read()
 
     @property
+    def deploying(self):
+        return self.state in (NodeState.CREATING, NodeState.CREATED, NodeState.CONFIGURING, NodeState.STARTING)
+
+    @property
     def deployed(self):
         return self.state == NodeState.STARTED
 
     @property
+    def undeploying(self):
+        return self.state in (NodeState.STOPPING, NodeState.DELETING)
+
+    @property
     def undeployed(self):
         return self.state == NodeState.INITIAL
+
+    @property
+    def error(self):
+        return self.state == NodeState.ERROR
 
     @property
     def ready_for_deploy(self):

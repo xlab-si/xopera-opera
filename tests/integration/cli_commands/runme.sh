@@ -82,7 +82,7 @@ sleep 2s && kill -SIGKILL $DEPLOY_TIMEOUT_PID
 
 # test opera info status after deploy
 info_out="$($opera_executable info --format json)"
-test "$(echo "$info_out" | jq -r .status)" = "interrupted"
+test "$(echo "$info_out" | jq -r .status)" = "deploying"
 
 # resume service template deploy (with force option to skip prompts)
 $opera_executable deploy --resume --force
@@ -193,7 +193,7 @@ sleep 2s && kill -SIGKILL $UNDEPLOY_TIMEOUT_PID
 
 # test opera info status after undeploy
 info_out="$($opera_executable info -p ./csar-test-dir -f json)"
-test "$(echo "$info_out" | jq -r .status)" = "interrupted"
+test "$(echo "$info_out" | jq -r .status)" = "undeploying"
 
 # resume service template undeploy (with force option to skip prompts)
 $opera_executable undeploy -p ./csar-test-dir -r -f
