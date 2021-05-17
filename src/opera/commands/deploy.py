@@ -59,7 +59,7 @@ def add_parser(subparsers):
     parser.set_defaults(func=_parser_callback)
 
 
-def _parser_callback(args):
+def _parser_callback(args):  # pylint: disable=too-many-statements
     if args.instance_path and not path.isdir(args.instance_path):
         raise argparse.ArgumentTypeError("Directory {} is not a valid path!".format(args.instance_path))
 
@@ -72,7 +72,7 @@ def _parser_callback(args):
     delete_existing_state = False
 
     if storage.exists("instances"):
-        if args.resume and status == "interrupted":
+        if args.resume and status == "error":
             if not args.force:
                 print("The resume deploy option might have unexpected consequences on the already deployed blueprint.")
                 question = prompt_yes_no_question()
@@ -89,10 +89,16 @@ def _parser_callback(args):
                     delete_existing_state = True
                 else:
                     return 0
+        elif status == "initialized":
+            print("The project is initialized. You have to deploy it first to be able to run undeploy.")
+            return 0
+        elif status == "undeploying":
+            print("The project is currently undeploying. Please try again after the undeployment.")
+            return 0
         elif status == "deployed":
             print("All instances have already been deployed.")
             return 0
-        elif status == "interrupted":
+        elif status == "error":
             print("The instance model already exists. Use --resume/-r to continue or --clean-state/-c to delete "
                   "current deployment state and start over the deployment.")
             return 0
