@@ -291,17 +291,17 @@ class TestNodePolicies:
         node_vm = service_template.find_node("VM")
         node_vm_policy_triggers = [policy.triggers for policy in node_vm.policies]
 
-        assert "scale_down_trigger" == node_vm_policy_triggers[0]["steampunk.triggers.scaling.ScaleDown"].event.data
-        assert "scale_up_trigger" == node_vm_policy_triggers[1]["steampunk.triggers.scaling.ScaleUp"].event.data
-        assert "auto_scale_trigger" == node_vm_policy_triggers[2]["steampunk.triggers.scaling.AutoScale"].event.data
+        assert node_vm_policy_triggers[0]["steampunk.triggers.scaling.ScaleDown"].event.data == "scale_down_trigger"
+        assert node_vm_policy_triggers[1]["steampunk.triggers.scaling.ScaleUp"].event.data == "scale_up_trigger"
+        assert node_vm_policy_triggers[2]["steampunk.triggers.scaling.AutoScale"].event.data == "auto_scale_trigger"
 
     def test_find_policy_trigger_target_filter(self, service_template):
         node_vm = service_template.find_node("VM")
         node_vm_policy_triggers = [policy.triggers for policy in node_vm.policies]
 
-        assert "VM" == node_vm_policy_triggers[0]["steampunk.triggers.scaling.ScaleDown"].target_filter[0]
-        assert "VM" == node_vm_policy_triggers[1]["steampunk.triggers.scaling.ScaleUp"].target_filter[0]
-        assert "VM" == node_vm_policy_triggers[2]["steampunk.triggers.scaling.AutoScale"].target_filter[0]
+        assert node_vm_policy_triggers[0]["steampunk.triggers.scaling.ScaleDown"].target_filter[0] == "VM"
+        assert node_vm_policy_triggers[1]["steampunk.triggers.scaling.ScaleUp"].target_filter[0] == "VM"
+        assert node_vm_policy_triggers[2]["steampunk.triggers.scaling.AutoScale"].target_filter[0] == "VM"
 
     def test_find_policy_trigger_action(self, service_template):
         node_vm = service_template.find_node("VM")

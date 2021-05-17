@@ -56,9 +56,15 @@ class TestAttributeMapping:
     def test_map_attribute_node(self, service_template):
         node = service_template.find_node("my_node")
         node.map_attribute(["SELF", "colour"], "green")
-        assert "green" == node.get_attribute(["SELF", "colour"])
+        assert node.get_attribute(["SELF", "colour"]) == "green"
 
-    @pytest.mark.parametrize("host", ["SOURCE", "TARGET", "HOST" "my_collector", "other"])
+    @pytest.mark.parametrize("host", [
+        ("SOURCE", "HOST as the attribute's 'host' is not yet supported"),
+        ("TARGET", "HOST as the attribute's 'host' is not yet supported"),
+        ("HOST", "HOST as the attribute's 'host' is not yet supported"),
+        ("my_collector", "The attribute's 'host' should be set to one of"),
+        ("other", "The attribute's 'host' should be set to one of")
+    ])
     def test_map_attribute_node_bad_host(self, service_template, host):
         node = service_template.find_node("my_node")
         with pytest.raises(DataError, match="The attribute's 'host' should be set to 'SELF'"):
@@ -76,7 +82,7 @@ class TestAttributeMapping:
 
         relationship_instance.map_attribute(["SOURCE", "colour"], "ochre")
 
-        assert "ochre" == node_source.get_attribute(["SELF", "colour"])
+        assert node_source.get_attribute(["SELF", "colour"]) == "ochre"
 
     def test_map_attribute_relationship_target(self, service_template):
         node_target = service_template.find_node("my_node")
@@ -86,7 +92,7 @@ class TestAttributeMapping:
 
         relationship_instance.map_attribute(["TARGET", "colour"], "magenta")
 
-        assert "magenta" == node_target.get_attribute(["SELF", "colour"])
+        assert node_target.get_attribute(["SELF", "colour"]) == "magenta"
 
     def test_map_attribute_relationship_self(self, service_template):
         node_source = service_template.find_node("my_collector")
@@ -95,7 +101,7 @@ class TestAttributeMapping:
 
         relationship_instance.map_attribute(["SELF", "colour"], "steampunk")
 
-        assert "steampunk" == relationship_instance.get_attribute(["SELF", "colour"])
+        assert relationship_instance.get_attribute(["SELF", "colour"]) == "steampunk"
 
     @pytest.mark.parametrize("host", [
         ("HOST", "HOST as the attribute's 'host' is not yet supported"),

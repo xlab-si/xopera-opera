@@ -13,7 +13,7 @@ class TestInstanceCompare:
                                   service_template2[0],
                                   service_template1[2],
                                   service_template2[2])
-        equal, diff = comparer.compare_service_template(service_template1[0], service_template2[0], context)
+        _, diff = comparer.compare_service_template(service_template1[0], service_template2[0], context)
         return diff
 
     def test_node_state_comparison(self, service_template1,

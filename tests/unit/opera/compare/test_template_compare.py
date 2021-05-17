@@ -16,8 +16,8 @@ class TestTemplateCompare:
         assert len(diff.changed["nodes"].deleted) == 1
         assert len(diff.changed["nodes"].changed) == 4
 
-        assert "hello-5" == diff.changed["nodes"].added[0]
-        assert "hello-4" == diff.changed["nodes"].deleted[0]
+        assert diff.changed["nodes"].added[0] == "hello-5"
+        assert diff.changed["nodes"].deleted[0] == "hello-4"
 
         assert "hello-1" in diff.changed["nodes"].changed
         assert "hello-2" in diff.changed["nodes"].changed
@@ -33,7 +33,7 @@ class TestTemplateCompare:
         context = TemplateContext(node1_1, node2_1,
                                   service_template1[2],
                                   service_template2[2])
-        equal, diff = comparer._compare_node(node1_1, node2_1, context)
+        equal, diff = comparer._compare_node(node1_1, node2_1, context)  # pylint: disable=protected-access
 
         assert equal is False
 
@@ -46,7 +46,7 @@ class TestTemplateCompare:
         node1_2 = service_template1[0].get_node("hello-2")
         node2_2 = service_template2[0].get_node("hello-2")
         context = TemplateContext(node1_2, node2_2, service_template1[2], service_template2[2])
-        equal, diff = comparer._compare_node(node1_2, node2_2, context)
+        equal, diff = comparer._compare_node(node1_2, node2_2, context)  # pylint: disable=protected-access
 
         assert equal is False
 
@@ -62,7 +62,7 @@ class TestTemplateCompare:
         node1 = service_template1[0].get_node("hello-6")
         node2 = service_template2[0].get_node("hello-6")
         context = TemplateContext(node1, node2, service_template1[2], service_template2[2])
-        equal, diff = comparer._compare_node(node1, node2, context)
+        equal, diff = comparer._compare_node(node1, node2, context)  # pylint: disable=protected-access
 
         assert equal is False
 
@@ -76,7 +76,7 @@ class TestTemplateCompare:
         node1 = service_template1[0].get_node("hello-1")
         node2 = service_template2[0].get_node("hello-1")
         context = TemplateContext(node1, node2, service_template1[2], service_template2[2])
-        equal, diff = comparer._compare_node(node1, node2, context)
+        equal, diff = comparer._compare_node(node1, node2, context)  # pylint: disable=protected-access
 
         assert equal is False
 
