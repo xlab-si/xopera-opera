@@ -14,7 +14,9 @@ cp inputs.yaml csar-test
 cd csar-test
 
 # deploy the compressed TOSCA CSAR
-$opera_executable info -f yaml
+$opera_executable info
+$opera_executable validate --tosca-only -i inputs.yaml test.csar
+$opera_executable info --format yaml
 $opera_executable deploy -i inputs.yaml test.csar
 $opera_executable info -f yaml
 $opera_executable outputs

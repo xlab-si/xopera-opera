@@ -13,16 +13,16 @@ info_out="$($opera_executable info --format json)"
 test "$(echo "$info_out" | jq -r .status)" = "null"
 
 # validate service template and CSAR (with YAML inputs)
-$opera_executable validate --inputs inputs.yaml service.yaml
-$opera_executable validate --inputs inputs.yaml test.csar
+$opera_executable validate --tosca-only --inputs inputs.yaml service.yaml
+$opera_executable validate --tosca-only --inputs inputs.yaml test.csar
 
 # test opera info status after validate
 info_out="$($opera_executable info --format json)"
 test "$(echo "$info_out" | jq -r .status)" = "null"
 
 # validate service template and CSAR (with JSON inputs)
-$opera_executable validate --inputs inputs.json service.yaml
-$opera_executable validate --inputs inputs.json test.csar
+$opera_executable validate --tosca-only --inputs inputs.json service.yaml
+$opera_executable validate --tosca-only --inputs inputs.json test.csar
 
 # test opera info status after validate
 info_out="$($opera_executable info --format json)"

@@ -31,6 +31,17 @@ class Topology:
 
         return "unknown"
 
+    def validate(self, verbose, workdir, num_workers=None):
+        # Currently, we are running a really stupid O(n^3) algorithm, but unless we get to the templates with
+        # millions of node instances, we should be fine.
+        with NodeExecutor(num_workers) as executor:
+            do_validate = True
+            while do_validate:
+                for node in self.nodes.values():
+                    if not node.validated and executor.can_submit(node.tosca_id):
+                        executor.submit_operation(node.validate, node.tosca_id, verbose, workdir)
+                do_validate = executor.wait_results()
+
     def deploy(self, verbose, workdir, num_workers=None):
         # Currently, we are running a really stupid O(n^3) algorithm, but unless we get to the templates with
         # millions of node instances, we should be fine.

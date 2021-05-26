@@ -16,6 +16,7 @@ class Node(Base):  # pylint: disable=too-many-public-methods
         self.in_edges = {}  # This gets filled by other instances for us.
         self.out_edges = {}  # This is what we fill during the linking phase.
         self.notified = False  # This indicates whether the node has been notified.
+        self.validated = False  # This indicates whether the node has been validated.
 
     def instantiate_relationships(self):
         if not self.topology:
@@ -80,16 +81,44 @@ class Node(Base):  # pylint: disable=too-many-public-methods
     def _configure_requirements(self,
                                 source_operation: ConfigureInterfaceOperation,
                                 target_operation: ConfigureInterfaceOperation,
-                                verbose: bool, workdir: str):
+                                verbose: bool, workdir: str,
+                                validate: bool = False):
         for requirement in set(r.name for r in self.template.requirements):
             for relationship in self.out_edges[requirement].values():
                 relationship.run_operation(OperationHost.SOURCE, ConfigureInterfaceOperation.shorthand_name(),
-                                           source_operation, verbose, workdir)
+                                           source_operation, verbose, workdir, validate)
 
         for requirement_dependants in self.in_edges.values():
             for relationship in requirement_dependants.values():
                 relationship.run_operation(OperationHost.TARGET, ConfigureInterfaceOperation.shorthand_name(),
-                                           target_operation, verbose, workdir)
+                                           target_operation, verbose, workdir, validate)
+
+    def validate(self, verbose, workdir):
+        thread_utils.print_thread("  Validating {}".format(self.tosca_id))
+
+        # validate node's deployment
+        self.run_operation(OperationHost.HOST, StandardInterfaceOperation.shorthand_name(),
+                           StandardInterfaceOperation.CREATE, verbose, workdir, True)
+        self._configure_requirements(ConfigureInterfaceOperation.PRE_CONFIGURE_SOURCE,
+                                     ConfigureInterfaceOperation.PRE_CONFIGURE_TARGET, verbose, workdir, True)
+        self.run_operation(OperationHost.HOST,
+                           StandardInterfaceOperation.shorthand_name(),
+                           StandardInterfaceOperation.CONFIGURE, verbose, workdir, True)
+        self._configure_requirements(ConfigureInterfaceOperation.POST_CONFIGURE_SOURCE,
+                                     ConfigureInterfaceOperation.POST_CONFIGURE_TARGET, verbose, workdir, True)
+        self.run_operation(OperationHost.HOST, StandardInterfaceOperation.shorthand_name(),
+                           StandardInterfaceOperation.START, verbose, workdir, True)
+
+        # validate node's undeployment
+        self.run_operation(OperationHost.HOST, StandardInterfaceOperation.shorthand_name(),
+                           StandardInterfaceOperation.STOP, verbose, workdir, True)
+        self.run_operation(OperationHost.HOST, StandardInterfaceOperation.shorthand_name(),
+                           StandardInterfaceOperation.DELETE, verbose, workdir, True)
+        self.reset_attributes()
+        self.write()
+
+        self.validated = True
+        thread_utils.print_thread("  Validation of {} complete".format(self.tosca_id))
 
     def deploy(self, verbose, workdir):
         thread_utils.print_thread("  Deploying {}".format(self.tosca_id))

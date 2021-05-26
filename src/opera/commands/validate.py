@@ -10,6 +10,7 @@ import yaml
 from opera.error import OperaError, ParseError
 from opera.parser import tosca
 from opera.parser.tosca.csar import CloudServiceArchive, DirCloudServiceArchive
+from opera.storage import Storage
 
 
 def add_parser(subparsers):
@@ -18,9 +19,17 @@ def add_parser(subparsers):
         help="Validate TOSCA service template or CSAR"
     )
     parser.add_argument(
+        "--instance-path", "-p",
+        help="Storage folder location (instead of default .opera)"
+    )
+    parser.add_argument(
         "--inputs", "-i", type=argparse.FileType("r"),
         help="YAML or JSON file with inputs",
     ).complete = shtab.FILE
+    parser.add_argument(
+        "--tosca-only", action="store_true",
+        help="Validate only TOSCA templates without the executors behind them",
+    )
     parser.add_argument(
         "--verbose", "-v", action="store_true",
         help="Turns on verbose mode",
@@ -39,6 +48,8 @@ def _parser_callback(args):
         print("Invalid inputs: {}".format(e))
         return 1
 
+    storage = Storage.create(args.instance_path)
+
     if args.csar_or_service_template is None:
         csar_or_st_path = PurePath(".")
     else:
@@ -47,10 +58,10 @@ def _parser_callback(args):
     try:
         if is_zipfile(csar_or_st_path) or Path(csar_or_st_path).is_dir():
             print("Validating CSAR...")
-            validate_csar(csar_or_st_path, inputs)
+            validate_csar(csar_or_st_path, inputs, storage, args.verbose, args.tosca_only)
         else:
             print("Validating service template...")
-            validate_service_template(csar_or_st_path, inputs)
+            validate_service_template(csar_or_st_path, inputs, storage, args.verbose, args.tosca_only)
         print("Done.")
     except ParseError as e:
         print("{}: {}".format(e.loc, e))
@@ -62,7 +73,8 @@ def _parser_callback(args):
     return 0
 
 
-def validate_csar(csar_path: PurePath, inputs: typing.Optional[dict]):
+def validate_csar(csar_path: PurePath, inputs: typing.Optional[dict], storage: Storage, verbose: bool,
+                  tosca_only: bool):
     if inputs is None:
         inputs = {}
 
@@ -72,17 +84,30 @@ def validate_csar(csar_path: PurePath, inputs: typing.Optional[dict]):
 
     if entrypoint is not None:
         if isinstance(csar, DirCloudServiceArchive):
-            ast = tosca.load(Path(csar_path), entrypoint)
-            ast.get_template(inputs)
+            workdir = Path(csar_path)
+            ast = tosca.load(workdir, entrypoint)
+            template = ast.get_template(inputs)
+            if not tosca_only:
+                topology = template.instantiate(storage)
+                topology.validate(verbose, workdir, 1)
         else:
             with TemporaryDirectory() as csar_validation_dir:
                 csar.unpackage_csar(csar_validation_dir)
-                ast = tosca.load(Path(csar_validation_dir), entrypoint)
-                ast.get_template(inputs)
+                workdir = Path(csar_validation_dir)
+                ast = tosca.load(workdir, entrypoint)
+                template = ast.get_template(inputs)
+                if not tosca_only:
+                    topology = template.instantiate(storage)
+                    topology.validate(verbose, csar_validation_dir, 1)
 
 
-def validate_service_template(service_template_path: PurePath, inputs: typing.Optional[dict]):
+def validate_service_template(service_template_path: PurePath, inputs: typing.Optional[dict], storage: Storage,
+                              verbose: bool, tosca_only: bool):
     if inputs is None:
         inputs = {}
-    ast = tosca.load(Path(service_template_path.parent), PurePath(service_template_path.name))
-    ast.get_template(inputs)
+    workdir = Path(service_template_path.parent)
+    ast = tosca.load(workdir, PurePath(service_template_path.name))
+    template = ast.get_template(inputs)
+    if not tosca_only:
+        topology = template.instantiate(storage)
+        topology.validate(verbose, workdir, 1)
