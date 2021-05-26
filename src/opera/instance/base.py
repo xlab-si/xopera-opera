@@ -75,9 +75,10 @@ class Base:
                       interface: str,
                       operation_type: Union[StandardInterfaceOperation, ConfigureInterfaceOperation],
                       verbose: bool,
-                      workdir: str):
+                      workdir: str,
+                      validate: bool = False):
         success, outputs, attributes = self.template.run_operation(host, interface, operation_type, self, verbose,
-                                                                   workdir)
+                                                                   workdir, validate)
 
         if not success:
             self.set_state(NodeState.ERROR)

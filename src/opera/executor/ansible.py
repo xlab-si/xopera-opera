@@ -27,7 +27,8 @@ def _get_inventory(host):
     return yaml.safe_dump(dict(all=dict(hosts=dict(opera=inventory))))
 
 
-def run(host, primary, dependencies, artifacts, variables, verbose, workdir):  # pylint: disable=too-many-locals
+def run(host, primary, dependencies, artifacts, variables, verbose, workdir, validate):
+    # pylint: disable=too-many-locals
     with tempfile.TemporaryDirectory() as dir_path:
         playbook = os.path.join(dir_path, os.path.basename(primary))
         utils.copy(os.path.join(workdir, primary), playbook)
@@ -62,6 +63,10 @@ def run(host, primary, dependencies, artifacts, variables, verbose, workdir):  #
             "-e", "@" + vars_file,
             playbook
         ]
+
+        if validate:
+            cmd.append("--syntax-check")
+
         env = dict(
             ANSIBLE_SHOW_CUSTOM_STATS="1",
             ANSIBLE_STDOUT_CALLBACK="json",
@@ -81,6 +86,8 @@ def run(host, primary, dependencies, artifacts, variables, verbose, workdir):  #
         if code != 0:
             return False, {}
 
-        with open(out) as fd:
-            outputs = json.load(fd)["global_custom_stats"]
+        outputs = {}
+        if not validate:
+            with open(out) as fd:
+                outputs = json.load(fd)["global_custom_stats"]
         return code == 0, outputs

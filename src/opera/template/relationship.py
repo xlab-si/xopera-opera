@@ -35,10 +35,11 @@ class Relationship:
                       operation_type: Union[StandardInterfaceOperation, ConfigureInterfaceOperation],
                       instance: Base,
                       verbose: bool,
-                      workdir: str):
+                      workdir: str,
+                      validate: bool = False):
         operation = self.interfaces[interface].operations.get(operation_type.value)
         if operation:
-            return operation.run(host, instance, verbose, workdir)
+            return operation.run(host, instance, verbose, workdir, validate)
         return True, {}, {}
 
     #

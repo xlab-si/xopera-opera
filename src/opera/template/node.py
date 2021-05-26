@@ -99,13 +99,14 @@ class Node:
                       operation_type: Union[StandardInterfaceOperation, ConfigureInterfaceOperation, str],
                       instance: Base,
                       verbose: bool,
-                      workdir: str):
+                      workdir: str,
+                      validate: bool = False):
         if isinstance(operation_type, (StandardInterfaceOperation, ConfigureInterfaceOperation)):
             operation = self.interfaces[interface].operations.get(operation_type.value)
         else:
             operation = self.interfaces[interface].operations.get(operation_type)
         if operation:
-            return operation.run(host, instance, verbose, workdir)
+            return operation.run(host, instance, verbose, workdir, validate)
         return True, {}, {}
 
     #
