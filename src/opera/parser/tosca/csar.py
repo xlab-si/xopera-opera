@@ -263,7 +263,7 @@ class FileCloudServiceArchive(CloudServiceArchive):
 
     def unpackage_csar(self, output_dir):
         csar_format = determine_archive_format(str(self.csar_file))
-        shutil.unpack_archive(self.csar_label, output_dir, csar_format)
+        shutil.unpack_archive(str(self.csar_file), output_dir, csar_format)
 
     def members(self) -> List[PurePath]:
         return [PurePath(zi.filename) for zi in self.backing_zip.infolist()]
