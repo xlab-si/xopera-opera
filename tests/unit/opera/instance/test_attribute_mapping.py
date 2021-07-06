@@ -61,7 +61,7 @@ class TestAttributeMapping:
     @pytest.mark.parametrize("host", ["SOURCE", "TARGET", "HOST" "my_collector", "other"])
     def test_map_attribute_node_bad_host(self, service_template, host):
         node = service_template.find_node("my_node")
-        with pytest.raises(DataError, match="The attribute's 'host' should be set to 'SELF'"):
+        with pytest.raises(DataError, match="Invalid attribute host for attribute mapping"):
             node.map_attribute([host, "colour"], "black")
 
     def test_map_attribute_node_bad_attribute(self, service_template):
@@ -108,18 +108,15 @@ class TestAttributeMapping:
         node_source_instance = next(iter(node_source.instances.values()))
         relationship_instance = next(iter(node_source_instance.out_edges["my_target"].values()))
 
-        with pytest.raises(DataError, match="The attribute's 'host' should be set to one of"):
+        with pytest.raises(DataError, match="Invalid attribute host for attribute mapping"):
             relationship_instance.map_attribute([host, "colour"], "ochre")
 
-    @pytest.mark.parametrize("host, pattern", [
-        ("SELF", "Instance has no 'volume' attribute"),
-        ("SOURCE", "Cannot find attribute 'volume' among"),
-        ("TARGET", "Cannot find attribute 'volume' among")
-    ])
-    def test_map_attr_rel_bad_attr(self, service_template, host, pattern):
+    @pytest.mark.parametrize("host", ["SELF", "SOURCE", "TARGET"])
+    def test_map_attr_rel_bad_attr(self, service_template, host):
         node_source = service_template.find_node("my_collector")
         node_source_instance = next(iter(node_source.instances.values()))
         relationship_instance = next(iter(node_source_instance.out_edges["my_target"].values()))
 
-        with pytest.raises(DataError, match=pattern):
+        with pytest.raises(DataError, match="Cannot find attribute 'volume' among"):
+            print(relationship_instance.map_attribute([host, "volume"], "quiet"))
             relationship_instance.map_attribute([host, "volume"], "quiet")

@@ -47,44 +47,38 @@ class Relationship:
     def get_property(self, params):
         host, prop, *_ = params
 
-        if host == OperationHost.TARGET.value:
-            raise DataError("{} is not yet supported in opera.".format(OperationHost.HOST.value))
-        if host != OperationHost.SELF.value:
+        if host == OperationHost.SELF.value:
+            # TODO: Add support for nested property values.
+            if prop not in self.properties:
+                raise DataError("Template has no '{}' attribute".format(prop))
+            return self.properties[prop].eval(self, prop)
+        elif host == OperationHost.HOST.value:
+            raise DataError("{} keyword can be only used within node template context.".format(host))
+        else:
+            # try to find the property within the TOSCA nodes
+            for node in self.topology.nodes.values():
+                if host == node.name or host in node.types:
+                    # TODO: Add support for nested property values.
+                    if prop in node.properties:
+                        return node.properties[prop].eval(self, prop)
+            # try to find the property within the TOSCA relationships
+            for rel in self.topology.relationships.values():
+                if host == rel.name or host in rel.types:
+                    # TODO: Add support for nested property values.
+                    if prop in rel.properties:
+                        return rel.properties[prop].eval(self, prop)
+
             raise DataError(
-                "Property host should be set to '{}' which is the only valid value. This is needed to indicate that "
-                "the property is referenced locally from something in the node itself. "
-                "Was: {}".format(OperationHost.SELF.value, host)
+                "We were unable to find the property: {} within the specified modelable entity or keyname: {} for node"
+                ": {}. The valid entities to get properties from are currently TOSCA nodes, relationships and policies."
+                " But the best practice is that the property host is set to '{}'. This indicates that the property is "
+                "referenced locally from something in the relationship itself.".format(prop, host, self.name,
+                                                                                       OperationHost.SELF.value)
             )
-
-        # TODO(@tadeboro): Add support for nested property values once we
-        # have data type support.
-        if prop not in self.properties:
-            raise DataError("Template has no '{}' property".format(prop))
-
-        return self.properties[prop].eval(self, prop)
 
     def get_attribute(self, params):
-        host, attr, *_ = params
-
-        if host == OperationHost.HOST.value:
-            raise DataError("{} is not yet supported in opera.".format(OperationHost.HOST.value))
-        if host != OperationHost.SELF.value:
-            raise DataError(
-                "The attribute's 'host' should be set to '{}' which is the only valid value."
-                "This is needed to indicate that the attribute is referenced locally from something in the node itself."
-                " Was: {}".format(OperationHost.SELF.value, host)
-            )
-
-        if attr not in self.attributes:
-            raise DataError("Template has no '{}' attribute".format(attr))
-
-        try:
-            return self.attributes[attr].eval(self, attr)
-        except DataError:
-            pass
-
         if len(self.instances) != 1:
-            raise DataError("Cannot get an attribute from multiple instances")
+            raise DataError("Cannot get an attribute from zero or multiple instances")
 
         return next(iter(self.instances.values())).get_attribute(params)
 
@@ -92,13 +86,7 @@ class Relationship:
         return self.topology.get_input(params)
 
     def map_attribute(self, params, value):
-        host, *_ = params
-
-        valid_hosts = [i.value for i in OperationHost]
-        if host not in valid_hosts:
-            raise DataError("The attribute's 'host' should be set to one of {}.".format(", ".join(valid_hosts)))
-
         if len(self.instances) != 1:
-            raise DataError("Mapping an attribute for multiple instances not supported")
+            raise DataError("Mapping an attribute for zero or multiple instances not supported")
 
         next(iter(self.instances.values())).map_attribute(params, value)
