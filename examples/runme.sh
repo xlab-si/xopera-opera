@@ -55,6 +55,11 @@ mkdir relationship_outputs/.opera
 $opera_executable deploy -p relationship_outputs/.opera relationship_outputs/service.yaml
 $opera_executable outputs -p relationship_outputs/.opera
 
+# test an example from ./tosca_functions
+echo "Testing an example from ./tosca_functions ..."
+mkdir tosca_functions/.opera
+$opera_executable deploy -p tosca_functions/.opera tosca_functions/service.yaml
+
 echo "All tests have finished successfully."
 
 # an end-to-end example from ./nginx_openstack cannot be deployed directly

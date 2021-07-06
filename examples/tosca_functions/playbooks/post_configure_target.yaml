@@ -1,0 +1,11 @@
+---
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: Print attribute values
+      debug:
+        msg: "{{ input_attr1 }} {{ input_attr2 }} {{ input_attr3 }} {{ input_attr_rel }} {{ input_attr_source }} {{ input_attr_target }}"
+
+    - name: Print property values
+      debug:
+        msg: "{{ input_prop1 }} {{ input_prop2 }} {{ input_prop3 }} {{ input_prop_rel }} {{ input_prop_source }} {{ input_prop_target }}"

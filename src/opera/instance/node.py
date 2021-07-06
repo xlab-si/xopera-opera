@@ -192,38 +192,67 @@ class Node(Base):  # pylint: disable=too-many-public-methods
     def get_attribute(self, params):
         host, attr, *rest = params
 
-        if host == OperationHost.HOST.value:
+        if host == OperationHost.SELF.value:
+            # TODO: Add support for nested attribute values once we have data type support.
+            if attr in self.attributes:
+                return self.attributes[attr].eval(self, attr)
+
+            # Check if there are capability and requirement with the same name.
+            if attr in self.out_edges and attr in [c.name for c in self.template.capabilities]:
+                raise DataError("There are capability and requirement with the same name: '{}'.".format(attr, ))
+
+            # If we have no attribute, try searching for capability.
+            capabilities = tuple(c for c in self.template.capabilities if c.name == attr)
+            if len(capabilities) > 1:
+                raise DataError("More than one capability is named '{}'.".format(attr, ))
+
+            if len(capabilities) == 1 and capabilities[0].attributes and len(rest) != 0:
+                return capabilities[0].attributes.get(rest[0]).data
+
+            # If we have no attribute, try searching for requirement.
+            relationships = self.out_edges.get(attr, {})
+            if len(relationships) == 0:
+                raise DataError("Cannot find attribute '{}' among {}.".format(attr, ", ".join(self.out_edges.keys())))
+            if len(relationships) > 1:
+                raise DataError("Targeting more than one instance via '{}'.".format(attr))
+
+            return next(iter(relationships.values())).target.get_attribute([OperationHost.SELF.value] + rest)
+        elif host == OperationHost.HOST.value:
+            for req in self.template.requirements:
+                # get value from the node that hosts the node as identified by its HostedOn relationship
+                if "tosca.relationships.HostedOn" in req.relationship.types:
+                    # TODO: Add support for nested attribute values.
+                    if req.target and attr in req.target.attributes:
+                        return req.target.attributes[attr].eval(self, attr)
+
             raise DataError(
-                "{} as the attribute's 'host' is not yet supported in opera.".format(OperationHost.HOST.value))
-        if host != OperationHost.SELF.value:
-            raise DataError("The attribute's 'host' should be set to '{}' which is the only valid value. "
-                            "This is needed to indicate that the attribute is referenced locally from something "
-                            "in the node itself. Was: {}".format(OperationHost.SELF.value, host))
+                "We were unable to find the attribute: {} specified with keyname: {} for node: {}. Check if the node "
+                "is connected to its host with tosca.relationships.HostedOn relationship.".format(attr, host,
+                                                                                                  self.template.name)
+            )
+        elif host in (OperationHost.SOURCE.value, OperationHost.TARGET.value):
+            raise DataError("{} keyword can be only used within relationship template context.".format(host))
+        else:
+            # try to find the attribute within the TOSCA nodes
+            for node in self.template.topology.nodes.values():
+                if host == node.name or host in node.types:
+                    # TODO: Add support for nested attribute values.
+                    if attr in node.attributes:
+                        return node.attributes[attr].eval(self, attr)
+            # try to find the attribute within the TOSCA relationships
+            for rel in self.template.topology.relationships.values():
+                if host == rel.name or host in rel.types:
+                    # TODO: Add support for nested attribute values.
+                    if attr in rel.attributes:
+                        return rel.attributes[attr].eval(self, attr)
 
-        # TODO(@tadeboro): Add support for nested attribute values once we
-        # have data type support.
-        if attr in self.attributes:
-            return self.attributes[attr].eval(self, attr)
-
-        # Check if there are capability and requirement with the same name.
-        if attr in self.out_edges and attr in [c.name for c in self.template.capabilities]:
-            raise DataError("There are capability and requirement with the same name: '{}'.".format(attr, ))
-
-        # If we have no attribute, try searching for capability.
-        capabilities = tuple(c for c in self.template.capabilities if c.name == attr)
-        if len(capabilities) > 1:
-            raise DataError("More than one capability is named '{}'.".format(attr, ))
-
-        if len(capabilities) == 1 and capabilities[0].attributes and len(rest) != 0:
-            return capabilities[0].attributes.get(rest[0]).data
-
-        # If we have no attribute, try searching for requirement.
-        relationships = self.out_edges.get(attr, {})
-        if len(relationships) == 0:
-            raise DataError("Cannot find attribute '{}' among {}.".format(attr, ", ".join(self.out_edges.keys())))
-        if len(relationships) > 1:
-            raise DataError("Targeting more than one instance via '{}'.".format(attr))
-        return next(iter(relationships.values())).target.get_attribute([OperationHost.SELF.value] + rest)
+            raise DataError(
+                "We were unable to find the attribute: {} within the specified modelable entity or keyname: {} for "
+                "node: {}. The valid entities to get attributes from are currently TOSCA nodes and relationships. But "
+                "the best practice is that the attribute host is set to '{}'. This indicates that the attribute is "
+                "referenced locally from something in the node itself.".format(attr, host, self.template.name,
+                                                                               OperationHost.SELF.value)
+            )
 
     def get_property(self, params):
         return self.template.get_property(params)
@@ -232,22 +261,34 @@ class Node(Base):  # pylint: disable=too-many-public-methods
         return self.template.get_input(params)
 
     def map_attribute(self, params, value):
-        host, attr, *_ = params
+        host, attr, *rest = params
 
-        if host == OperationHost.HOST.value:
-            raise DataError(
-                "{} as the attribute's 'host' is not yet supported in opera.".format(OperationHost.HOST.value))
         if host != OperationHost.SELF.value:
-            raise DataError("The attribute's 'host' should be set to '{}' which is the only valid value. "
-                            "This is needed to indicate that the attribute is referenced locally from something "
-                            "in the node itself. Was: {}".format(OperationHost.SELF.value, host))
+            raise DataError(
+                "Invalid attribute host for attribute mapping: {} for node: {}. For operation outputs in interfaces on "
+                "node templates, the only allowed keyname is: {}. This is because the output values must always be "
+                "stored into attributes that belong to the node template that has the interface for which the output "
+                "values are returned.".format(host, self.template.name, OperationHost.SELF.value)
+            )
 
-        # TODO(@tadeboro): Add support for nested attribute values once we
-        # have data type support.
-        if attr not in self.attributes:
+        attribute_mapped = False
+        # TODO: Add support for nested attribute values once we have data type support.
+        if attr in self.attributes:
+            self.set_attribute(attr, value)
+            attribute_mapped = True
+
+        # If we have no attribute, try searching for capability.
+        capabilities = tuple(c for c in self.template.capabilities if c.name == attr)
+        if len(capabilities) > 1:
+            raise DataError("More than one capability is named '{}'.".format(attr, ))
+
+        if len(capabilities) == 1 and capabilities[0].attributes and len(rest) != 0:
+            if rest[0] in capabilities[0].attributes:
+                capabilities[0].attributes[rest[0]] = value
+                attribute_mapped = True
+
+        if not attribute_mapped:
             raise DataError("Cannot find attribute '{}' among {}.".format(attr, ", ".join(self.attributes.keys())))
-
-        self.set_attribute(attr, value)
 
     def get_artifact(self, params):
         return self.template.get_artifact(params)

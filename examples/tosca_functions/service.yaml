@@ -1,0 +1,178 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  workstation_node:
+    derived_from: tosca.nodes.Compute
+    attributes:
+      attribute_host:
+        type: string
+    properties:
+      property_host:
+        type: string
+
+  hello_node_1:
+    derived_from: tosca.nodes.SoftwareComponent
+    attributes:
+      attribute1:
+        type: string
+    properties:
+      property1:
+        type: string
+
+  hello_node_2:
+    derived_from: tosca.nodes.SoftwareComponent
+    attributes:
+      attribute2:
+        type: string
+    properties:
+      property2:
+        type: string
+    requirements:
+      - requirement1:
+          capability: tosca.capabilities.Root
+          relationship: hello_relationship
+          occurrences: [ 0, UNBOUNDED ]
+
+  hello_node_3:
+    derived_from: tosca.nodes.SoftwareComponent
+    attributes:
+      attribute3:
+        type: string
+    properties:
+      property3:
+        type: string
+    interfaces:
+      Standard:
+        inputs:
+          input_attr1:
+            default: { get_attribute: [ hello1, attribute1 ] }
+            type: string
+          input_prop1:
+            default: { get_property: [ hello1, property1 ] }
+            type: string
+          input_attr2:
+            default: { get_attribute: [ hello2, attribute2 ] }
+            type: string
+          input_prop2:
+            default: { get_property: [ hello2, property2 ] }
+            type: string
+          input_attr3:
+            default: { get_attribute: [ SELF, attribute3 ] }
+            type: string
+          input_prop3:
+            default: { get_property: [ SELF, property3 ] }
+            type: string
+          input_attr_rel:
+            default: { get_attribute: [ hello_rel, attribute_rel ] }
+            type: string
+          input_prop_rel:
+            default: { get_property: [ hello_rel, property_rel ] }
+            type: string
+          input_attr_host:
+            default: { get_attribute: [ HOST, attribute_host ] }
+            type: string
+          input_prop_host:
+            default: { get_property: [ HOST, property_host ] }
+            type: string
+        operations:
+          create: playbooks/create.yaml
+
+relationship_types:
+  hello_relationship:
+    derived_from: tosca.relationships.DependsOn
+    attributes:
+      attribute_rel:
+        type: string
+        default: "string"
+    properties:
+      property_rel:
+        type: string
+        default: "string"
+    interfaces:
+      Configure:
+        inputs:
+          input_attr1:
+            default: { get_attribute: [ hello1, attribute1 ] }
+            type: string
+          input_prop1:
+            default: { get_property: [ hello1, property1 ] }
+            type: string
+          input_attr2:
+            default: { get_attribute: [ hello2, attribute2 ] }
+            type: string
+          input_prop2:
+            default: { get_property: [ hello2, property2 ] }
+            type: string
+          input_attr3:
+            default: { get_attribute: [ hello3, attribute3 ] }
+            type: string
+          input_prop3:
+            default: { get_property: [ hello3, property3 ] }
+            type: string
+          input_attr_rel:
+            default: { get_attribute: [ SELF, attribute_rel ] }
+            type: string
+          input_prop_rel:
+            default: { get_property: [ SELF, property_rel ] }
+            type: string
+          input_attr_source:
+            default: { get_attribute: [ SOURCE, attribute2 ] }
+            type: string
+          input_prop_source:
+            default: { get_property: [ SOURCE, property2 ] }
+            type: string
+          input_attr_target:
+            default: { get_attribute: [ TARGET, attribute1 ] }
+            type: string
+          input_prop_target:
+            default: { get_property: [ TARGET, property1 ] }
+            type: string
+        operations:
+          post_configure_target: playbooks/post_configure_target.yaml
+
+topology_template:
+  node_templates:
+    my-workstation:
+      type: workstation_node
+      attributes:
+        private_address: localhost
+        public_address: localhost
+        attribute_host: "attribute_host"
+      properties:
+        property_host: "property_host"
+
+    hello1:
+      type: hello_node_1
+      attributes:
+        attribute1: "attribute1"
+      properties:
+        property1: "property1"
+      requirements:
+        - host: my-workstation
+
+    hello2:
+      type: hello_node_2
+      attributes:
+        attribute2: "attribute2"
+      properties:
+        property2: "property2"
+      requirements:
+        - host: my-workstation
+        - requirement1: hello1
+
+    hello3:
+      type: hello_node_3
+      attributes:
+        attribute3: "attribute3"
+      properties:
+        property3: "property3"
+      requirements:
+        - host: my-workstation
+
+  relationship_templates:
+    hello_rel:
+      type: hello_relationship
+      attributes:
+        attribute_rel: "attribute_rel"
+      properties:
+        property_rel: "property_rel"

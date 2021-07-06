@@ -114,10 +114,58 @@ class Node:
     def get_property(self, params):
         host, prop, *rest = params
 
-        if host == OperationHost.HOST.value:
-            raise DataError("{} is not yet supported in opera.".format(OperationHost.HOST.value))
-        if host != OperationHost.SELF.value:
-            # try to find the property within connected TOSCA polices
+        if host == OperationHost.SELF.value:
+            # TODO: Add support for nested property values.
+            if prop in self.properties:
+                return self.properties[prop].eval(self, prop)
+
+            # Check if there are capability and requirement with the same name.
+            if prop in [r.name for r in self.requirements] and prop in [c.name for c in self.capabilities]:
+                raise DataError("There are capability and requirement with the same name: '{}'.".format(prop, ))
+
+            # If we have no property, try searching for capability.
+            capabilities = tuple(c for c in self.capabilities if c.name == prop)
+            if len(capabilities) > 1:
+                raise DataError("More than one capability is named '{}'.".format(prop))
+
+            if len(capabilities) == 1 and capabilities[0].properties:
+                return capabilities[0].properties.get(rest[0]).data
+
+            # If we have no property, try searching for requirement.
+            requirements = tuple(r for r in self.requirements if r.name == prop)
+            if len(requirements) == 0:
+                raise DataError("Cannot find property '{}'.".format(prop))
+            if len(requirements) > 1:
+                raise DataError("More than one requirement is named '{}'.".format(prop))
+            return requirements[0].target.get_property([OperationHost.SELF.value] + rest)
+        elif host == OperationHost.HOST.value:
+            for req in self.requirements:
+                # get value from the node that hosts the node as identified by its HostedOn relationship
+                if "tosca.relationships.HostedOn" in req.relationship.types:
+                    # TODO: Add support for nested property values.
+                    if req.target and prop in req.target.properties:
+                        return req.target.properties[prop].eval(self, prop)
+
+            raise DataError(
+                "We were unable to find the property: {} specified with keyname: {} for node: {}. Check if the node "
+                "is connected to its host with tosca.relationships.HostedOn relationship.".format(prop, host, self.name)
+            )
+        elif host in (OperationHost.SOURCE.value, OperationHost.TARGET.value):
+            raise DataError("{} keyword can be only used within relationship template context.".format(host))
+        else:
+            # try to find the property within the TOSCA nodes
+            for node in self.topology.nodes.values():
+                if host == node.name or host in node.types:
+                    # TODO: Add support for nested property values.
+                    if prop in node.properties:
+                        return node.properties[prop].eval(self, prop)
+            # try to find the property within the TOSCA relationships
+            for rel in self.topology.relationships.values():
+                if host == rel.name or host in rel.types:
+                    # TODO: Add support for nested property values.
+                    if prop in rel.properties:
+                        return rel.properties[prop].eval(self, prop)
+            # try to find the property within the connected TOSCA polices
             for policy in self.policies:
                 if host == policy.name or host in policy.types:
                     # TODO: Add support for nested property values.
@@ -125,51 +173,16 @@ class Node:
                         return policy.properties[prop].eval(self, prop)
 
             raise DataError(
-                "Property host should be set to '{}' which is the only valid value. This is needed to indicate that "
-                "the property is referenced locally from something in the node itself. The only valid entity to get "
-                "properties from are currently TOSCA policies, but we were unable to find the policy: {}.".format(
-                    OperationHost.SELF.value, host)
+                "We were unable to find the property: {} within the specified modelable entity or keyname: {} for node"
+                ": {}. The valid entities to get properties from are currently TOSCA nodes, relationships and policies."
+                " But the best practice is that the property host is set to '{}'. This indicates that the property is "
+                "referenced locally from something in the node itself.".format(prop, host, self.name,
+                                                                               OperationHost.SELF.value)
             )
-
-        # TODO(@tadeboro): Add support for nested property values.
-        if prop in self.properties:
-            return self.properties[prop].eval(self, prop)
-
-        # Check if there are capability and requirement with the same name.
-        if prop in [r.name for r in self.requirements] \
-                and prop in [c.name for c in self.capabilities]:
-            raise DataError("There are capability and requirement with the same name: '{}'.".format(prop, ))
-
-        # If we have no property, try searching for capability.
-        capabilities = tuple(c for c in self.capabilities if c.name == prop)
-        if len(capabilities) > 1:
-            raise DataError("More than one capability is named '{}'.".format(prop))
-
-        if len(capabilities) == 1 and capabilities[0].properties:
-            return capabilities[0].properties.get(rest[0]).data
-
-        # If we have no property, try searching for requirement.
-        requirements = tuple(r for r in self.requirements if r.name == prop)
-        if len(requirements) == 0:
-            raise DataError("Cannot find property '{}'.".format(prop))
-        if len(requirements) > 1:
-            raise DataError("More than one requirement is named '{}'.".format(prop))
-        return requirements[0].target.get_property([OperationHost.SELF.value] + rest)
 
     def get_attribute(self, params):
-        host, *_ = params
-
-        if host == OperationHost.HOST.value:
-            raise DataError("{} as the attribute's 'host' is not yet supported in opera.".format(host))
-        if host != OperationHost.SELF.value:
-            raise DataError(
-                "The attribute's 'host' should be set to 'SELF' which is the only valid value. "
-                "This is needed to indicate that the attribute is referenced locally from something in the node itself."
-                " Was: {}".format(host)
-            )
-
         if len(self.instances) != 1:
-            raise DataError("Cannot get an attribute from multiple instances")
+            raise DataError("Cannot get an attribute from zero or multiple instances")
 
         return next(iter(self.instances.values())).get_attribute(params)
 
@@ -177,19 +190,8 @@ class Node:
         return self.topology.get_input(params)
 
     def map_attribute(self, params, value):
-        host, *_ = params
-
-        if host == OperationHost.HOST.value:
-            raise DataError("{} as the attribute's 'host' is not yet supported in opera.".format(host))
-        if host != OperationHost.SELF.value:
-            raise DataError(
-                "The attribute's 'host' should be set to 'SELF' which is the only valid value. "
-                "This is needed to indicate that the attribute is referenced locally from something in the node itself."
-                " Was: {}".format(host)
-            )
-
         if len(self.instances) != 1:
-            raise DataError("Mapping an attribute for multiple instances not supported")
+            raise DataError("Mapping an attribute for zero or multiple instances not supported")
 
         next(iter(self.instances.values())).map_attribute(params, value)
 
