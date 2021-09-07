@@ -72,11 +72,13 @@ def validate_csar(csar_path: PurePath, inputs: typing.Optional[dict]):
 
     if entrypoint is not None:
         if isinstance(csar, DirCloudServiceArchive):
-            validate_service_template(csar_path / entrypoint, inputs)
+            ast = tosca.load(Path(csar_path), entrypoint)
+            ast.get_template(inputs)
         else:
             with TemporaryDirectory() as csar_validation_dir:
                 csar.unpackage_csar(csar_validation_dir)
-                validate_service_template(PurePath(csar_validation_dir) / entrypoint, inputs)
+                ast = tosca.load(Path(csar_validation_dir), entrypoint)
+                ast.get_template(inputs)
 
 
 def validate_service_template(service_template_path: PurePath, inputs: typing.Optional[dict]):
