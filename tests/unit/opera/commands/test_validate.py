@@ -6,6 +6,10 @@ class TestValidate:
         _, path, _ = service_template
         validate_service_template(path / "service.yaml", {"marker": "test-marker"})
 
-    def test_validate_csar(self, csar):
+    def test_validate_directory_based_csar(self, csar):
         path, _ = csar
         validate_csar(path, {"marker": "test-marker"})
+
+    def test_validate_compressed_csar(self, csar):
+        path, _ = csar
+        validate_csar(path / "compressed" / "test.zip", {"marker": "test-marker"})
