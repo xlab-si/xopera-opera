@@ -87,3 +87,6 @@ dmypy.json
 
 # default opera storage folder
 .opera
+
+# standard IntelliJ ignore
+.idea/
