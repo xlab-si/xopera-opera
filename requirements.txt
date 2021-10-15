@@ -1,3 +1,3 @@
-pyyaml >= 3.10  # MIT
-ansible >= 2.8  # GPLv3
-shtab >= 1.3.3  # Apache 2.0
+ansible>=4.7.0  # GPLv3
+pyyaml <= 5.4.1  # MIT
+shtab>=1.4.2  # Apache 2.0
