@@ -22,7 +22,7 @@ class Base:
 
     @classmethod
     def abort(cls, msg, loc=None):
-        raise ParseError("[{}] {}".format(cls.__name__, msg), loc)
+        raise ParseError(f"[{cls.__name__}] {msg}", loc)
 
     def __init__(self, data, loc):
         self.data = data

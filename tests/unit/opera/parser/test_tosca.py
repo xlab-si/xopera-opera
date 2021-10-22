@@ -54,12 +54,12 @@ class TestLoad:
         name = pathlib.PurePath("custom.yaml")
         (tmp_path / name).write_text(yaml_text(
             # language=yaml
-            """
+            f"""
             tosca_definitions_version: tosca_simple_yaml_1_3
-            {}:
+            {typ[0]}:
               my.custom.Type:
-                derived_from: {}
-            """.format(*typ)
+                derived_from: {typ[1]}
+            """
         ))
 
         doc = tosca.load(tmp_path, name)

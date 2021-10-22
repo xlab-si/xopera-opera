@@ -45,7 +45,7 @@ def _parser_callback(args):
     try:
         inputs = yaml.safe_load(args.inputs) if args.inputs else {}
     except yaml.YAMLError as e:
-        print("Invalid inputs: {}".format(e))
+        print(f"Invalid inputs: {e}")
         return 1
 
     storage = Storage.create(args.instance_path)
@@ -64,7 +64,7 @@ def _parser_callback(args):
             validate_service_template(csar_or_st_path, inputs, storage, args.verbose, args.tosca_only)
         print("Done.")
     except ParseError as e:
-        print("{}: {}".format(e.loc, e))
+        print(f"{e.loc}: {e}")
         return 1
     except OperaError as e:
         print(str(e))

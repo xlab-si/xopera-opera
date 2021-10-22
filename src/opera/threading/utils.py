@@ -2,4 +2,4 @@ from threading import current_thread  # type: ignore # pylint: disable=no-name-i
 
 
 def print_thread(string):
-    print("[{}] {}".format(current_thread().name, string))
+    print(f"[{current_thread().name}] {string}")

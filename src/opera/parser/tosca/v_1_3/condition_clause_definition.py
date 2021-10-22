@@ -9,7 +9,7 @@ from ..reference import Reference, ReferenceXOR
 
 
 class ConditionClauseDefinition(Entity):
-    ATTRS: Dict[str, Union[Type[Base], Base, Map, List, Reference, ReferenceXOR]] = dict()
+    ATTRS: Dict[str, Union[Type[Base], Base, Map, List, Reference, ReferenceXOR]] = {}
     KEYNAMES = {"and", "or", "not"}
 
     @classmethod

@@ -45,13 +45,13 @@ def _parser_callback(args):
     print("Warning: 'opera init' command is deprecated and will probably be removed within one of the next releases. "
           "Please use 'opera deploy' to initialize and deploy service templates or compressed CSARs.")
     if args.instance_path and not path.isdir(args.instance_path):
-        raise argparse.ArgumentTypeError("Directory {} is not a valid path!".format(args.instance_path))
+        raise argparse.ArgumentTypeError(f"Directory {args.instance_path} is not a valid path!")
 
     storage = Storage.create(args.instance_path)
     try:
         inputs = yaml.safe_load(args.inputs) if args.inputs else {}
     except yaml.YAMLError as e:
-        print("Invalid inputs: {}".format(e))
+        print(f"Invalid inputs: {e}")
         return 1
 
     try:
@@ -62,13 +62,13 @@ def _parser_callback(args):
             init_service_template(PurePath(args.csar.name), inputs, storage, args.clean)
             print("Service template was initialized")
     except ParseError as e:
-        print("{}: {}".format(e.loc, e))
+        print(f"{e.loc}: {e}")
         return 1
     except DataError as e:
         print(str(e))
         return 1
     except OperaError as e:
-        print("Invalid CSAR: {}".format(e))
+        print(f"Invalid CSAR: {e}")
         return 1
 
     return 0
@@ -96,7 +96,7 @@ def init_compressed_csar(csar_path: PurePath, inputs: typing.Optional[dict], sto
 
     # unzip csar and save the path to storage
     csar_dir = csars_dir / Path("csar")
-    ZipFile(csar_path, "r").extractall(csar_dir)
+    ZipFile(csar_path, "r").extractall(csar_dir)  # pylint: disable=consider-using-with
     csar_tosca_service_template_path = csar_dir / tosca_service_template
     storage.write(str(csar_tosca_service_template_path), "root_file")
 

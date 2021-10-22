@@ -77,9 +77,10 @@ class ServiceTemplate(Entity):
 
     def merge(self, other):
         if self.tosca_definitions_version != other.tosca_definitions_version:
-            self.abort("Incompatible TOSCA definitions: {} and {}".format(
-                self.tosca_definitions_version, other.tosca_definitions_version
-            ), other.loc)
+            self.abort(
+                f"Incompatible TOSCA definitions: {self.tosca_definitions_version} and "
+                f"{other.tosca_definitions_version}", other.loc
+            )
 
         # TODO(@tadeboro): Should we merge the topology templates or should we
         # be doing substitution mapping instead?

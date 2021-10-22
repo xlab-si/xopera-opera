@@ -13,7 +13,7 @@ T_ATTR = Dict[str, Union[Type[Base], Base, Map, List, Reference, ReferenceXOR]]
 
 
 class ActivityDefinition(Entity):
-    ATTRS: T_ATTR = dict()
+    ATTRS: T_ATTR = {}
 
     @classmethod
     def validate(cls, yaml_node):

@@ -20,14 +20,14 @@ class Relationship(Base):
             # TODO: Add support for nested attribute values once we have data type support.
             if attr not in self.attributes:
                 raise DataError(
-                    "Instance has no '{}' attribute. Available attributes: {}".format(attr, ", ".join(self.attributes)))
+                    f"Instance has no '{attr}' attribute. Available attributes: {', '.join(self.attributes)}")
             return self.attributes[attr].eval(self, attr)
         elif host == OperationHost.SOURCE.value:
             return self.source.get_attribute([OperationHost.SELF.value, attr] + rest)
         elif host == OperationHost.TARGET.value:
             return self.target.get_attribute([OperationHost.SELF.value, attr] + rest)
         elif host == OperationHost.HOST.value:
-            raise DataError("{} keyword can be only used within node template context.".format(host))
+            raise DataError(f"{host} keyword can be only used within node template context.")
         else:
             # try to find the attribute within the TOSCA nodes
             for node in self.template.topology.nodes.values():
@@ -43,11 +43,11 @@ class Relationship(Base):
                         return rel.attributes[attr].eval(self, attr)
 
             raise DataError(
-                "We were unable to find the attribute: {} within the specified modelable entity or keyname: {} "
-                "for relationship: {}. The valid entities to get attributes from are currently TOSCA nodes and "
-                "relationships. But the best practice is that the attribute host is set to '{}'. This indicates "
-                "that the attribute is referenced locally from something in the relationship "
-                "itself.".format(attr, host, self.template.name, OperationHost.SELF.value)
+                f"We were unable to find the attribute: {attr} within the specified modelable entity or keyname: "
+                f"{host} for relationship: {self.template.name}. The valid entities to get attributes from are "
+                f"currently TOSCA nodes and relationships. But the best practice is that the attribute host is set to "
+                f"'{OperationHost.SELF.value}'. This indicates that the attribute is referenced locally from something "
+                f"in the relationship itself."
             )
 
     def get_property(self, params):
@@ -68,7 +68,7 @@ class Relationship(Base):
         if host == OperationHost.SELF.value:
             # TODO: Add support for nested attribute values once we have data type support.
             if attr not in self.attributes:
-                raise DataError("Cannot find attribute '{}' among {}.".format(attr, ", ".join(self.attributes.keys())))
+                raise DataError(f"Cannot find attribute '{attr}' among {', '.join(self.attributes.keys())}.")
             self.set_attribute(attr, value)
         elif host == OperationHost.SOURCE.value:
             self.source.map_attribute([OperationHost.SELF.value, attr] + rest, value)
@@ -76,10 +76,9 @@ class Relationship(Base):
             self.target.map_attribute([OperationHost.SELF.value, attr] + rest, value)
         else:
             raise DataError(
-                "Invalid attribute host for attribute mapping: {}. For operation outputs in interfaces on relationship "
-                "templates, allowable keynames are: {}, {}, or {}.".format(host, OperationHost.SELF.value,
-                                                                           OperationHost.SOURCE.value,
-                                                                           OperationHost.TARGET.value)
+                f"Invalid attribute host for attribute mapping: {host}. For operation outputs in interfaces on "
+                f"relationship templates, allowable keynames are: {OperationHost.SELF.value}, "
+                f"{OperationHost.SOURCE.value}, or {OperationHost.TARGET.value}."
             )
 
     def get_artifact(self, params):
@@ -87,7 +86,7 @@ class Relationship(Base):
 
         valid_hosts = [i.value for i in OperationHost]
         if host not in valid_hosts:
-            raise DataError("Artifact host should be set to one of {}. Was: {}".format(", ".join(valid_hosts), host))
+            raise DataError(f"Artifact host should be set to one of {', '.join(valid_hosts)}. Was: {host}")
 
         if host == OperationHost.SOURCE.value:
             return self.source.get_property([OperationHost.SELF.value, prop] + rest)

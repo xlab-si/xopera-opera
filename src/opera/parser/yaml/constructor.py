@@ -62,7 +62,7 @@ class Constructor(BaseConstructor):
         if duplicates:
             raise ConstructorError(
                 None, None,
-                "Duplicate map names: {}".format(", ".join(duplicates)),
+                f"Duplicate map names: {', '.join(duplicates)}",
                 node.start_mark,
             )
 
@@ -70,7 +70,7 @@ class Constructor(BaseConstructor):
     def construct_undefined(node):
         raise ConstructorError(
             None, None,
-            "could not determine a constructor for {}".format(node.tag),
+            f"could not determine a constructor for {node.tag}",
             node.start_mark,
         )
 
@@ -78,8 +78,8 @@ class Constructor(BaseConstructor):
 # Add constructors for YAML 1.2 types (core schema).
 for tag in ("null", "bool", "int", "float", "str", "seq", "map"):
     Constructor.add_constructor(
-        "tag:yaml.org,2002:{}".format(tag),
-        getattr(Constructor, "construct_yaml_{}".format(tag)),
+        f"tag:yaml.org,2002:{tag}",
+        getattr(Constructor, f"construct_yaml_{tag}"),
     )
 
 # Error reporter.

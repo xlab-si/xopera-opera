@@ -76,7 +76,7 @@ class NodeTemplate(CollectorMixin, Entity):
             else:
                 # Create an anonymous relationship template of the right type
                 relationship = RelationshipTemplate(dict(type=definitions[name].relationship), None)
-                relationship_name = "{}-{}-{}".format(node_name, name, assignment.node.data)
+                relationship_name = f"{node_name}-{name}-{assignment.node.data}"
 
             occurrences = definitions[name].get("occurrences")
 
@@ -87,6 +87,6 @@ class NodeTemplate(CollectorMixin, Entity):
             )
 
         if undeclared_requirements:
-            self.abort("Undeclared requirements: {}.".format(", ".join(undeclared_requirements)), self.loc)
+            self.abort(f"Undeclared requirements: {', '.join(undeclared_requirements)}.", self.loc)
 
         return requirements

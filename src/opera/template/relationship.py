@@ -25,7 +25,7 @@ class Relationship:
         return typ in self.types
 
     def instantiate(self, source, target):
-        relationship_id = "{}--{}".format(source.tosca_id, target.tosca_id)
+        relationship_id = f"{source.tosca_id}--{target.tosca_id}"
         self.instances = {relationship_id: Instance(self, relationship_id, source, target)}
         return self.instances.values()
 
@@ -51,10 +51,10 @@ class Relationship:
         if host == OperationHost.SELF.value:
             # TODO: Add support for nested property values.
             if prop not in self.properties:
-                raise DataError("Template has no '{}' attribute".format(prop))
+                raise DataError(f"Template has no '{prop}' attribute")
             return self.properties[prop].eval(self, prop)
         elif host == OperationHost.HOST.value:
-            raise DataError("{} keyword can be only used within node template context.".format(host))
+            raise DataError(f"{host} keyword can be only used within node template context.")
         else:
             # try to find the property within the TOSCA nodes
             for node in self.topology.nodes.values():
@@ -70,11 +70,11 @@ class Relationship:
                         return rel.properties[prop].eval(self, prop)
 
             raise DataError(
-                "We were unable to find the property: {} within the specified modelable entity or keyname: {} for node"
-                ": {}. The valid entities to get properties from are currently TOSCA nodes, relationships and policies."
-                " But the best practice is that the property host is set to '{}'. This indicates that the property is "
-                "referenced locally from something in the relationship itself.".format(prop, host, self.name,
-                                                                                       OperationHost.SELF.value)
+                f"We were unable to find the property: {prop} within the specified modelable entity or keyname: "
+                f"{host} for node: {self.name}. The valid entities to get properties from are currently TOSCA nodes, "
+                f"relationships and policies. But the best practice is that the property host is set to "
+                f"'{OperationHost.SELF.value}'. This indicates that the property is referenced locally from something "
+                f"in the relationship itself."
             )
 
     def get_attribute(self, params):

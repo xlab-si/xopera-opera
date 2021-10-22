@@ -53,7 +53,7 @@ def add_parser(subparsers):
 
 def _parser_callback(args):
     if args.instance_path and not path.isdir(args.instance_path):
-        raise argparse.ArgumentTypeError("Directory {} is not a valid path!".format(args.instance_path))
+        raise argparse.ArgumentTypeError(f"Directory {args.instance_path} is not a valid path!")
 
     storage_old = Storage.create(args.instance_path)
     comparer = TemplateComparer()
@@ -81,7 +81,7 @@ def _parser_callback(args):
         else:
             inputs_new = {}
     except yaml.YAMLError as e:
-        print("Invalid inputs: {}".format(e))
+        print(f"Invalid inputs: {e}")
         return 1
 
     workdir_old = get_workdir(storage_old)
@@ -118,7 +118,7 @@ def _parser_callback(args):
         else:
             print(format_outputs(outputs, args.format))
     except ParseError as e:
-        print("{}: {}".format(e.loc, e))
+        print(f"{e.loc}: {e}")
         return 1
     except DataError as e:
         print(str(e))

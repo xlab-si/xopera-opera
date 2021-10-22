@@ -43,25 +43,21 @@ class CsarMeta:
 
         for req in CsarMeta.REQUIRED_KEYS:
             if req not in parsed:
-                raise ParseError("Missing required meta entry: {}".format(req), CsarMeta.METADATA_PATH)
+                raise ParseError(f"Missing required meta entry: {req}", CsarMeta.METADATA_PATH)
 
         csar_version = str(parsed[CsarMeta.KEY_CSAR_VERSION])
         if csar_version not in CsarMeta.SUPPORTED_CSAR_VERSIONS:
             raise ParseError(
-                "{} {} is not supported. Supported versions: {}\".".format(
-                    CsarMeta.KEY_CSAR_VERSION,
-                    csar_version,
-                    CsarMeta.SUPPORTED_CSAR_VERSIONS
-                ), CsarMeta.METADATA_PATH)
+                f"{CsarMeta.KEY_CSAR_VERSION} {csar_version} is not supported. Supported versions: "
+                f"{CsarMeta.SUPPORTED_CSAR_VERSIONS}\".", CsarMeta.METADATA_PATH
+            )
 
         tmf_version = str(parsed[CsarMeta.KEY_TOSCA_META_FILE_VERSION])
         if tmf_version not in CsarMeta.SUPPORTED_META_FILE_VERSIONS:
             raise ParseError(
-                "{} {} is not supported. Supported versions: {}\".".format(
-                    CsarMeta.KEY_TOSCA_META_FILE_VERSION,
-                    tmf_version,
-                    CsarMeta.SUPPORTED_META_FILE_VERSIONS
-                ), CsarMeta.METADATA_PATH)
+                f"{CsarMeta.KEY_TOSCA_META_FILE_VERSION} {tmf_version} is not supported. Supported versions: "
+                f"{CsarMeta.SUPPORTED_META_FILE_VERSIONS}\".", CsarMeta.METADATA_PATH
+            )
 
         result = CsarMeta(
             name=parsed.get(CsarMeta.KEY_NAME),
@@ -84,7 +80,7 @@ class CsarMeta:
             (CsarMeta.KEY_ENTRY_DEFINITIONS, self.entry_definitions)
         ]
 
-        return "\n".join("{}: {}".format(k, v) for k, v in ordered_fields if v is not None)
+        return "\n".join(f"{k}: {v}" for k, v in ordered_fields if v is not None)
 
     def to_dict(self) -> dict:
         return {
@@ -118,7 +114,7 @@ class ServiceTemplateMeta:
 
         for req in ServiceTemplateMeta.REQUIRED_KEYS:
             if req not in parsed["metadata"]:
-                raise ParseError("Missing required service template meta entry: metadata. {}".format(req), "")
+                raise ParseError(f"Missing required service template meta entry: metadata. {req}", "")
 
         return ServiceTemplateMeta(
             name=parsed["metadata"][ServiceTemplateMeta.KEY_NAME],
@@ -143,7 +139,7 @@ class CloudServiceArchive(ABC):
         resolved_path = Path(path)
 
         if not resolved_path.exists():
-            raise FileNotFoundError("File does not exist at {}".format(path))
+            raise FileNotFoundError(f"File does not exist at {path}")
 
         if resolved_path.is_file():
             return FileCloudServiceArchive(resolved_path)
@@ -201,22 +197,28 @@ class CloudServiceArchive(ABC):
 
         if not contains_meta:
             if not contains_single_root_yaml:
-                raise OperaError("When CSAR metadata is not present, there should be exactly one root level YAML file "
-                                 "in the root of the CSAR. Files found: {}.".format(str(root_yaml_files)))
+                raise OperaError(
+                    f"When CSAR metadata is not present, there should be exactly one root level YAML file in the root "
+                    f"of the CSAR. Files found: {str(root_yaml_files)}."
+                )
 
             try:
                 self.parse_service_template_meta(root_yaml_files[0])
             except ParseError as e:
-                raise OperaError("When CSAR metadata is not present, the single root level YAML file must contain "
-                                 "metadata: {}".format(str(e))) from e
+                raise OperaError(
+                    f"When CSAR metadata is not present, the single root level YAML file must contain metadata: "
+                    f"{str(e)}"
+                ) from e
 
         meta = self.parse_csar_meta()
         if meta is not None and meta.entry_definitions is not None:
             # check if "Entry-Definitions" points to an existing
             # template file in the CSAR
             if not self._member_exists(PurePath(meta.entry_definitions)):
-                raise OperaError("{} defined with Entry-Definitions in {} "
-                                 "does not exist.".format(meta.entry_definitions, CsarMeta.METADATA_PATH))
+                raise OperaError(
+                    f"{meta.entry_definitions} defined with Entry-Definitions in {CsarMeta.METADATA_PATH} does not "
+                    f"exist."
+                )
 
     def parse_csar_meta(self) -> Optional[CsarMeta]:
         path = PurePath(CsarMeta.METADATA_PATH)
@@ -302,32 +304,39 @@ class DirCloudServiceArchive(CloudServiceArchive):
                 root_yaml_files = self.get_root_yaml_files()
 
                 if meta is None and len(root_yaml_files) != 1:
-                    raise ParseError("You didn't specify the CSAR TOSCA entrypoint with '-t/--service-template' "
-                                     "option. Therefore there should be one YAML file in the root of the CSAR to "
-                                     "select it as the entrypoint. More than one YAML has been found: {}. Please "
-                                     "select one of the files as the CSAR entrypoint using '-t/--service-template' "
-                                     "flag or remove all the excessive YAML files."
-                                     .format(list(map(str, root_yaml_files))), self)
+                    raise ParseError(
+                        f"You didn't specify the CSAR TOSCA entrypoint with '-t/--service-template' option. Therefore "
+                        f"there should be one YAML file in the root of the CSAR to select it as the entrypoint. More "
+                        f"than one YAML has been found: {list(map(str, root_yaml_files))}. Please select one of the "
+                        f"files as the CSAR entrypoint using '-t/--service-template' flag or remove all the excessive "
+                        f"YAML files.", self
+                    )
                 service_template = root_yaml_files[0].name
             else:
                 if not self._member_exists(PurePath(service_template)):
-                    raise ParseError("The supplied TOSCA service template file '{}' does not exist in folder '{}'."
-                                     .format(service_template, self.csar_dir), self)
+                    raise ParseError(
+                        f"The supplied TOSCA service template file '{service_template}' does not exist in folder "
+                        f"'{self.csar_dir}'.", self
+                    )
 
             meta = self.parse_csar_meta()
             if meta is not None:
 
                 template_entry = meta.entry_definitions
                 if service_template and template_entry != service_template:
-                    raise ParseError("The file entry '{}' defined within 'Entry-Definitions' in "
-                                     "'TOSCA-Metadata/TOSCA.meta' does not match with the file name '{}' supplied "
-                                     "in service_template CLI argument.".format(template_entry, service_template), self)
+                    raise ParseError(
+                        f"The file entry '{template_entry}' defined within 'Entry-Definitions' in "
+                        f"'TOSCA-Metadata/TOSCA.meta' does not match with the file name '{service_template}' supplied "
+                        f"in service_template CLI argument.", self
+                    )
 
                 # check if "Entry-Definitions" points to an existing
                 # template file in the CSAR
                 if template_entry is not None and not self._member_exists(PurePath(template_entry)):
-                    raise ParseError("The file '{}' defined within 'Entry-Definitions' in 'TOSCA-Metadata/TOSCA.meta' "
-                                     "does not exist.".format(template_entry), self)
+                    raise ParseError(
+                        f"The file '{template_entry}' defined within 'Entry-Definitions' in "
+                        f"'TOSCA-Metadata/TOSCA.meta' does not exist.", self
+                    )
                 return shutil.make_archive(output_file, csar_format, self.csar_dir)
             else:
                 with TemporaryDirectory(prefix="opera-package-") as tempdir:
@@ -336,21 +345,23 @@ class DirCloudServiceArchive(CloudServiceArchive):
 
                     # create TOSCA-Metadata/TOSCA.meta file using the specified
                     # TOSCA service template or directory root YAML file
-                    content = ("TOSCA-Meta-File-Version: 1.1\n"
-                               "CSAR-Version: 1.1\n"
-                               "Created-By: xOpera TOSCA orchestrator\n"
-                               "Entry-Definitions: {}\n").format(service_template)
+                    content = (
+                        f"TOSCA-Meta-File-Version: 1.1\n"
+                        f"CSAR-Version: 1.1\n"
+                        f"Created-By: xOpera TOSCA orchestrator\n"
+                        f"Entry-Definitions: {service_template}\n"
+                    )
 
                     meta_file_folder = extract_path / "TOSCA-Metadata"
                     meta_file = (meta_file_folder / "TOSCA.meta")
 
                     meta_file_folder.mkdir()
                     meta_file.touch()
-                    meta_file.write_text(content)
+                    meta_file.write_text(content, encoding="utf-8")
 
                     return shutil.make_archive(output_file, csar_format, extract_path)
         except Exception as e:  # noqa: W0703
-            raise ParseError("Error creating CSAR:\n{}".format(traceback.format_exc()), self) from e
+            raise ParseError(f"Error creating CSAR:\n{traceback.format_exc()}", self) from e
 
     def unpackage_csar(self, output_dir):
         raise OperaError("Cannot unpackage a directory-based CSAR.")

@@ -7,7 +7,7 @@ class ToscaDefinitionsVersion(String):
         super().validate(yaml_node)
         if yaml_node.value != "tosca_simple_yaml_1_3":
             cls.abort(
-                "Invalid TOSCA version: {}. Expected {}.".format(yaml_node.value, "tosca_simple_yaml_1_3"),
+                f"Invalid TOSCA version: {yaml_node.value}. Expected tosca_simple_yaml_1_3.",
                 yaml_node.loc
             )
 

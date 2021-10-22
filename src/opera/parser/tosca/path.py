@@ -57,10 +57,10 @@ class Path(String):
         # Concrete checks
         abs_path = base_path / self.data
         if not abs_path.exists():
-            self.abort("Path {} does not exist.".format(abs_path), self.loc)
+            self.abort(f"Path {abs_path} does not exist.", self.loc)
         # We test for symlinks separately since is_dir() and is_file() return
         # True on symlinks and this is not what we want.
         if abs_path.is_symlink():
-            self.abort("Path {} is a symlink.".format(abs_path), self.loc)
+            self.abort(f"Path {abs_path} is a symlink.", self.loc)
         if not abs_path.is_dir() and not abs_path.is_file():
-            self.abort("Path {} is not file or folder.".format(abs_path), self.loc)
+            self.abort(f"Path {abs_path} is not file or folder.", self.loc)

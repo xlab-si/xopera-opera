@@ -43,8 +43,8 @@ class NodeExecutor(ThreadPoolExecutor):
             # and halt execution
             results = wait(running, return_when="ALL_COMPLETED")
             errors.update(self.process_results(results))
-            for node_id in errors:
-                print("Error processing node {0}: {1}".format(node_id, errors[node_id]))
+            for node_id, error in errors.items():
+                print(f"Error processing node {node_id}: {error}")
             raise OperationError("Failed")
 
         return proceed

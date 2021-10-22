@@ -35,7 +35,7 @@ def prompt_yes_no_question(
             print("Invalid input. Please try again.")
             return prompt_yes_no_question(yes_responses, no_responses, case_sensitive, default_yes_response)
     except EOFError as e:
-        print("Exception occurred: {}. Please enter valid inputs.".format(e))
+        print(f"Exception occurred: {e}. Please enter valid inputs.")
         return prompt_yes_no_question(yes_responses, no_responses, case_sensitive, default_yes_response)
 
 
@@ -46,7 +46,7 @@ def determine_archive_format(filepath):
         return "zip"
     else:
         raise Exception(
-            "Unsupported archive format: '{}'. The packaging format should be one of: zip, tar.".format(filepath)
+            f"Unsupported archive format: '{filepath}'. The packaging format should be one of: zip, tar."
         )
 
 
@@ -69,7 +69,7 @@ def format_outputs(outputs, outputs_format):
 
 
 def save_outputs(outputs, outputs_format, filename):
-    with open(filename, "w+") as outfile:
+    with open(filename, "w+", encoding="utf-8") as outfile:
         if outputs_format == "json":
             return json.dump(outputs, outfile, indent=2)
         if outputs_format == "yaml":

@@ -121,7 +121,7 @@ class TemplateComparer:
             path.join(context.workdir2, filepath2),
             shallow=False
         )
-        return equal, "file {0}".format(filepath1)
+        return equal, f"file {filepath1}"
 
     @staticmethod
     def _get_filename(filepath):

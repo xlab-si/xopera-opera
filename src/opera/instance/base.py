@@ -63,7 +63,7 @@ class Base:
         try:
             return next(s for s in NodeState if s.value == state_value)
         except StopIteration as e:
-            raise DataError("Could not find state {} in {}".format(state_value, list(NodeState))) from e
+            raise DataError(f"Could not find state {state_value} in {list(NodeState)}") from e
 
     def set_state(self, state: NodeState, write=True):
         self.set_attribute("state", state.value)
@@ -97,6 +97,6 @@ class Base:
         # TODO(@tadeboro): Add type validation.
         if name not in self.attributes:
             raise DataError(
-                "Instance has no '{}' attribute. Available attributes: "
-                "{}".format(name, ", ".join(self.attributes.keys())))
+                f"Instance has no '{name}' attribute. Available attributes: {', '.join(self.attributes.keys())}"
+            )
         self.attributes[name].set(value)

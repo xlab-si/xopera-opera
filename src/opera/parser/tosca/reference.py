@@ -19,7 +19,7 @@ class ReferenceWrapper(String):
 
         target = service_template.dig(*self.section_path, self.data)
         if not target:
-            self.abort("Invalid reference {}".format("/".join(self.section_path + (self.data,))), self.loc)
+            self.abort(f"Invalid reference {'/'.join(self.section_path + (self.data,))}", self.loc)
 
         return target
 
@@ -59,16 +59,15 @@ class MultipleReferenceWrapper(String):
 
         if len(targets) > 1:
             self.abort(
-                "Duplicate policy targets names were found: {}. Try to use unique names.".format(
-                    str(["/".join(path_tuple) + "/" + str(self.data) for path_tuple in self.section_paths])
-                ), self.loc)
+                f"Duplicate policy targets names were found: "
+                f"{str([('/'.join(path_tuple) + '/' + str(self.data)) for path_tuple in self.section_paths])}. Try to "
+                f"use unique names.", self.loc
+            )
 
         if not path_exists:
-            self.abort("Invalid reference, {} is not in {}".format(
-                str(self.data),
-                str(["/".join(path_tuple) if isinstance(path_tuple, tuple) else path_tuple
-                     for path_tuple in self.section_paths])
-            ), self.loc)
+            paths = str([("/".join(path_tuple) if isinstance(path_tuple, tuple) else path_tuple) for path_tuple in
+                         self.section_paths])
+            self.abort(f"Invalid reference, {str(self.data)} is not in {paths}", self.loc)
         return target_result
 
 

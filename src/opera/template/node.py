@@ -48,11 +48,11 @@ class Node:
             max_occurrences = occurrences_range[1] if occurrences_range else 1
 
             if requirement_occurrences[r.name] < min_occurrences:
-                raise DataError("Not enough occurrences found for requirement '{}'. Minimum is: {}"
-                                .format(r.name, min_occurrences))
+                raise DataError(
+                    f"Not enough occurrences found for requirement '{r.name}'. Minimum is: {min_occurrences}"
+                )
             if requirement_occurrences[r.name] > max_occurrences:
-                raise DataError("Too many occurrences found for requirement '{}'. Maximum is: {}"
-                                .format(r.name, max_occurrences))
+                raise DataError(f"Too many occurrences found for requirement '{r.name}'. Maximum is: {max_occurrences}")
             r.resolve(topology)
 
     def is_a(self, typ):
@@ -122,12 +122,12 @@ class Node:
 
             # Check if there are capability and requirement with the same name.
             if prop in [r.name for r in self.requirements] and prop in [c.name for c in self.capabilities]:
-                raise DataError("There are capability and requirement with the same name: '{}'.".format(prop, ))
+                raise DataError(f"There are capability and requirement with the same name: '{prop}'.")
 
             # If we have no property, try searching for capability.
             capabilities = tuple(c for c in self.capabilities if c.name == prop)
             if len(capabilities) > 1:
-                raise DataError("More than one capability is named '{}'.".format(prop))
+                raise DataError(f"More than one capability is named '{prop}'.")
 
             if len(capabilities) == 1 and capabilities[0].properties:
                 return capabilities[0].properties.get(rest[0]).data
@@ -135,9 +135,9 @@ class Node:
             # If we have no property, try searching for requirement.
             requirements = tuple(r for r in self.requirements if r.name == prop)
             if len(requirements) == 0:
-                raise DataError("Cannot find property '{}'.".format(prop))
+                raise DataError(f"Cannot find property '{prop}'.")
             if len(requirements) > 1:
-                raise DataError("More than one requirement is named '{}'.".format(prop))
+                raise DataError(f"More than one requirement is named '{prop}'.")
             return requirements[0].target.get_property([OperationHost.SELF.value] + rest)
         elif host == OperationHost.HOST.value:
             for req in self.requirements:
@@ -148,11 +148,11 @@ class Node:
                         return req.target.properties[prop].eval(self, prop)
 
             raise DataError(
-                "We were unable to find the property: {} specified with keyname: {} for node: {}. Check if the node "
-                "is connected to its host with tosca.relationships.HostedOn relationship.".format(prop, host, self.name)
+                f"We were unable to find the property: {prop} specified with keyname: {host} for node: {self.name}. "
+                f"Check if the node is connected to its host with tosca.relationships.HostedOn relationship."
             )
         elif host in (OperationHost.SOURCE.value, OperationHost.TARGET.value):
-            raise DataError("{} keyword can be only used within relationship template context.".format(host))
+            raise DataError(f"{host} keyword can be only used within relationship template context.")
         else:
             # try to find the property within the TOSCA nodes
             for node in self.topology.nodes.values():
@@ -174,11 +174,11 @@ class Node:
                         return policy.properties[prop].eval(self, prop)
 
             raise DataError(
-                "We were unable to find the property: {} within the specified modelable entity or keyname: {} for node"
-                ": {}. The valid entities to get properties from are currently TOSCA nodes, relationships and policies."
-                " But the best practice is that the property host is set to '{}'. This indicates that the property is "
-                "referenced locally from something in the node itself.".format(prop, host, self.name,
-                                                                               OperationHost.SELF.value)
+                f"We were unable to find the property: {prop} within the specified modelable entity or keyname: {host} "
+                f"for node: {self.name}. The valid entities to get properties from are currently TOSCA nodes, "
+                f"relationships and policies. But the best practice is that the property host is set to "
+                f"'{OperationHost.SELF.value}'. This indicates that the property is referenced locally from something "
+                f"in the node itself."
             )
 
     def get_attribute(self, params):
@@ -212,9 +212,9 @@ class Node:
             raise DataError("HOST is not yet supported in opera.")
         if host != OperationHost.SELF.value:
             raise DataError(
-                "Artifact host should be set to '{}' which is the only valid value. This is needed to indicate that "
-                "the artifact is referenced locally from something in the node itself. "
-                "Was: {}".format(OperationHost.SELF.value, host)
+                f"Artifact host should be set to '{OperationHost.SELF.value}' which is the only valid value. This is "
+                f"needed to indicate that the artifact is referenced locally from something in the node itself. Was: "
+                f"{host}."
             )
 
         if location == "LOCAL_FILE":
@@ -227,7 +227,7 @@ class Node:
             self.artifacts[prop].eval(self, prop)
             return Path(self.artifacts[prop].data).name
         else:
-            raise DataError("Cannot find artifact '{}'.".format(prop))
+            raise DataError(f"Cannot find artifact '{prop}'.")
 
     def concat(self, params):
         return self.topology.concat(params, self)

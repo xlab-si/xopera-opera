@@ -38,7 +38,7 @@ def _get_tosca_version(input_yaml):
             try:
                 return SUPPORTED_VERSIONS[v.value]
             except (TypeError, KeyError) as e:
-                raise ParseError("Invalid TOSCA version. Available: {}.".format(", ".join(SUPPORTED_VERSIONS.keys())),
+                raise ParseError(f"Invalid TOSCA version. Available: {', '.join(SUPPORTED_VERSIONS.keys())}.",
                                  v.loc) from e
 
     raise ParseError("Missing TOSCA version", input_yaml.loc)

@@ -41,7 +41,7 @@ def run(host, primary, dependencies, artifacts, variables, verbose, workdir, val
         inventory = utils.write(dir_path, _get_inventory(host), suffix=".yaml")
         vars_file = utils.write(dir_path, yaml.safe_dump(variables), suffix=".yaml")
 
-        with open("{}/ansible.cfg".format(dir_path), "w") as fd:
+        with open(f"{dir_path}/ansible.cfg", "w", encoding="utf-8") as fd:
             fd.write("[defaults]\n")
             fd.write("retry_files_enabled = False\n")
 
@@ -54,7 +54,7 @@ def run(host, primary, dependencies, artifacts, variables, verbose, workdir, val
 
         if verbose:
             print("***inputs***")
-            print(["{}: {}".format(key, variables[key]) for key in variables])
+            print([f"{key}: {variables[key]}" for key in variables])
             print("***inputs***")
 
         cmd = [
@@ -74,11 +74,11 @@ def run(host, primary, dependencies, artifacts, variables, verbose, workdir, val
         code, out, err = utils.run_in_directory(dir_path, cmd, env)
         if code != 0 or verbose:
             thread_utils.print_thread("------------")
-            with open(out) as fd:
+            with open(out, encoding="utf-8") as fd:
                 for line in fd:
                     print(line.rstrip())
             thread_utils.print_thread("------------")
-            with open(err) as fd:
+            with open(err, encoding="utf-8") as fd:
                 for line in fd:
                     print(line.rstrip())
             thread_utils.print_thread("============")
@@ -88,6 +88,6 @@ def run(host, primary, dependencies, artifacts, variables, verbose, workdir, val
 
         outputs = {}
         if not validate:
-            with open(out) as fd:
+            with open(out, encoding="utf-8") as fd:
                 outputs = json.load(fd)["global_custom_stats"]
         return code == 0, outputs
