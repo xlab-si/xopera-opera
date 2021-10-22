@@ -38,7 +38,7 @@ def add_parser(subparsers):
 
 def _parser_callback(args):
     if not Path(args.service_template_folder).is_dir():
-        raise argparse.ArgumentTypeError("Directory {} is not a valid path!".format(args.service_template_folder))
+        raise argparse.ArgumentTypeError(f"Directory {args.service_template_folder} is not a valid path!")
 
     # if the output is set use it, if not create a random file name with UUID
     if args.output:
@@ -56,9 +56,9 @@ def _parser_callback(args):
     try:
         output_package = package(PurePath(args.service_template_folder), csar_output, PurePath(args.service_template),
                                  args.format)
-        print("CSAR was created and packed to '{}'.".format(output_package))
+        print(f"CSAR was created and packed to '{output_package}'.")
     except ParseError as e:
-        print("{}: {}".format(e.loc, e))
+        print(f"{e.loc}: {e}")
         return 1
     except DataError as e:
         print(str(e))

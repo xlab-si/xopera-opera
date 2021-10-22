@@ -15,4 +15,4 @@ class Node:
         return self.value
 
     def __str__(self):
-        return "Node({})[{}]".format(self.loc, self.bare)
+        return f"Node({self.loc})[{self.bare}]"

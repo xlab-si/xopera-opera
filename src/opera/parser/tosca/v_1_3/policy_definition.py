@@ -83,17 +83,18 @@ class PolicyDefinition(CollectorMixin, Entity):
                         break
 
         if actions_found == 0:
-            self.abort("Trigger action: {} from call_operation does not belong to any node interface. Make "
-                       "sure that you have referenced it correctly (as "
-                       "<interface_sub_name>.<operation_sub_name>, where interface_sub_name is the "
-                       "interface name and the operation_sub_name is the name of the operation within this "
-                       "interface). The node that you're targeting with interface operation also has to be "
-                       "used in topology_template/node_templates section."
-                       .format(call_operation_name), self.loc)
+            self.abort(
+                f"Trigger action: {call_operation_name} from call_operation does not belong to any node interface. "
+                f"Make sure that you have referenced it correctly (as <interface_sub_name>.<operation_sub_name>, where "
+                f"interface_sub_name is the interface name and the operation_sub_name is the name of the operation "
+                f"within this interface). The node that you're targeting with interface operation also has to be used "
+                f"in topology_template/node_templates section", self.loc
+            )
         elif actions_found > 1:
-            self.abort("Found duplicated trigger actions: {} from call_operation. It seems that the "
-                       "operation with the same name belongs to two different node types/templates. "
-                       "".format(call_operation_name), self.loc)
+            self.abort(
+                f"Found duplicated trigger actions: {call_operation_name} from call_operation. It seems that the "
+                f"operation with the same name belongs to two different node types/templates.", self.loc
+            )
 
         return collected_action
 
@@ -101,7 +102,7 @@ class PolicyDefinition(CollectorMixin, Entity):
     def collect_trigger_target_nodes(self, target_filter: Optional[Tuple[str, Any]], nodes: Dict[str, Node],
                                      policy_targets: Dict[str, Any]) -> Dict[str, Node]:
         # pylint: disable=no-self-use
-        targeted_nodes = dict()
+        targeted_nodes = {}
         if target_filter:
             # if target node filter is applied collect just one targeted node from it
             for node_name, node in nodes.items():
@@ -129,8 +130,10 @@ class PolicyDefinition(CollectorMixin, Entity):
         for action in action_definitions:
             # TODO: implement support for other types of trigger activity definitions.
             if list(action)[0] != "call_operation":
-                self.abort("Unsupported trigger activity definitions: {}. Only call_operation is supported."
-                           .format(list(action)[0]), self.loc)
+                self.abort(
+                    f"Unsupported trigger activity definitions: {list(action)[0]}. Only call_operation is supported.",
+                    self.loc
+                )
             else:
                 # collect connected node interface operations
                 call_operation = action.get("call_operation", None)
@@ -142,8 +145,9 @@ class PolicyDefinition(CollectorMixin, Entity):
                 elif isinstance(call_operation.data, dict):
                     call_operation_name = call_operation.data.get("operation", None)
                 else:
-                    self.abort("Invalid call operation activity definition type: {}."
-                               .format(type(call_operation.data, )), self.loc)
+                    self.abort(
+                        f"Invalid call operation activity definition type: {type(call_operation.data)}.", self.loc
+                    )
 
                 # having no operation name should never happen but to be completely sure we can also check here
                 if not call_operation_name:
@@ -175,7 +179,7 @@ class PolicyDefinition(CollectorMixin, Entity):
         definitions.update(assignments)
 
         # TODO: optimize this code which is now nasty with a lot of parsing, looping and everything else.
-        triggers = dict()
+        triggers = {}
         for name, definition in definitions.items():
             # collect and resolve target filter definition
             target_filter = None
@@ -190,8 +194,10 @@ class PolicyDefinition(CollectorMixin, Entity):
 
             # check if target_filter also matches one node reference from policy's targets
             if target_filter and policy_targets and target_filter[0] not in list(policy_targets):
-                self.abort("The node reference: {} from policy trigger's target_filter should be also present in "
-                           "policy's targets.".format(target_filter[0]), self.loc)
+                self.abort(
+                    f"The node reference: {target_filter[0]} from policy trigger's target_filter should be also "
+                    f"present in policy's targets.", self.loc
+                )
 
             # collect action definitions
             actions = self.collect_trigger_actions(definition, target_filter, nodes, policy_targets)

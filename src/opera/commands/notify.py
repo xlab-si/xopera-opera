@@ -43,7 +43,7 @@ def add_parser(subparsers):
 
 def _parser_callback(args):
     if args.instance_path and not path.isdir(args.instance_path):
-        raise argparse.ArgumentTypeError("Directory {} is not a valid path!".format(args.instance_path))
+        raise argparse.ArgumentTypeError(f"Directory {args.instance_path} is not a valid path!")
 
     storage = Storage.create(args.instance_path)
     status = info(None, storage)["status"]
@@ -76,12 +76,12 @@ def _parser_callback(args):
             return 0
 
     # read the notification file and the pass its contents to the library function
-    notification_file_contents = Path(args.notification.name).read_text() if args.notification else None
+    notification_file_contents = Path(args.notification.name).read_text(encoding="utf-8") if args.notification else None
 
     try:
         notify(storage, args.verbose, args.trigger, notification_file_contents)
     except ParseError as e:
-        print("{}: {}".format(e.loc, e))
+        print(f"{e.loc}: {e}")
         return 1
     except DataError as e:
         print(str(e))
@@ -120,7 +120,7 @@ def notify(storage: Storage, verbose_mode: bool, trigger_name_or_event: str,
                         break
 
             if not trigger_name_or_event_exists:
-                raise DataError("The provided trigger or event name does not exist: {}.".format(trigger_name_or_event))
+                raise DataError(f"The provided trigger or event name does not exist: {trigger_name_or_event}.")
 
         topology = template.instantiate(storage)
         topology.notify(verbose_mode, workdir, trigger_name_or_event, notification_file_contents)

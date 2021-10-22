@@ -16,7 +16,7 @@ class Operation:
         self.host = host
 
     def run(self, host: OperationHost, instance, verbose, workdir, validate):
-        thread_utils.print_thread("    Executing {} on {}".format(self.name, instance.tosca_id))
+        thread_utils.print_thread(f"    Executing {self.name} on {instance.tosca_id}")
 
         # TODO(@tadeboro): Respect the timeout option.
         # TODO(@tadeboro): Add host validation.
@@ -60,6 +60,6 @@ class Operation:
 
         if len(unresolved_outputs) > 0:
             raise DataError(
-                "Operation did not return the following outputs: {}".format(", ".join(unresolved_outputs)))
+                f"Operation did not return the following outputs: {', '.join(unresolved_outputs)}")
 
         return success, outputs, ansible_outputs

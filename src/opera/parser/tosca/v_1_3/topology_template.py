@@ -50,7 +50,7 @@ class TopologyTemplate(Entity):
         undeclared_inputs = set(inputs.keys()) - declared_inputs.keys()
 
         if undeclared_inputs:
-            raise DataError("Undeclared inputs: {}".format(", ".join(undeclared_inputs)))
+            raise DataError(f"Undeclared inputs: {', '.join(undeclared_inputs)}")
 
         input_values = {
             name: definition.get_value(definition.get_value_type(service_ast))

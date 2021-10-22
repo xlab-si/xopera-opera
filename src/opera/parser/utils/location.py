@@ -5,4 +5,4 @@ class Location:
         self.column = column
 
     def __str__(self):
-        return "{}:{}:{}".format(self.stream_name, self.line, self.column)
+        return f"{self.stream_name}:{self.line}:{self.column}"

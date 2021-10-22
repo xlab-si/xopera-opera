@@ -37,7 +37,7 @@ def add_parser(subparsers):
 
 def _parser_callback(args):
     if args.instance_path and not path.isdir(args.instance_path):
-        raise argparse.ArgumentTypeError("Directory {} is not a valid path!".format(args.instance_path))
+        raise argparse.ArgumentTypeError(f"Directory {args.instance_path} is not a valid path!")
 
     storage = Storage.create(args.instance_path)
 
@@ -48,7 +48,7 @@ def _parser_callback(args):
         else:
             print(format_outputs(outs, args.format))
     except ParseError as e:
-        print("{}: {}".format(e.loc, e))
+        print(f"{e.loc}: {e}")
         return 1
     except DataError as e:
         print(str(e))

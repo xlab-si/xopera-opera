@@ -58,12 +58,13 @@ class Topology:
         relationship = self.find_relationship(entity_name)
 
         if not node and not relationship:
-            raise DataError("Node template or relationship template '{}' does not exist.".format(entity_name))
+            raise DataError(f"Node template or relationship template '{entity_name}' does not exist.")
 
         if node and relationship:
             if node.name == relationship.name:
-                raise DataError("Node template and relationship template '{}' should not have the same name."
-                                .format(entity_name))
+                raise DataError(
+                    f"Node template and relationship template '{entity_name}' should not have the same name."
+                )
 
         if node:
             return node
@@ -92,7 +93,7 @@ class Topology:
             params = [params]
 
         if params[0] not in self.inputs:
-            raise DataError("Invalid input: '{}'".format(params[0]))
+            raise DataError(f"Invalid input: '{params[0]}'")
 
         return self.inputs[params[0]].eval(self, params[0])
 
@@ -112,29 +113,30 @@ class Topology:
 
     def concat(self, params, node=None):
         if not isinstance(params, list):
-            raise DataError("Concat intrinsic function parameters '{}' should be a list".format(params))
+            raise DataError(f"Concat intrinsic function parameters '{params}' should be a list")
 
         return self.join([params], node)
 
     def join(self, params, node=None):
         if 1 <= len(params) <= 2:
             if not isinstance(params[0], list):
-                raise DataError("Concat or join intrinsic function parameters '{}' should be a list".format(params))
+                raise DataError(f"Concat or join intrinsic function parameters '{params}' should be a list")
 
             string_value_expressions = params[0]
             delimiter = "" if len(params) == 1 else params[1]
 
             if not isinstance(delimiter, str):
                 raise DataError(
-                    "Delimiter: '{}' should be a string.".format(delimiter))
+                    f"Delimiter: '{delimiter}' should be a string.")
 
             values_to_join = []
             for param in string_value_expressions:
                 if isinstance(param, dict):
                     param_dict_keys = list(param.keys())
                     if len(param_dict_keys) > 1:
-                        raise DataError("Dict value expression for concat or join function has too many keys: '{}'"
-                                        .format(param))
+                        raise DataError(
+                            f"Dict value expression for concat or join function has too many keys: '{param}'"
+                        )
 
                     value_expression_name = param_dict_keys[0]
                     try:
@@ -143,18 +145,19 @@ class Topology:
                             getattr(entity, value_expression_name)(
                                 param[value_expression_name]))
                     except TypeError as e:
-                        raise DataError("Invalid value expression for concat or join function: '{}'"
-                                        .format(value_expression_name)) from e
+                        raise DataError(
+                            f"Invalid value expression for concat or join function: '{value_expression_name}'"
+                        ) from e
                 elif isinstance(param, str):
                     values_to_join.append(param)
                 else:
-                    raise DataError("Invalid value for concat or join function function: '{}'".format(param))
+                    raise DataError(f"Invalid value for concat or join function function: '{param}'")
 
             return delimiter.join(values_to_join)
         else:
             raise DataError(
-                "Too many or too less parameters for: '{}'. Join or concat intrinsic functions can only receive "
-                "one or two parameters.".format(params)
+                f"Too many or too less parameters for: '{params}'. Join or concat intrinsic functions can only receive "
+                f"one or two parameters."
             )
 
     @staticmethod
@@ -165,24 +168,25 @@ class Topology:
             substring_index = params[2]
 
             if not isinstance(string_with_tokens, str):
-                raise DataError("String with tokens: '{}' should be a string!".format(string_with_tokens))
+                raise DataError(f"String with tokens: '{string_with_tokens}' should be a string!")
 
             if not isinstance(string_of_token_chars, str):
-                raise DataError("String of token chars: '{}' should be a string!".format(string_of_token_chars))
+                raise DataError(f"String of token chars: '{string_of_token_chars}' should be a string!")
 
             if not isinstance(substring_index, int):
-                raise DataError("Substring index: '{}' should be an integer!".format(substring_index))
+                raise DataError(f"Substring index: '{substring_index}' should be an integer!")
 
             if string_of_token_chars not in string_with_tokens:
-                raise DataError("Token: '{}' is not present in string '{}'.".format(string_of_token_chars,
-                                                                                    string_with_tokens))
+                raise DataError(f"Token: '{string_of_token_chars}' is not present in string '{string_with_tokens}'.")
 
             substrings = string_with_tokens.split(string_of_token_chars)
 
             if not 0 <= substring_index < len(substrings):
-                raise DataError("Substring index '{}' for token function does not exist.".format(substring_index))
+                raise DataError(f"Substring index '{substring_index}' for token function does not exist.")
 
             return substrings[substring_index]
         else:
-            raise DataError("Too many or too less parameters for: '{}'. Token intrinsic function requires exactly "
-                            "three parameters.".format(params))
+            raise DataError(
+                f"Too many or too less parameters for: '{params}'. Token intrinsic function requires exactly three "
+                f"parameters."
+            )

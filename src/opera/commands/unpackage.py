@@ -32,7 +32,7 @@ def add_parser(subparsers):
 def _parser_callback(args):
     csar_path = Path(args.csar)
     if not csar_path.is_file():
-        raise argparse.ArgumentTypeError("CSAR file {} is not a valid path!".format(args.csar))
+        raise argparse.ArgumentTypeError(f"CSAR file {args.csar} is not a valid path!")
 
     # if the output is set use it, if not create a random file name with UUID
     if args.destination:
@@ -46,9 +46,9 @@ def _parser_callback(args):
         abs_dest_path = PurePath(extracted_folder.resolve())
 
         unpackage(abs_csar_path, abs_dest_path)
-        print("The CSAR was unpackaged to '{}'.".format(abs_dest_path))
+        print(f"The CSAR was unpackaged to '{abs_dest_path}'.")
     except ParseError as e:
-        print("{}: {}".format(e.loc, e))
+        print(f"{e.loc}: {e}")
         return 1
     except DataError as e:
         print(str(e))

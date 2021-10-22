@@ -41,10 +41,10 @@ def add_parser(subparsers):
 
 def _parser_callback(args):
     if args.instance_path and not path.isdir(args.instance_path):
-        raise argparse.ArgumentTypeError("Directory {} is not a valid path!".format(args.instance_path))
+        raise argparse.ArgumentTypeError(f"Directory {args.instance_path} is not a valid path!")
 
     if args.workers < 1:
-        print("{} is not a positive number!".format(args.workers))
+        print(f"{args.workers} is not a positive number!")
         return 1
 
     storage = Storage.create(args.instance_path)
@@ -74,7 +74,7 @@ def _parser_callback(args):
     try:
         undeploy(storage, args.verbose, args.workers)
     except ParseError as e:
-        print("{}: {}".format(e.loc, e))
+        print(f"{e.loc}: {e}")
         return 1
     except DataError as e:
         print(str(e))

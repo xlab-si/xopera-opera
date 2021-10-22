@@ -52,15 +52,19 @@ class DefinitionCollectorMixin:
                 valid_standard_interface_operation_names = [i.value for i in StandardInterfaceOperation]
                 for operation in definition.get("operations", {}):
                     if operation not in valid_standard_interface_operation_names:
-                        self.abort("Invalid operation for {} interface: {}. Valid operation names are: {}."
-                                   .format(name, operation, valid_standard_interface_operation_names), self.loc)
+                        self.abort(
+                            f"Invalid operation for {name} interface: {operation}. Valid operation names are: "
+                            f"{valid_standard_interface_operation_names}.", self.loc
+                        )
 
             if name in configure_interface_names:
                 valid_configure_interface_operation_names = [i.value for i in ConfigureInterfaceOperation]
                 for operation in definition.get("operations", {}):
                     if operation not in valid_configure_interface_operation_names:
-                        self.abort("Invalid operation for {} interface: {}. Valid operation names are: {}."
-                                   .format(name, operation, valid_configure_interface_operation_names), self.loc)
+                        self.abort(
+                            f"Invalid operation for {name} interface: {operation}. Valid operation names are: "
+                            f"{valid_configure_interface_operation_names}.", self.loc
+                        )
 
             # collect operations and inputs from linked interface_types
             # do this only when type is specified and interface name is not Standard or Configure

@@ -34,7 +34,7 @@ class MapWrapper(Base):
     def merge(self, other):
         duplicates = set(self.keys()) & set(other.keys())
         if duplicates:
-            self.abort("Duplicate keys '{}' found in {} and {}".format(", ".join(duplicates), self.loc, other.loc),
+            self.abort(f"Duplicate keys '{', '.join(duplicates)}' found in {self.loc} and {other.loc}",
                        self.loc)
         self.data.update(other.data)
 

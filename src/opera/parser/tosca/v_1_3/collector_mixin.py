@@ -18,7 +18,7 @@ class CollectorMixin:
 
         undeclared_props = set(assignments.keys()) - definitions.keys()
         if undeclared_props:
-            self.abort("Invalid properties: {}.".format(", ".join(undeclared_props)), self.loc)
+            self.abort(f"Invalid properties: {', '.join(undeclared_props)}.", self.loc)
 
         for key, prop_definition in definitions.items():
             prop_required = prop_definition.get("required", None)
@@ -31,9 +31,8 @@ class CollectorMixin:
 
             if prop_required and not prop_has_default and not prop_assignment:
                 self.abort(
-                    "Missing a required property: {}. If the property is optional please specify "
-                    "this in the definition with 'required: false' or supply its default value using "
-                    "'default: <value>'.".format(key), self.loc
+                    f"Missing a required property: {key}. If the property is optional please specify this in the "
+                    f"definition with 'required: false' or supply its default value using 'default: <value>'.", self.loc
                 )
 
         return {
@@ -48,7 +47,7 @@ class CollectorMixin:
 
         undeclared_attrs = set(assignments.keys()) - definitions.keys()
         if undeclared_attrs:
-            self.abort("Invalid attributes: {}.".format(", ".join(undeclared_attrs)), self.loc)
+            self.abort(f"Invalid attributes: {', '.join(undeclared_attrs)}.", self.loc)
         return {
             name: (assignments.get(name) or definition).get_value(
                 definition.get_value_type(service_ast),
@@ -62,7 +61,7 @@ class CollectorMixin:
 
         undeclared_interfaces = set(assignments.keys()) - definitions.keys()
         if undeclared_interfaces:
-            self.abort("Undeclared interfaces: {}.".format(", ".join(undeclared_interfaces)), self.loc)
+            self.abort(f"Undeclared interfaces: {', '.join(undeclared_interfaces)}.", self.loc)
 
         # Next section is nasty. You have been warned.
         interfaces = {}
@@ -73,7 +72,7 @@ class CollectorMixin:
             assigned_operations = assignment.get("operations", {})
             undeclared_operations = set(assigned_operations.keys()) - defined_operations.keys()
             if undeclared_operations:
-                self.abort("Undeclared operations: {}.".format(", ".join(undeclared_operations)), self.loc)
+                self.abort(f"Undeclared operations: {', '.join(undeclared_operations)}.", self.loc)
 
             operations = {}
             for op_name, op_definition in defined_operations.items():
@@ -106,9 +105,7 @@ class CollectorMixin:
                         inputs[k] = v.get_value(inputs[k].type)
 
                 if undeclared_inputs:
-                    self.abort("Undeclared inputs: {}.".format(
-                        ", ".join(undeclared_inputs),
-                    ), self.loc)
+                    self.abort(f"Undeclared inputs: {', '.join(undeclared_inputs)}.", self.loc)
 
                 # Outputs, which define the attribute mapping, come from:
                 #  1. interface operation definition,
@@ -133,8 +130,9 @@ class CollectorMixin:
                     try:
                         operation_host = next(oh for oh in OperationHost if oh.value == operation_host_value)
                     except StopIteration as e:
-                        raise DataError("Could not find operation host {} in "
-                                        "{}".format(operation_host_value, list(OperationHost))) from e
+                        raise DataError(
+                            f"Could not find operation host {operation_host_value} in {list(OperationHost)}"
+                        ) from e
 
                 operations[op_name] = Operation(
                     op_name,
@@ -164,7 +162,7 @@ class CollectorMixin:
 
         undeclared_caps = set(assignments.keys()) - definitions.keys()
         if undeclared_caps:
-            self.abort("Invalid capabilities: {}.".format(", ".join(undeclared_caps)), self.loc)
+            self.abort(f"Invalid capabilities: {', '.join(undeclared_caps)}.", self.loc)
 
         return [
             Capability(name, assignment.get("properties", None), assignment.get("attributes", None))

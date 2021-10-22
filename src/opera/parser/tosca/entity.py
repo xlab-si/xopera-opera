@@ -33,11 +33,11 @@ class Entity(MapWrapper):
 
         missing_keys = cls.REQUIRED - data_keys
         if missing_keys:
-            cls.abort("Missing required fields: {}".format(", ".join(missing_keys)), yaml_node.loc)
+            cls.abort(f"Missing required fields: {', '.join(missing_keys)}", yaml_node.loc)
 
         extra_keys = data_keys - cls.attrs().keys()
         if extra_keys:
-            cls.abort("Invalid keys: {}".format(", ".join(extra_keys)), yaml_node.loc)
+            cls.abort(f"Invalid keys: {', '.join(extra_keys)}", yaml_node.loc)
 
     @classmethod
     def build(cls, yaml_node):
@@ -73,7 +73,7 @@ class TypeEntity(Entity):
     @classmethod
     def attrs(cls):
         if not isinstance(cls.REFERENCE, Reference):
-            raise AssertionError("Override REFERENCE in {} with Reference.".format(cls.__name__))
+            raise AssertionError(f"Override REFERENCE in {cls.__name__} with Reference.")
 
         attributes = cls.ATTRS.copy()
         attributes.update(

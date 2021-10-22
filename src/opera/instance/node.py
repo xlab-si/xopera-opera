@@ -94,7 +94,7 @@ class Node(Base):  # pylint: disable=too-many-public-methods
                                            target_operation, verbose, workdir, validate)
 
     def validate(self, verbose, workdir):
-        thread_utils.print_thread("  Validating {}".format(self.tosca_id))
+        thread_utils.print_thread(f"  Validating {self.tosca_id}")
 
         # validate node's deployment
         self.run_operation(OperationHost.HOST, StandardInterfaceOperation.shorthand_name(),
@@ -118,10 +118,10 @@ class Node(Base):  # pylint: disable=too-many-public-methods
         self.write()
 
         self.validated = True
-        thread_utils.print_thread("  Validation of {} complete".format(self.tosca_id))
+        thread_utils.print_thread(f"  Validation of {self.tosca_id} complete")
 
     def deploy(self, verbose, workdir):
-        thread_utils.print_thread("  Deploying {}".format(self.tosca_id))
+        thread_utils.print_thread(f"  Deploying {self.tosca_id}")
 
         self.set_state(NodeState.CREATING)
         self.run_operation(OperationHost.HOST, StandardInterfaceOperation.shorthand_name(),
@@ -149,10 +149,10 @@ class Node(Base):  # pylint: disable=too-many-public-methods
         self.set_state(NodeState.STARTED)
 
         # TODO(@tadeboro): Execute various add hooks
-        thread_utils.print_thread("  Deployment of {} complete".format(self.tosca_id))
+        thread_utils.print_thread(f"  Deployment of {self.tosca_id} complete")
 
     def undeploy(self, verbose, workdir):
-        thread_utils.print_thread("  Undeploying {}".format(self.tosca_id))
+        thread_utils.print_thread(f"  Undeploying {self.tosca_id}")
 
         self.set_state(NodeState.STOPPING)
         self.run_operation(OperationHost.HOST, StandardInterfaceOperation.shorthand_name(),
@@ -169,7 +169,7 @@ class Node(Base):  # pylint: disable=too-many-public-methods
         self.reset_attributes()
         self.write()
 
-        thread_utils.print_thread("  Undeployment of {} complete".format(self.tosca_id))
+        thread_utils.print_thread(f"  Undeployment of {self.tosca_id} complete")
 
     def invoke_trigger(self, verbose: bool, workdir: str, trigger: Trigger,
                        notification_file_contents: Optional[str]):
@@ -182,9 +182,10 @@ class Node(Base):  # pylint: disable=too-many-public-methods
                 if notification_file_contents:
                     # add notification file contents to operation inputs that are exposed in the executor
                     if "notification" in operation.inputs:
-                        raise ToscaDeviationError("The input name: notification within the node: {} cannot be "
-                                                  "used. It it reserved and holds the contents of notification "
-                                                  "file. Please rename it.".format(self.template.name))
+                        raise ToscaDeviationError(
+                            f"The input name: notification within the node: {self.template.name} cannot be used. It it "
+                            f"reserved and holds the contents of notification file. Please rename it."
+                        )
 
                     notification_value = Value(None, True, notification_file_contents)
                     operation.inputs.update({"notification": notification_value})
@@ -193,7 +194,7 @@ class Node(Base):  # pylint: disable=too-many-public-methods
 
     def notify(self, verbose: bool, workdir: str, trigger_name_or_event: Optional[str],
                notification_file_contents: Optional[str]):
-        thread_utils.print_thread("  Notifying {}".format(self.tosca_id))
+        thread_utils.print_thread(f"  Notifying {self.tosca_id}")
 
         for policy in self.template.policies:
             for trigger_name, trigger in policy.triggers.items():
@@ -208,12 +209,12 @@ class Node(Base):  # pylint: disable=too-many-public-methods
 
                 # invoke the chosen trigger only if it contains any actions
                 if invoke_trigger and trigger.action:
-                    thread_utils.print_thread("   Calling trigger {} with event {}".format(trigger_name, trigger.event))
+                    thread_utils.print_thread(f"   Calling trigger {trigger_name} with event {trigger.event}")
                     self.invoke_trigger(verbose, workdir, trigger, notification_file_contents)
-                    thread_utils.print_thread("   Calling trigger actions with event {} complete".format(trigger.event))
+                    thread_utils.print_thread(f"   Calling trigger actions with event {trigger.event} complete")
 
         self.notified = True
-        thread_utils.print_thread("  Notification on {} complete".format(self.tosca_id))
+        thread_utils.print_thread(f"  Notification on {self.tosca_id} complete")
 
     #
     # TOSCA functions
@@ -228,12 +229,12 @@ class Node(Base):  # pylint: disable=too-many-public-methods
 
             # Check if there are capability and requirement with the same name.
             if attr in self.out_edges and attr in [c.name for c in self.template.capabilities]:
-                raise DataError("There are capability and requirement with the same name: '{}'.".format(attr, ))
+                raise DataError(f"There are capability and requirement with the same name: '{attr}'.")
 
             # If we have no attribute, try searching for capability.
             capabilities = tuple(c for c in self.template.capabilities if c.name == attr)
             if len(capabilities) > 1:
-                raise DataError("More than one capability is named '{}'.".format(attr, ))
+                raise DataError(f"More than one capability is named '{attr}'.")
 
             if len(capabilities) == 1 and capabilities[0].attributes and len(rest) != 0:
                 return capabilities[0].attributes.get(rest[0]).data
@@ -241,9 +242,9 @@ class Node(Base):  # pylint: disable=too-many-public-methods
             # If we have no attribute, try searching for requirement.
             relationships = self.out_edges.get(attr, {})
             if len(relationships) == 0:
-                raise DataError("Cannot find attribute '{}' among {}.".format(attr, ", ".join(self.out_edges.keys())))
+                raise DataError(f"Cannot find attribute '{attr}' among {', '.join(self.out_edges.keys())}.")
             if len(relationships) > 1:
-                raise DataError("Targeting more than one instance via '{}'.".format(attr))
+                raise DataError(f"Targeting more than one instance via '{attr}'.")
 
             return next(iter(relationships.values())).target.get_attribute([OperationHost.SELF.value] + rest)
         elif host == OperationHost.HOST.value:
@@ -255,12 +256,12 @@ class Node(Base):  # pylint: disable=too-many-public-methods
                         return req.target.attributes[attr].eval(self, attr)
 
             raise DataError(
-                "We were unable to find the attribute: {} specified with keyname: {} for node: {}. Check if the node "
-                "is connected to its host with tosca.relationships.HostedOn relationship.".format(attr, host,
-                                                                                                  self.template.name)
+                f"We were unable to find the attribute: {attr} specified with keyname: {host} for node: "
+                f"{self.template.name}. Check if the node is connected to its host with tosca.relationships.HostedOn "
+                f"relationship."
             )
         elif host in (OperationHost.SOURCE.value, OperationHost.TARGET.value):
-            raise DataError("{} keyword can be only used within relationship template context.".format(host))
+            raise DataError(f"{host} keyword can be only used within relationship template context.")
         else:
             # try to find the attribute within the TOSCA nodes
             for node in self.template.topology.nodes.values():
@@ -276,11 +277,11 @@ class Node(Base):  # pylint: disable=too-many-public-methods
                         return rel.attributes[attr].eval(self, attr)
 
             raise DataError(
-                "We were unable to find the attribute: {} within the specified modelable entity or keyname: {} for "
-                "node: {}. The valid entities to get attributes from are currently TOSCA nodes and relationships. But "
-                "the best practice is that the attribute host is set to '{}'. This indicates that the attribute is "
-                "referenced locally from something in the node itself.".format(attr, host, self.template.name,
-                                                                               OperationHost.SELF.value)
+                f"We were unable to find the attribute: {attr} within the specified modelable entity or keyname: "
+                f"{host} for node: {self.template.name}. The valid entities to get attributes from are currently TOSCA "
+                f"nodes and relationships. But the best practice is that the attribute host is set to "
+                f"'{OperationHost.SELF.value}'. This indicates that the attribute is referenced locally from something "
+                f"in the node itself."
             )
 
     def get_property(self, params):
@@ -294,10 +295,10 @@ class Node(Base):  # pylint: disable=too-many-public-methods
 
         if host != OperationHost.SELF.value:
             raise DataError(
-                "Invalid attribute host for attribute mapping: {} for node: {}. For operation outputs in interfaces on "
-                "node templates, the only allowed keyname is: {}. This is because the output values must always be "
-                "stored into attributes that belong to the node template that has the interface for which the output "
-                "values are returned.".format(host, self.template.name, OperationHost.SELF.value)
+                f"Invalid attribute host for attribute mapping: {host} for node: {self.template.name}. For operation "
+                f"outputs in interfaces on node templates, the only allowed keyname is: {OperationHost.SELF.value}. "
+                f"This is because the output values must always be stored into attributes that belong to the node "
+                f"template that has the interface for which the output values are returned."
             )
 
         attribute_mapped = False
@@ -309,7 +310,7 @@ class Node(Base):  # pylint: disable=too-many-public-methods
         # If we have no attribute, try searching for capability.
         capabilities = tuple(c for c in self.template.capabilities if c.name == attr)
         if len(capabilities) > 1:
-            raise DataError("More than one capability is named '{}'.".format(attr, ))
+            raise DataError(f"More than one capability is named '{attr}'.")
 
         if len(capabilities) == 1 and capabilities[0].attributes and len(rest) != 0:
             if rest[0] in capabilities[0].attributes:
@@ -317,7 +318,7 @@ class Node(Base):  # pylint: disable=too-many-public-methods
                 attribute_mapped = True
 
         if not attribute_mapped:
-            raise DataError("Cannot find attribute '{}' among {}.".format(attr, ", ".join(self.attributes.keys())))
+            raise DataError(f"Cannot find attribute '{attr}' among {', '.join(self.attributes.keys())}.")
 
     def get_artifact(self, params):
         return self.template.get_artifact(params)

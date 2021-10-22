@@ -60,10 +60,10 @@ def add_parser(subparsers):
 
 def _parser_callback(args):  # pylint: disable=too-many-statements
     if args.instance_path and not path.isdir(args.instance_path):
-        raise argparse.ArgumentTypeError("Directory {} is not a valid path!".format(args.instance_path))
+        raise argparse.ArgumentTypeError(f"Directory {args.instance_path} is not a valid path!")
 
     if args.workers < 1:
-        print("{} is not a positive number!".format(args.workers))
+        print(f"{args.workers} is not a positive number!")
         return 1
 
     storage = Storage.create(args.instance_path)
@@ -117,7 +117,7 @@ def _parser_callback(args):  # pylint: disable=too-many-statements
         else:
             inputs = None
     except yaml.YAMLError as e:
-        print("Invalid inputs: {}".format(e))
+        print(f"Invalid inputs: {e}")
         return 1
 
     try:
@@ -130,7 +130,7 @@ def _parser_callback(args):  # pylint: disable=too-many-statements
                                     args.verbose, args.workers,
                                     delete_existing_state)
     except ParseError as e:
-        print("{}: {}".format(e.loc, e))
+        print(f"{e.loc}: {e}")
         return 1
     except DataError as e:
         print(str(e))
@@ -197,7 +197,7 @@ def deploy_compressed_csar(
 
     # unzip csar, save the path to storage and set workdir
     csar_dir = csars_dir / Path("csar")
-    ZipFile(csar_path, "r").extractall(csar_dir)
+    ZipFile(csar_path, "r").extractall(csar_dir)  # pylint: disable=consider-using-with
     csar_tosca_service_template_path = csar_dir / tosca_service_template
     storage.write(str(csar_tosca_service_template_path), "root_file")
     workdir = str(csar_dir)

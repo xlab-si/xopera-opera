@@ -45,7 +45,7 @@ class Value:
 
     def eval(self, instance, key):
         if not self.present:
-            raise DataError("Cannot use an unset value: {}".format(key))
+            raise DataError(f"Cannot use an unset value: {key}")
 
         if self.is_function:
             return Value.eval_function(self.data, instance)
@@ -84,4 +84,4 @@ class Value:
         return data
 
     def __str__(self):
-        return "Value({})[{}]".format(self.present, self._data)
+        return f"Value({self.present})[{self._data}]"
