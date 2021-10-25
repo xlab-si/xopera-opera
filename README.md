@@ -13,7 +13,7 @@ xOpera orchestration tool compliant with TOSCA YAML v1.3 in the making.
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/opera)](https://pypi.org/project/opera/)
 
 <p align="center">
-  <img src="https://github.com/xlab-si/xopera-docs/blob/master/docs/images/xopera-black-text-side-mid.svg" width="60%" height="60%" title="xOpera logo">
+  <img src="https://raw.githubusercontent.com/xlab-si/xopera-docs/158ae10a3178e689a55ff2f993cf2d90c935c530/docs/images/xopera-black-text-side-mid.svg" width="60%" height="60%" title="xOpera logo">
 </p>
 
 ---
