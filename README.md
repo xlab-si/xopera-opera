@@ -12,10 +12,16 @@ xOpera orchestration tool compliant with TOSCA YAML v1.3 in the making.
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/opera)](https://pypi.org/project/opera/)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/opera)](https://pypi.org/project/opera/)
 
+<p align="center">
+  <img src="https://github.com/xlab-si/xopera-docs/blob/master/docs/images/xopera-black-text-side-mid.svg" width="50%" height="50%" title="xOpera logo">
+</p>
+
+---
+
 | Aspect                         | Information                               |
 | ------------------------------ |:-----------------------------------------:|
 | Tool name                      | [opera]                                   |
-| Documentation                  | [opera CLI documentation]                 |
+| Documentation                  | [opera documentation]                     |
 | Orchestration standard         | [OASIS TOSCA Simple Profile in YAML v1.3] |
 | Implementation tools           | [Ansible]                                 |
 
@@ -27,7 +33,7 @@ xOpera orchestration tool compliant with TOSCA YAML v1.3 in the making.
 
 ## Introduction
 `opera` aims to be a lightweight orchestrator compliant with [OASIS TOSCA]. The current compliance is with the 
-[OASIS TOSCA Simple Profile in YAML v1.3]. The [opera CLI documentation] for is available on GitHub pages. Opera implements 
+[OASIS TOSCA Simple Profile in YAML v1.3]. The [opera documentation] for is available on GitHub pages. Opera implements 
 TOSCA standard with [Ansible] automation tool where Ansible playbooks can be used as orchestration actuators within the 
 TOSCA interface operations.
 
@@ -91,7 +97,7 @@ Agreements No. 825040 ([RADON]) and No. 825480 ([SODALITE]).
 [OASIS TOSCA]: https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=tosca
 [OASIS TOSCA Simple Profile in YAML v1.3]: https://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.3/TOSCA-Simple-Profile-YAML-v1.3.html
 [xOpera documentation]: https://xlab-si.github.io/xopera-docs/
-[opera CLI documentation]: https://xlab-si.github.io/xopera-docs/
+[opera documentation]: https://xlab-si.github.io/xopera-docs/
 [Ansible]: https://www.ansible.com/ 
 [opera]: https://pypi.org/project/opera/
 [PyPI production]: https://pypi.org/project/opera/#history
