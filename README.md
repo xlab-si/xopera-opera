@@ -16,8 +16,6 @@ xOpera orchestration tool compliant with TOSCA YAML v1.3 in the making.
   <img src="https://raw.githubusercontent.com/xlab-si/xopera-docs/158ae10a3178e689a55ff2f993cf2d90c935c530/docs/images/xopera-black-text-side-mid.svg" width="60%" height="60%" title="xOpera logo">
 </p>
 
----
-
 | Aspect                         | Information                               |
 | ------------------------------ |:-----------------------------------------:|
 | Tool name                      | [opera]                                   |
@@ -92,7 +90,7 @@ API take a look at [xopera-api] repository. To find more about xOpera project vi
 
 ## Acknowledgement
 This project has received funding from the European Union’s Horizon 2020 research and innovation programme under Grant 
-Agreements No. 825040 ([RADON]) and No. 825480 ([SODALITE]).
+Agreements No. 825040 ([RADON]), No. 825480 ([SODALITE]) and No. 101000162 ([PIACERE]).
 
 [OASIS TOSCA]: https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=tosca
 [OASIS TOSCA Simple Profile in YAML v1.3]: https://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.3/TOSCA-Simple-Profile-YAML-v1.3.html
@@ -106,3 +104,4 @@ Agreements No. 825040 ([RADON]) and No. 825480 ([SODALITE]).
 [xopera-api]: https://github.com/xlab-si/xopera-api
 [RADON]: http://radon-h2020.eu
 [SODALITE]: http://www.sodalite.eu/
+[PIACERE]: https://www.piacere-project.eu/
