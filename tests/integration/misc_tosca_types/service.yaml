@@ -22,7 +22,7 @@ metadata:
   file_name: "service-template.yaml"
 
 description: This is a service template for daily testing with xOpera.
-namespace: "daily_test.templates"
+namespace: "urn:daily_test.templates"
 
 repositories:
   test_repo:
@@ -59,6 +59,8 @@ topology_template:
 
     file:
       type: daily_test.nodes.file
+      requirements:
+        - host: my-workstation1
 
     hello:
       type: daily_test.nodes.hello
@@ -69,6 +71,8 @@ topology_template:
 
     interfaces:
       type: daily_test.nodes.interfaces
+      requirements:
+        - host: my-workstation1
 
     noimpl:
       type: daily_test.nodes.noimpl

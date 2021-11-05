@@ -23,7 +23,7 @@ node_types:
         default: "1"
         type: string
       test_map:
-        default:
+        default: {}
         type: map
     capabilities:
       test:
