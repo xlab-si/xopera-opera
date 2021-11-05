@@ -2,7 +2,7 @@ from opera.parser.yaml.node import Node
 from .operation_implementation_definition import (
     OperationImplementationDefinition,
 )
-from .property_definition import PropertyDefinition
+from .parameter_definition import ParameterDefinition
 from ..entity import Entity
 from ..list import List
 from ..map import Map
@@ -13,7 +13,7 @@ class OperationDefinitionForType(Entity):
     ATTRS = dict(
         description=String,
         implementation=OperationImplementationDefinition,
-        inputs=Map(PropertyDefinition),
+        inputs=Map(ParameterDefinition),
         outputs=Map(List(String)),
     )
 
