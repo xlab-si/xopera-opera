@@ -80,9 +80,9 @@ policy_types:
       adjustment:
         description: The amount by which to scale
         type: integer
-        required: false
+        required: true
         constraints:
-          - less_or_equal: -1
+          - greater_or_equal: 1
     targets: [ radon.nodes.OpenStack.VM ]
     triggers:
       radon.triggers.scaling.ScaleDown:
@@ -114,7 +114,7 @@ policy_types:
       adjustment:
         description: The amount by which to scale
         type: integer
-        required: false
+        required: true
         constraints:
           - greater_or_equal: 1
     targets: [ radon.nodes.OpenStack.VM ]
@@ -152,7 +152,7 @@ policy_types:
         required: true
         status: supported
         constraints:
-          - greater_or_equal: 10
+          - less_or_equal: 10
 
 topology_template:
   node_templates:
@@ -201,15 +201,13 @@ topology_template:
               end_time: 2022-04-08T21:59:43.10-06:00
             target_filter:
               node: openstack_vm
-              requirement: workstation
-              capability: host_capability
             condition:
               constraint:
                 - not:
                     - and:
                         - available_instances: [ { greater_than: 42 } ]
                         - available_space: [ { greater_than: 1000 } ]
-              period: 60 sec
+              period: 60 s
               evaluations: 2
               method: average
             action:

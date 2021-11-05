@@ -54,15 +54,29 @@ topology_template:
         attribute: { get_input: test_attribute_input }
       properties:
         property: { get_input: test_property_input }
+      requirements:
+        - host: compute
 
     berlin:
       type: cli_commands_test.nodes.berlin
+      requirements:
+        - host: compute
 
     denver:
       type: cli_commands_test.nodes.denver
+      requirements:
+        - host: compute
 
     nairobi:
       type: cli_commands_test.nodes.nairobi
+      requirements:
+        - host: compute
+
+    compute:
+      type: tosca.nodes.Compute
+      attributes:
+        public_address: localhost
+        private_address: localhost
 
   outputs:
     output_attr:

@@ -29,7 +29,7 @@ node_types:
         type: string
     requirements:
       - requirement1:
-          capability: tosca.capabilities.Root
+          capability: tosca.capabilities.Node
           relationship: hello_relationship
           occurrences: [ 0, UNBOUNDED ]
 

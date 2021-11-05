@@ -29,7 +29,7 @@ node_types:
     derived_from: tosca.nodes.Root
     requirements:
       - student:
-          capability: tosca.capabilities.Root
+          capability: tosca.capabilities.Node
           relationship: steampunk.test.relationships.TeacherTeachesStudent
           occurrences: [ 0, UNBOUNDED ]
     attributes:
