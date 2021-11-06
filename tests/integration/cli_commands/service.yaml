@@ -15,8 +15,8 @@ node_types:
     interfaces:
       Standard:
         inputs:
-          my_attribute_input: { default: { get_attribute: [ SELF, attribute ] }, type: string }
-          my_property_input: { default: { get_property: [ SELF, property ] }, type: string }
+          my_attribute_input: { value: { get_attribute: [ SELF, attribute ] }, type: string }
+          my_property_input: { value: { get_property: [ SELF, property ] }, type: string }
         operations:
           create: playbooks/create.yaml
           delete: playbooks/delete.yaml

@@ -34,7 +34,7 @@ relationship_types:
           post_configure_target:
             inputs:
               marker:
-                default: { get_attribute: [ TARGET, host, id ] }
+                value: { get_attribute: [ TARGET, host, id ] }
                 type: string
             implementation:
               primary: playbooks/reload.yaml

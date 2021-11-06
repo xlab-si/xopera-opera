@@ -7,7 +7,7 @@ node_types:
       Standard:
         inputs:
           marker:
-            default: { get_input: marker }
+            value: { get_input: marker }
             type: string
         operations:
           create: playbooks/create.yaml

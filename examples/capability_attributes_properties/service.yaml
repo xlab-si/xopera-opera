@@ -44,10 +44,10 @@ node_types:
           create:
             implementation: playbooks/create.yaml
             inputs:
-              cap_attr_input: { default: { get_attribute: [ SELF, my_capability, capability_attribute ] }, type: string }
-              cap_prop_input: { default: { get_property: [ SELF, my_capability, capability_property ] }, type: string }
-              req_attr_input: { default: { get_attribute: [ SELF, my_target, my_attribute] }, type: string }
-              req_prop_input: { default: { get_property: [ SELF, my_target, my_property] }, type: string }
+              cap_attr_input: { value: { get_attribute: [ SELF, my_capability, capability_attribute ] }, type: string }
+              cap_prop_input: { value: { get_property: [ SELF, my_capability, capability_property ] }, type: string }
+              req_attr_input: { value: { get_attribute: [ SELF, my_target, my_attribute] }, type: string }
+              req_prop_input: { value: { get_property: [ SELF, my_target, my_property] }, type: string }
     requirements:
       - my_target:
           capability: tosca.capabilities.Node

@@ -34,16 +34,16 @@ node_types:
         operations:
           create:
             inputs:
-              vm_name:  { default: { get_property: [ SELF, name     ] }, type: string }
-              image:    { default: { get_property: [ SELF, image    ] }, type: string }
-              flavor:   { default: { get_property: [ SELF, flavor   ] }, type: string }
-              network:  { default: { get_property: [ SELF, network  ] }, type: string }
-              key_name: { default: { get_property: [ SELF, key_name ] }, type: string }
+              vm_name:  { value: { get_property: [ SELF, name     ] }, type: string }
+              image:    { value: { get_property: [ SELF, image    ] }, type: string }
+              flavor:   { value: { get_property: [ SELF, flavor   ] }, type: string }
+              network:  { value: { get_property: [ SELF, network  ] }, type: string }
+              key_name: { value: { get_property: [ SELF, key_name ] }, type: string }
               security_groups:
-                default: { get_property: [ SELF, security_groups ] }
+                value: { get_property: [ SELF, security_groups ] }
                 type: string
             implementation: playbooks/create.yaml
           delete:
             inputs:
-              id: { default: { get_attribute: [ SELF, id ] }, type: string }
+              id: { value: { get_attribute: [ SELF, id ] }, type: string }
             implementation: playbooks/delete.yaml

@@ -26,8 +26,8 @@ node_types:
         operations:
           create:
             inputs:
-              capability_attribute_input: { default: { get_attribute: [ SELF, test_capability, capability_attribute ] }, type: string }
-              capability_property_input: { default: { get_property: [ SELF, test_capability, capability_property ] }, type: string }
+              capability_attribute_input: { value: { get_attribute: [ SELF, test_capability, capability_attribute ] }, type: string }
+              capability_property_input: { value: { get_property: [ SELF, test_capability, capability_property ] }, type: string }
             implementation:
               primary: playbooks/create.yaml
       test:

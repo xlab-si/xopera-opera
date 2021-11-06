@@ -11,7 +11,7 @@ node_types:
       Standard:
         inputs:
           time:
-            default: { get_property: [SELF, time] }
+            value: { get_property: [SELF, time] }
             type: string
         operations:
           create: playbooks/sleep.yaml

@@ -67,13 +67,13 @@ relationship_types:
             inputs:
               relationship_attribute:
                 type: string
-                default: { get_attribute: [ SELF, relationship_attribute ] }
+                value: { get_attribute: [ SELF, relationship_attribute ] }
               relationship_property:
                 type: string
-                default: { get_property: [ SELF, relationship_property ] }
+                value: { get_property: [ SELF, relationship_property ] }
               relationship_input:
                 type: string
-                default: { get_input: relationship_input }
+                value: { get_input: relationship_input }
             implementation:
               primary: playbooks/post_configure_source.yaml
               dependencies:
