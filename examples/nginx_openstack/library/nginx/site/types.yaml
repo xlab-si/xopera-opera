@@ -14,7 +14,7 @@ node_types:
       Standard:
         inputs:
           site_config_dir:
-            default: { get_attribute: [ SELF, host, site_config_dir ] }
+            value: { get_attribute: [ SELF, host, site_config_dir ] }
             type: string
         operations:
           create: playbooks/create.yaml

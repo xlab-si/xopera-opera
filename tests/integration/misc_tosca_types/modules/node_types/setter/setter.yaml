@@ -14,7 +14,7 @@ node_types:
     interfaces:
       Standard:
         inputs:
-          receive_something: { default:  { get_attribute: [SELF, receives_notification, something_to_pass_on] }, type: string }
+          receive_something: { value:  { get_attribute: [SELF, receives_notification, something_to_pass_on] }, type: string }
         operations:
           create: playbooks/create.yaml
     requirements:

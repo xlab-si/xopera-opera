@@ -18,7 +18,7 @@ relationship_types:
           pre_configure_source:
             inputs:
               relationship_property:
-                default: { get_property: [ SELF, relationship_property ] }
+                value: { get_property: [ SELF, relationship_property ] }
                 type: string
             implementation:
               primary: playbooks/test.yaml

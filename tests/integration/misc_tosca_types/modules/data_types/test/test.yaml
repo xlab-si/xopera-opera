@@ -19,7 +19,7 @@ data_types:
       d:
         type: list
         required: false
-        default: [1, 2, 3]
+        default: ["1", "2", "3"]
       e:
         type: map
         required: false

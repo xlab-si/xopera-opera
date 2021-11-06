@@ -34,10 +34,10 @@ node_types:
             inputs:
               cpu_lower_bound:
                 type: float
-                default: { get_property: [ radon.policies.scaling.ScaleDown, cpu_lower_bound ] }
+                value: { get_property: [ radon.policies.scaling.ScaleDown, cpu_lower_bound ] }
               cpu_upper_bound:
                 type: float
-                default: { get_property: [ radon.policies.scaling.ScaleUp, cpu_upper_bound ] }
+                value: { get_property: [ radon.policies.scaling.ScaleUp, cpu_upper_bound ] }
 
 policy_types:
   radon.policies.scaling.ScaleDown:

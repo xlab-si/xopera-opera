@@ -8,7 +8,7 @@ node_types:
       Standard:
         inputs:
           file_content:
-            default: { get_input: file_content }
+            value: { get_input: file_content }
             type: string
         operations:
           create: playbooks/create.yaml

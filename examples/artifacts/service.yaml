@@ -24,11 +24,11 @@ node_types:
               text_file_artifact:
                 description: Text file artifact input
                 type: string
-                default: { get_artifact: [ SELF, text_file ] }
+                value: { get_artifact: [ SELF, text_file ] }
               json_file_artifact:
                 description: JSON file artifact input
                 type: string
-                default: { get_property: [ SELF, json_file ] }
+                value: { get_property: [ SELF, json_file ] }
     artifacts:
       text_file:
         type: tosca.artifacts.File

@@ -45,34 +45,34 @@ node_types:
       Standard:
         inputs:
           input_attr1:
-            default: { get_attribute: [ hello1, attribute1 ] }
+            value: { get_attribute: [ hello1, attribute1 ] }
             type: string
           input_prop1:
-            default: { get_property: [ hello1, property1 ] }
+            value: { get_property: [ hello1, property1 ] }
             type: string
           input_attr2:
-            default: { get_attribute: [ hello2, attribute2 ] }
+            value: { get_attribute: [ hello2, attribute2 ] }
             type: string
           input_prop2:
-            default: { get_property: [ hello2, property2 ] }
+            value: { get_property: [ hello2, property2 ] }
             type: string
           input_attr3:
-            default: { get_attribute: [ SELF, attribute3 ] }
+            value: { get_attribute: [ SELF, attribute3 ] }
             type: string
           input_prop3:
-            default: { get_property: [ SELF, property3 ] }
+            value: { get_property: [ SELF, property3 ] }
             type: string
           input_attr_rel:
-            default: { get_attribute: [ hello_rel, attribute_rel ] }
+            value: { get_attribute: [ hello_rel, attribute_rel ] }
             type: string
           input_prop_rel:
-            default: { get_property: [ hello_rel, property_rel ] }
+            value: { get_property: [ hello_rel, property_rel ] }
             type: string
           input_attr_host:
-            default: { get_attribute: [ HOST, attribute_host ] }
+            value: { get_attribute: [ HOST, attribute_host ] }
             type: string
           input_prop_host:
-            default: { get_property: [ HOST, property_host ] }
+            value: { get_property: [ HOST, property_host ] }
             type: string
         operations:
           create: playbooks/create.yaml
@@ -92,40 +92,40 @@ relationship_types:
       Configure:
         inputs:
           input_attr1:
-            default: { get_attribute: [ hello1, attribute1 ] }
+            value: { get_attribute: [ hello1, attribute1 ] }
             type: string
           input_prop1:
-            default: { get_property: [ hello1, property1 ] }
+            value: { get_property: [ hello1, property1 ] }
             type: string
           input_attr2:
-            default: { get_attribute: [ hello2, attribute2 ] }
+            value: { get_attribute: [ hello2, attribute2 ] }
             type: string
           input_prop2:
-            default: { get_property: [ hello2, property2 ] }
+            value: { get_property: [ hello2, property2 ] }
             type: string
           input_attr3:
-            default: { get_attribute: [ hello3, attribute3 ] }
+            value: { get_attribute: [ hello3, attribute3 ] }
             type: string
           input_prop3:
-            default: { get_property: [ hello3, property3 ] }
+            value: { get_property: [ hello3, property3 ] }
             type: string
           input_attr_rel:
-            default: { get_attribute: [ SELF, attribute_rel ] }
+            value: { get_attribute: [ SELF, attribute_rel ] }
             type: string
           input_prop_rel:
-            default: { get_property: [ SELF, property_rel ] }
+            value: { get_property: [ SELF, property_rel ] }
             type: string
           input_attr_source:
-            default: { get_attribute: [ SOURCE, attribute2 ] }
+            value: { get_attribute: [ SOURCE, attribute2 ] }
             type: string
           input_prop_source:
-            default: { get_property: [ SOURCE, property2 ] }
+            value: { get_property: [ SOURCE, property2 ] }
             type: string
           input_attr_target:
-            default: { get_attribute: [ TARGET, attribute1 ] }
+            value: { get_attribute: [ TARGET, attribute1 ] }
             type: string
           input_prop_target:
-            default: { get_property: [ TARGET, property1 ] }
+            value: { get_property: [ TARGET, property1 ] }
             type: string
         operations:
           post_configure_target: playbooks/post_configure_target.yaml
