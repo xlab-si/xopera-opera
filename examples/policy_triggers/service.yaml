@@ -179,12 +179,14 @@ topology_template:
         properties:
           cpu_lower_bound: 10
           adjustment: 1
+        targets: [ openstack_vm ]
 
     - scale_up:
         type: radon.policies.scaling.ScaleUp
         properties:
           cpu_upper_bound: 90
           adjustment: 1
+        targets: [ openstack_vm ]
 
     - autoscale:
         type: radon.policies.scaling.AutoScale

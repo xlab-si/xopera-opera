@@ -97,8 +97,10 @@ topology_template:
         type: radon.policies.scaling.ScaleDown
         properties:
           cpu_lower_bound: 10
+        targets: [aws_lambda, configure_monitoring]
 
     - scale_up:
         type: radon.policies.scaling.ScaleUp
         properties:
           cpu_upper_bound: 90
+        targets: [aws_lambda, configure_monitoring]
