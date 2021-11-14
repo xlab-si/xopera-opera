@@ -27,6 +27,7 @@ xOpera orchestration tool compliant with TOSCA YAML v1.3 in the making.
   - [Introduction](#introduction)
   - [Prerequisites](#prerequisites)
   - [Installation and Quickstart](#installation-and-quickstart)
+  - [Contact](#contact)
   - [Acknowledgement](#acknowledgement)
 
 ## Introduction
@@ -87,6 +88,9 @@ To delete the created directory, we can undeploy our stuff by running:
 And that is it. For more startup examples please visit [examples folder](examples), or go to [xopera-examples] 
 repository if you wish to explore deeper with more complex xOpera examples. If you want to use opera commands from an 
 API take a look at [xopera-api] repository. To find more about xOpera project visit our [xOpera documentation].
+
+## Contact
+You can contact the xOpera team by sending an email to [xopera@xlab.si](mailto:xopera@xlab.si).
 
 ## Acknowledgement
 This project has received funding from the European Union’s Horizon 2020 research and innovation programme under Grant 
