@@ -19,25 +19,29 @@ xOpera orchestration tool compliant with TOSCA YAML v1.3 in the making.
 | Aspect                         | Information                               |
 | ------------------------------ |:-----------------------------------------:|
 | Tool name                      | [opera]                                   |
-| Documentation                  | [opera documentation]                     |
+| Documentation                  | [CLI documentation]                       |
 | Orchestration standard         | [OASIS TOSCA Simple Profile in YAML v1.3] |
 | Implementation tools           | [Ansible]                                 |
+| Contact us                     | [xopera@xlab.si](mailto:xopera@xlab.si)   |
 
 ## Table of Contents
   - [Introduction](#introduction)
   - [Prerequisites](#prerequisites)
   - [Installation and Quickstart](#installation-and-quickstart)
+  - [License](#license)
   - [Contact](#contact)
   - [Acknowledgement](#acknowledgement)
 
 ## Introduction
-`opera` aims to be a lightweight orchestrator compliant with [OASIS TOSCA]. The current compliance is with the 
-[OASIS TOSCA Simple Profile in YAML v1.3]. The [opera documentation] for is available on GitHub pages. Opera implements 
-TOSCA standard with [Ansible] automation tool where Ansible playbooks can be used as orchestration actuators within the 
-TOSCA interface operations.
+`opera` aims to be a lightweight orchestrator compliant with [OASIS TOSCA]. 
+The current compliance is with the [OASIS TOSCA Simple Profile in YAML v1.3]. 
+The [xOpera documentation] for is available on GitHub pages. 
+`opera` implements the TOSCA standard with [Ansible] automation tool where Ansible playbooks can be used as 
+orchestration actuators within the TOSCA interface operations.
 
 ## Prerequisites
-`opera` requires Python 3 and a virtual environment. In a typical modern Linux environment, we should already be set. 
+`opera` requires Python 3 and a virtual environment. 
+In a typical modern Linux environment, we should already be set. 
 In Ubuntu, however, we might need to run the following commands:
 
 ```console
@@ -46,9 +50,9 @@ $ sudo apt install -y python3-venv python3-wheel python-wheel-common
 ```
 
 ## Installation and Quickstart
-The orchestration tool is available on PyPI as a package named [opera]. Apart from the latest [PyPI production] 
-version, you can also find the latest opera [PyPI development] version, which includes pre-releases so that you will be 
-able to test the latest features before they are officially released.
+The orchestration tool is available on PyPI as a package named [opera]. 
+Apart from the latest [PyPI production] version, you can also find the latest opera [PyPI development] version, which 
+includes pre-releases so that you will be able to test the latest features before they are officially released.
 
 The simplest way to test `opera` is to install it into Python virtual environment:
 
@@ -85,9 +89,15 @@ To delete the created directory, we can undeploy our stuff by running:
 [Worker_0]   Undeployment of my-workstation_0 complete
 ```
 
-And that is it. For more startup examples please visit [examples folder](examples), or go to [xopera-examples] 
-repository if you wish to explore deeper with more complex xOpera examples. If you want to use opera commands from an 
-API take a look at [xopera-api] repository. To find more about xOpera project visit our [xOpera documentation].
+And that is it. 
+For more startup examples please visit [examples folder](examples), or go to [xopera-examples] repository if you wish 
+to explore deeper with more complex xOpera examples. 
+If you want to use opera commands from an API take a look at [xopera-api] repository. 
+You can also take a look at the [xOpera SaaS] component, which is designed for business partners and enterprise users.
+To find more about xOpera project visit our [xOpera documentation].
+
+## License
+This work is licensed under the [Apache License 2.0].
 
 ## Contact
 You can contact the xOpera team by sending an email to [xopera@xlab.si](mailto:xopera@xlab.si).
@@ -99,13 +109,15 @@ Agreements No. 825040 ([RADON]), No. 825480 ([SODALITE]) and No. 101000162 ([PIA
 [OASIS TOSCA]: https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=tosca
 [OASIS TOSCA Simple Profile in YAML v1.3]: https://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.3/TOSCA-Simple-Profile-YAML-v1.3.html
 [xOpera documentation]: https://xlab-si.github.io/xopera-docs/
-[opera documentation]: https://xlab-si.github.io/xopera-docs/
+[CLI documentation]: https://xlab-si.github.io/xopera-docs/cli.html
 [Ansible]: https://www.ansible.com/ 
 [opera]: https://pypi.org/project/opera/
 [PyPI production]: https://pypi.org/project/opera/#history
 [PyPI development]: https://test.pypi.org/project/opera/#history
 [xopera-examples]: https://github.com/xlab-si/xopera-examples
 [xopera-api]: https://github.com/xlab-si/xopera-api
+[xOpera SaaS]: https://xlab-si.github.io/xopera-docs/saas.html
+[Apache License 2.0]: https://www.apache.org/licenses/LICENSE-2.0
 [RADON]: http://radon-h2020.eu
 [SODALITE]: http://www.sodalite.eu/
 [PIACERE]: https://www.piacere-project.eu/
