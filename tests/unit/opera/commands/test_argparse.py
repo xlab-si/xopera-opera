@@ -10,7 +10,6 @@ class TestArgparse:
             parser.parse_args(["deploy", "-h"])
             parser.parse_args(["diff", "-h"])
             parser.parse_args(["info", "-h"])
-            parser.parse_args(["init", "-h"])
             parser.parse_args(["notify", "-h"])
             parser.parse_args(["outputs", "-h"])
             parser.parse_args(["package", "-h"])

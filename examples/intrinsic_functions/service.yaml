@@ -74,6 +74,8 @@ topology_template:
         attribute3_1: { concat: [ 'Attribute: ', get_property: [ SELF, property3_1 ] ] }
       properties:
         property3_1: { token: [ "my_property", "_", 1 ] }
+      requirements:
+        - host: my-workstation
 
   outputs:
     concat_output:

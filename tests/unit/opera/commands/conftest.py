@@ -16,7 +16,7 @@ def setupdir(path, yaml_text):
 
         node_types:
           hello_node:
-            derived_from: tosca.nodes.SoftwareComponent
+            derived_from: tosca.nodes.Root
             properties:
               marker:
                 type: string
@@ -26,7 +26,7 @@ def setupdir(path, yaml_text):
                 inputs:
                   marker:
                     type: string
-                    default: { get_property: [ SELF, marker ] }
+                    value: { get_property: [ SELF, marker ] }
                 operations:
                   create: files/create.yaml
                   delete: files/delete.yaml

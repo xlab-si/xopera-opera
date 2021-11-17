@@ -46,10 +46,10 @@ def setupdir(path, yaml_text):
                     Standard:
                         inputs:
                             marker:
-                                default: { get_input: marker }
+                                value: { get_input: marker }
                                 type: string
                             time:
-                                default: { get_property: [SELF, time] }
+                                value: { get_property: [SELF, time] }
                                 type: string
                         operations:
                             create: files/create.yaml

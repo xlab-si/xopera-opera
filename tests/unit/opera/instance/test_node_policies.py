@@ -39,13 +39,13 @@ class TestNodePolicies:
                         inputs:
                           min_size:
                             type: float
-                            default: { get_property: [ autoscale, min_size ] }
+                            value: { get_property: [ autoscale, min_size ] }
                           max_size:
                             type: float
-                            default: { get_property: [ autoscale, max_size ] }
+                            value: { get_property: [ autoscale, max_size ] }
 
               steampunk.nodes.ConfigureMonitoring:
-                derived_from: tosca.nodes.SoftwareComponent
+                derived_from: tosca.nodes.Root
                 interfaces:
                   Standard:
                     type: tosca.interfaces.node.lifecycle.Standard
@@ -55,10 +55,10 @@ class TestNodePolicies:
                         inputs:
                           cpu_lower_bound:
                             type: float
-                            default: { get_property: [ steampunk.policies.scaling.ScaleDown, cpu_lower_bound ] }
+                            value: { get_property: [ steampunk.policies.scaling.ScaleDown, cpu_lower_bound ] }
                           cpu_upper_bound:
                             type: float
-                            default: { get_property: [ steampunk.policies.scaling.ScaleUp, cpu_upper_bound ] }
+                            value: { get_property: [ steampunk.policies.scaling.ScaleUp, cpu_upper_bound ] }
 
             interface_types:
               steampunk.interfaces.scaling.ScaleDown:
@@ -68,7 +68,7 @@ class TestNodePolicies:
                     inputs:
                       adjustment:
                         type: float
-                        default: { get_property: [ steampunk.policies.scaling.ScaleDown, adjustment ] }
+                        value: { get_property: [ steampunk.policies.scaling.ScaleDown, adjustment ] }
                     description: Operation for scaling down.
                     implementation: playbooks/scale_down.yaml
 
@@ -79,7 +79,7 @@ class TestNodePolicies:
                     inputs:
                       adjustment:
                         type: float
-                        default: { get_property: [ steampunk.policies.scaling.ScaleUp, adjustment ] }
+                        value: { get_property: [ steampunk.policies.scaling.ScaleUp, adjustment ] }
                     description: Operation for scaling up.
                     implementation: playbooks/scale_up.yaml
 

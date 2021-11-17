@@ -20,17 +20,9 @@ $opera_executable validate --inputs inputs.yaml test.csar
 info_out="$($opera_executable info --format json)"
 test "$(echo "$info_out" | jq -r .status)" = "null"
 
-# validate service template and CSAR (with JSON inputs)
-$opera_executable validate --inputs inputs.json service.yaml
-$opera_executable validate --inputs inputs.json test.csar
-
-# test opera info status after validate
-info_out="$($opera_executable info --format json)"
-test "$(echo "$info_out" | jq -r .status)" = "null"
-
 # test opera commands on TOSCA service template
 # deploy service template with inputs
-$opera_executable deploy --inputs inputs.yaml
+$opera_executable deploy --inputs inputs.yaml service.yaml
 
 # test opera info status after deploy
 info_out="$($opera_executable info --format json)"

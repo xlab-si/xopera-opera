@@ -326,15 +326,15 @@ class TestExecute:
             topology_template:
               node_templates:
                 node_1:
-                  type: tosca.nodes.SoftwareComponent
+                  type: tosca.nodes.Root
                 node_2:
-                  type: tosca.nodes.SoftwareComponent
+                  type: tosca.nodes.Root
                   requirements:
                     - dependency: node_1
                 node_3:
-                  type: tosca.nodes.SoftwareComponent
+                  type: tosca.nodes.Root
                   requirements:
-                    - dependency_not_defined1: node_1
+                    - dependency_not_defined1: node_2
         """
         ))
         storage = Storage(tmp_path / pathlib.Path(".opera"))
