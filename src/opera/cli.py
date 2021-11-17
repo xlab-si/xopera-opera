@@ -2,6 +2,7 @@ import argparse
 import inspect
 import sys
 
+import pkg_resources
 import shtab
 
 from opera import commands
@@ -23,6 +24,15 @@ class ArgParser(argparse.ArgumentParser):
         return subparsers
 
 
+class PrintCurrentVersionAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        try:
+            print(pkg_resources.get_distribution("opera").version)
+            parser.exit(0)
+        except Exception as e:
+            raise Exception(f"Error when retrieving current opera version: {e}")
+
+
 def create_parser():
     parser = ArgParser(
         description="opera orchestrator",
@@ -42,6 +52,9 @@ def main():
     shtab.add_argument_to(
         parser, ["-s", "--shell-completion"],
         help="Generate tab completion script for your shell"
+    )
+    parser.add_argument(
+        "--version", "-v", action=PrintCurrentVersionAction, nargs=0, help="Get current opera package version"
     )
     args = parser.parse_args()
     return args.func(args)
