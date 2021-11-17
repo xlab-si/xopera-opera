@@ -63,7 +63,7 @@ def format_outputs(outputs, outputs_format):
     if outputs_format == "json":
         return json.dumps(outputs, indent=2)
     if outputs_format == "yaml":
-        return yaml.safe_dump(outputs, default_flow_style=False)
+        return yaml.safe_dump(outputs, default_flow_style=False, sort_keys=False)
 
     raise AssertionError("BUG - invalid format")
 
@@ -73,7 +73,7 @@ def save_outputs(outputs, outputs_format, filename):
         if outputs_format == "json":
             return json.dump(outputs, outfile, indent=2)
         if outputs_format == "yaml":
-            return yaml.safe_dump(outputs, outfile, default_flow_style=False)
+            return yaml.safe_dump(outputs, outfile, default_flow_style=False, sort_keys=False)
 
         raise AssertionError("BUG - invalid format")
 

@@ -13,30 +13,22 @@ info_out="$($opera_executable info --format json)"
 test "$(echo "$info_out" | jq -r .status)" = "null"
 
 # validate service template and CSAR (with YAML inputs)
-$opera_executable validate --tosca-only --inputs inputs.yaml service.yaml
-$opera_executable validate --tosca-only --inputs inputs.yaml test.csar
+$opera_executable validate --inputs inputs.yaml service.yaml
+$opera_executable validate --inputs inputs.yaml test.csar
 
 # test opera info status after validate
 info_out="$($opera_executable info --format json)"
 test "$(echo "$info_out" | jq -r .status)" = "null"
 
 # validate service template and CSAR (with JSON inputs)
-$opera_executable validate --tosca-only --inputs inputs.json service.yaml
-$opera_executable validate --tosca-only --inputs inputs.json test.csar
+$opera_executable validate --inputs inputs.json service.yaml
+$opera_executable validate --inputs inputs.json test.csar
 
 # test opera info status after validate
 info_out="$($opera_executable info --format json)"
 test "$(echo "$info_out" | jq -r .status)" = "null"
 
 # test opera commands on TOSCA service template
-# init service template without inputs
-# warning: opera init is deprecated and could be removed in the future
-$opera_executable init service.yaml
-
-# test opera info status after init
-info_out="$($opera_executable info --format json)"
-test "$(echo "$info_out" | jq -r .status)" = "initialized"
-
 # deploy service template with inputs
 $opera_executable deploy --inputs inputs.yaml
 
@@ -67,15 +59,7 @@ $opera_executable deploy --inputs inputs.json -c -f service.yaml
 info_out="$($opera_executable info --format json)"
 test "$(echo "$info_out" | jq -r .status)" = "deployed"
 
-# init service template again (with clean option and with inputs
-# warning: opera init is deprecated and could be removed in the future
-$opera_executable init --clean service.yaml
-
-# test opera info status after init
-info_out="$($opera_executable info --format json)"
-test "$(echo "$info_out" | jq -r .status)" = "initialized"
-
-# deploy service template
+# deploy service template again
 $opera_executable deploy
 
 # test opera info status after deploy
@@ -124,23 +108,14 @@ rm -rf unpacked-csar
 # prepare new opera storage folder
 mkdir -p ./csar-test-dir
 
-# initialize the CSAR (from the prepared compressed CSAR file)
-# also provide inputs and relocate opera storage to some other folder
-# warning: opera init is deprecated and could be removed in the future
-$opera_executable init -i inputs.yaml --instance-path ./csar-test-dir --clean test.csar
-
-# test opera info status after init
-info_out="$($opera_executable info --instance-path ./csar-test-dir --format json)"
-test "$(echo "$info_out" | jq -r .status)" = "initialized"
-
-# deploy the initialized CSAR (with four workers and with verbose option)
-$opera_executable deploy -p ./csar-test-dir -w 4 -v
+# deploy the CSAR (with four workers and with verbose option)
+$opera_executable deploy -i inputs.yaml --instance-path ./csar-test-dir --clean test.csar -w 4 -v
 
 # test opera info status after deploy
 info_out="$($opera_executable info -p ./csar-test-dir -f json)"
 test "$(echo "$info_out" | jq -r .status)" = "deployed"
 
-# deploy the initialized CSAR again (with clean state and without yes/no prompts)
+# deploy the CSAR again (with clean state and without yes/no prompts)
 $opera_executable deploy -p ./csar-test-dir -c -f
 
 # test opera info status after deploy

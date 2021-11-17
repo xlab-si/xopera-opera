@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path, PurePath
+from typing import Optional
 
 import shtab
 
@@ -54,7 +55,11 @@ def _parser_callback(args):
         csar_output = generate_random_pathname("opera-package-")
 
     try:
-        output_package = package(PurePath(args.service_template_folder), csar_output, PurePath(args.service_template),
+        service_template_path = None
+        if args.service_template:
+            service_template_path = PurePath(args.service_template)
+
+        output_package = package(PurePath(args.service_template_folder), csar_output, service_template_path,
                                  args.format)
         print(f"CSAR was created and packed to '{output_package}'.")
     except ParseError as e:
@@ -67,7 +72,7 @@ def _parser_callback(args):
     return 0
 
 
-def package(input_dir: PurePath, csar_output: str, service_template_path: PurePath, csar_format: str) -> str:
+def package(input_dir: PurePath, csar_output: str, service_template_path: Optional[PurePath], csar_format: str) -> str:
     csar = CloudServiceArchive.create(input_dir)
     result: str = csar.package_csar(csar_output, service_template_path, csar_format)
     return result

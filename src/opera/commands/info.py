@@ -56,7 +56,7 @@ def _parser_callback(args):
         if args.output:
             save_outputs(outs, args.format, args.output)
         else:
-            print(format_outputs(outs, args.format))
+            print(format_outputs(outs, args.format).strip())
     except ParseError as e:
         print(f"{e.loc}: {e}")
         return 1
@@ -66,7 +66,7 @@ def _parser_callback(args):
     return 0
 
 
-def info(csar_or_rootdir: Optional[PurePath], storage: Storage) -> dict:
+def info(csar_or_rootdir: Optional[PurePath], storage: Storage) -> dict:  # pylint: disable=too-many-statements
     info_dict: Dict[str, Optional[Union[str, dict, bool]]] = dict(
         service_template=None,
         content_root=None,
@@ -85,20 +85,29 @@ def info(csar_or_rootdir: Optional[PurePath], storage: Storage) -> dict:
             # this validates CSAR and the entrypoint's (if it exists) metadata
             # failure to validate here means no static information will be available at all
             csar.validate_csar()
+            info_dict["csar_valid"] = True
 
             info_dict["content_root"] = str(csar_or_rootdir)
             if csar.get_entrypoint() is not None:
                 info_dict["service_template"] = str(csar.get_entrypoint())
 
-                service_template_meta = csar.parse_service_template_meta(csar.get_entrypoint())
-                info_dict["service_template_metadata"] = service_template_meta
+                try:
+                    service_template_meta = csar.parse_service_template_meta(csar.get_entrypoint())
+                    if service_template_meta:
+                        info_dict["service_template_metadata"] = service_template_meta.to_dict()
+                except OperaError:
+                    pass
 
-            csar_meta = csar.parse_csar_meta()
-            info_dict["csar_metadata"] = csar_meta.to_dict()
+            try:
+                csar_meta = csar.parse_csar_meta()
+                if csar_meta:
+                    info_dict["csar_metadata"] = csar_meta.to_dict()
+            except OperaError:
+                pass
         except OperaError:
             # anything that fails because of validation can be ignored, we can use state
             # we mark the CSAR as invalid because it's useful to know
-            pass
+            info_dict["csar_valid"] = False
 
     # detection from state, overrides stateless
     if storage.exists("root_file"):
@@ -115,6 +124,28 @@ def info(csar_or_rootdir: Optional[PurePath], storage: Storage) -> dict:
             csar_dir = Path(storage.path) / "csars" / "csar"
             info_dict["content_root"] = str(csar_dir)
             ast = tosca.load(Path(csar_dir), service_template_path.relative_to(csar_dir))
+
+            try:
+                csar = CloudServiceArchive.create(csar_dir)
+                csar.validate_csar()
+                info_dict["csar_valid"] = True
+
+                try:
+                    service_template_meta = csar.parse_service_template_meta(csar.get_entrypoint())
+                    if service_template_meta:
+                        info_dict["service_template_metadata"] = service_template_meta.to_dict()
+                except OperaError:
+                    pass
+
+                try:
+                    csar_meta = csar.parse_csar_meta()
+                    if csar_meta:
+                        info_dict["csar_metadata"] = csar_meta.to_dict()
+                except OperaError:
+                    pass
+
+            except OperaError:
+                info_dict["csar_valid"] = False
         else:
             ast = tosca.load(Path(service_template_path.parent), PurePath(service_template_path.name))
 

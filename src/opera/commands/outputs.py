@@ -46,7 +46,7 @@ def _parser_callback(args):
         if args.output:
             save_outputs(outs, args.format, args.output)
         else:
-            print(format_outputs(outs, args.format))
+            print(format_outputs(outs, args.format).strip())
     except ParseError as e:
         print(f"{e.loc}: {e}")
         return 1

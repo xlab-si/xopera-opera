@@ -5,7 +5,7 @@ set -euo pipefail
 opera_executable="$1"
 
 # perform integration test
-$opera_executable validate --tosca-only service.yaml
+$opera_executable validate service.yaml
 $opera_executable deploy service.yaml
 # scale down by calling scale_down_trigger with notification_scale_down.json notification file
 $opera_executable notify -e scale_down_trigger -n files/notification_scale_down.json

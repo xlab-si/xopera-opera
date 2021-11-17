@@ -29,8 +29,9 @@ class PrintCurrentVersionAction(argparse.Action):
         try:
             print(pkg_resources.get_distribution("opera").version)
             parser.exit(0)
-        except Exception as e:
-            raise Exception(f"Error when retrieving current opera version: {e}")
+        except pkg_resources.DistributionNotFound as e:
+            print(f"Error when retrieving current opera version: {e}")
+            parser.exit(1)
 
 
 def create_parser():
