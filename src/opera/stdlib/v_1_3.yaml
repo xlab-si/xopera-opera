@@ -205,6 +205,8 @@ capability_types:
   tosca.capabilities.network.Bindable:
     derived_from: tosca.capabilities.Node
 
+  tosca.capabilities.network.Linkable:
+    derived_from: tosca.capabilities.Node
 
 data_types:
   tosca.datatypes.Root:
@@ -591,6 +593,79 @@ node_types:
           relationship: tosca.relationships.RoutesTo
           occurrences: [0, UNBOUNDED]
 
+  tosca.nodes.network.Network:
+    derived_from: tosca.nodes.Root
+    properties:
+      ip_version:
+        type: integer
+        required: false
+        default: 4
+        constraints:
+          - valid_values: [ 4, 6 ]
+      cidr:
+        type: string
+        required: false
+      start_ip:
+        type: string
+        required: false
+      end_ip:
+        type: string
+        required: false
+      gateway_ip:
+        type: string
+        required: false
+      network_name:
+        type: string
+        required: false
+      network_id:
+        type: string
+        required: false
+      segmentation_id:
+        type: string
+        required: false
+      network_type:
+        type: string
+        required: false
+      physical_network:
+        type: string
+        required: false
+      dhcp_enabled: # missed in Section 8.5.1.3 but defined in Section 8.5.1.1
+        type: boolean
+        required: false
+        default: true
+    capabilities:
+      link:
+        type: tosca.capabilities.network.Linkable
+
+  tosca.nodes.network.Port:
+    derived_from: tosca.nodes.Root
+    properties:
+      ip_address:
+        type: string
+        required: false
+      order:
+        type: integer
+        required: true
+        default: 0
+        constraints:
+          - greater_or_equal: 0
+      is_default:
+        type: boolean
+        required: false
+        default: false
+      ip_range_start:
+        type: string
+        required: false
+      ip_range_end:
+        type: string
+        required: false
+    requirements:
+     - link:
+        capability: tosca.capabilities.network.Linkable
+        relationship: tosca.relationships.network.LinksTo
+     - binding:
+        capability: tosca.capabilities.network.Bindable
+        relationship: tosca.relationships.network.BindsTo
 
 policy_types:
   tosca.policies.Root:
@@ -669,3 +744,11 @@ relationship_types:
   tosca.relationships.RoutesTo:
     derived_from: tosca.relationships.ConnectsTo
     valid_target_types: [ tosca.capabilities.Endpoint ]
+
+  tosca.relationships.network.LinksTo:
+    derived_from: tosca.relationships.DependsOn
+    valid_target_types: [ tosca.capabilities.network.Linkable ]
+
+  tosca.relationships.network.BindsTo:
+    derived_from: tosca.relationships.DependsOn
+    valid_target_types: [ tosca.capabilities.network.Bindable ]
