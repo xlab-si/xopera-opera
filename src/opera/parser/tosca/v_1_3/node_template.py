@@ -89,4 +89,14 @@ class NodeTemplate(CollectorMixin, Entity):
         if undeclared_requirements:
             self.abort(f"Undeclared requirements: {', '.join(undeclared_requirements)}.", self.loc)
 
+        # detect missing requirements based on their occurrences
+        missing_requirements = set()
+        for req in definitions.keys() - {req.name for req in requirements}:
+            occurrences = definitions[req].get("occurrences")
+            if not occurrences or (occurrences and occurrences.data[0] > 0):
+                missing_requirements.add(req)
+
+        if missing_requirements:
+            self.abort(f"Missing requirements: {', '.join(missing_requirements)}.", self.loc)
+
         return requirements
