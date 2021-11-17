@@ -22,7 +22,7 @@ xOpera orchestration tool compliant with TOSCA YAML v1.3 in the making.
 | Documentation                  | [CLI documentation]                       |
 | Orchestration standard         | [OASIS TOSCA Simple Profile in YAML v1.3] |
 | Implementation tools           | [Ansible]                                 |
-| Contact us                     | [xopera@xlab.si](mailto:xopera@xlab.si)   |
+| Contact us                     | [xopera@xlab.si]                          |
 
 ## Table of Contents
   - [Introduction](#introduction)
@@ -90,8 +90,8 @@ To delete the created directory, we can undeploy our stuff by running:
 ```
 
 And that is it. 
-For more startup examples please visit [examples folder](examples), or go to [xopera-examples] repository if you wish 
-to explore deeper with more complex xOpera examples. 
+For more startup examples please visit [examples folder], or go to [xopera-examples] repository if you wish to explore 
+deeper with more complex xOpera examples. 
 If you want to use opera commands from an API take a look at [xopera-api] repository. 
 You can also take a look at the [xOpera SaaS] component, which is designed for business partners and enterprise users.
 To find more about xOpera project visit our [xOpera documentation].
@@ -100,20 +100,22 @@ To find more about xOpera project visit our [xOpera documentation].
 This work is licensed under the [Apache License 2.0].
 
 ## Contact
-You can contact the xOpera team by sending an email to [xopera@xlab.si](mailto:xopera@xlab.si).
+You can contact the xOpera team by sending an email to [xopera@xlab.si].
 
 ## Acknowledgement
 This project has received funding from the European Union’s Horizon 2020 research and innovation programme under Grant 
 Agreements No. 825040 ([RADON]), No. 825480 ([SODALITE]) and No. 101000162 ([PIACERE]).
 
-[OASIS TOSCA]: https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=tosca
+[opera]: https://pypi.org/project/opera/
 [OASIS TOSCA Simple Profile in YAML v1.3]: https://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.3/TOSCA-Simple-Profile-YAML-v1.3.html
 [xOpera documentation]: https://xlab-si.github.io/xopera-docs/
 [CLI documentation]: https://xlab-si.github.io/xopera-docs/cli.html
-[Ansible]: https://www.ansible.com/ 
-[opera]: https://pypi.org/project/opera/
+[Ansible]: https://www.ansible.com/
+[xopera@xlab.si]: mailto:xopera@xlab.si
+[OASIS TOSCA]: https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=tosca
 [PyPI production]: https://pypi.org/project/opera/#history
 [PyPI development]: https://test.pypi.org/project/opera/#history
+[examples folder]: examples
 [xopera-examples]: https://github.com/xlab-si/xopera-examples
 [xopera-api]: https://github.com/xlab-si/xopera-api
 [xOpera SaaS]: https://xlab-si.github.io/xopera-docs/saas.html
