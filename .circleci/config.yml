@@ -5,7 +5,7 @@ commands:
     description: Prepare the repository for work
     steps:
       - checkout
-      - run: sudo pip install pipenv
+      - run: sudo pip install pipenv==2021.5.29
       - run: make init
       - run: sudo apt-get install -y shellcheck
 
