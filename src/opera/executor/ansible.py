@@ -73,14 +73,10 @@ def run(host, primary, dependencies, artifacts, variables, verbose, workdir, val
         )
         code, out, err = utils.run_in_directory(dir_path, cmd, env)
         if code != 0 or verbose:
-            thread_utils.print_thread("------------")
             with open(out, encoding="utf-8") as fd:
-                for line in fd:
-                    print(line.rstrip())
-            thread_utils.print_thread("------------")
+                thread_utils.SafePrinter.print_lines(fd)
             with open(err, encoding="utf-8") as fd:
-                for line in fd:
-                    print(line.rstrip())
+                thread_utils.SafePrinter.print_lines(fd)
             thread_utils.print_thread("============")
 
         if code != 0:
