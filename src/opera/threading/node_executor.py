@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor, wait
 from concurrent.futures._base import CancelledError
 
-from opera.error import OperationError
+from opera.error import AggregatedOperationError, OperaError
 
 WORKER_PREFIX = "Worker"
 
@@ -45,7 +45,7 @@ class NodeExecutor(ThreadPoolExecutor):
             errors.update(self.process_results(results))
             for node_id, error in errors.items():
                 print(f"Error processing node {node_id}: {error}")
-            raise OperationError("Failed")
+            raise AggregatedOperationError("Failed", errors)
 
         return proceed
 
@@ -56,7 +56,7 @@ class NodeExecutor(ThreadPoolExecutor):
             try:
                 future.result()
                 self.processed_nodes.remove(node_id)
-            except (CancelledError, TimeoutError) as e:
+            except (CancelledError, TimeoutError, OperaError) as e:
                 errors[node_id] = e
 
         return errors

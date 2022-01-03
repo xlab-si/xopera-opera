@@ -82,7 +82,7 @@ class Base:
 
         if not success:
             self.set_state(NodeState.ERROR)
-            raise OperationError("Failed")
+            raise OperationError("Failed", self.tosca_name, interface, operation_type.value)
 
         for params, value in outputs:
             self.template.map_attribute(params, value)
