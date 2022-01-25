@@ -183,6 +183,7 @@ def deploy_compressed_csar(
         delete_existing_state: bool
 ):
     if delete_existing_state:
+        storage.remove("inputs")
         storage.remove("instances")
 
     if inputs is None:
