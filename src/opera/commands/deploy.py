@@ -148,6 +148,7 @@ def deploy_service_template(
         delete_existing_state: bool
 ):
     if delete_existing_state:
+        storage.remove("inputs")
         storage.remove("instances")
 
     if inputs is None:
