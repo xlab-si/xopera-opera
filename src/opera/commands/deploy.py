@@ -121,14 +121,16 @@ def _parser_callback(args):  # pylint: disable=too-many-statements
         return 1
 
     try:
+        if delete_existing_state:
+            storage.remove("inputs")
+            storage.remove("instances")
+
         if is_zipfile(csar_or_st_path):
             deploy_compressed_csar(csar_or_st_path, inputs, storage,
-                                   args.verbose, args.workers,
-                                   delete_existing_state)
+                                   args.verbose, args.workers)
         else:
             deploy_service_template(csar_or_st_path, inputs, storage,
-                                    args.verbose, args.workers,
-                                    delete_existing_state)
+                                    args.verbose, args.workers)
     except ParseError as e:
         print(f"{e.loc}: {e}")
         return 1
@@ -144,12 +146,7 @@ def deploy_service_template(
         inputs: typing.Optional[dict],
         storage: Storage,
         verbose_mode: bool,
-        num_workers: int,
-        delete_existing_state: bool
-):
-    if delete_existing_state:
-        storage.remove("inputs")
-        storage.remove("instances")
+        num_workers: int):
 
     if inputs is None:
         if storage.exists("inputs"):
@@ -179,13 +176,8 @@ def deploy_compressed_csar(
         inputs: typing.Optional[dict],
         storage: Storage,
         verbose_mode: bool,
-        num_workers: int,
-        delete_existing_state: bool
+        num_workers: int
 ):
-    if delete_existing_state:
-        storage.remove("inputs")
-        storage.remove("instances")
-
     if inputs is None:
         inputs = {}
     storage.write_json(inputs, "inputs")
