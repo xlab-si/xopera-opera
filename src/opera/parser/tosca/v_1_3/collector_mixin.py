@@ -72,11 +72,12 @@ class CollectorMixin:
             assigned_operations = assignment.get("operations", {})
             undeclared_operations = set(assigned_operations.keys()) - defined_operations.keys()
             if undeclared_operations:
+                typ.check_tosca_standard_and_configure_interfaces(name, undeclared_operations)
                 self.abort(f"Undeclared operations: {', '.join(undeclared_operations)}.", self.loc)
 
             operations = {}
             for op_name, op_definition in defined_operations.items():
-                op_assignment = assigned_operations.get(name, {})
+                op_assignment = assigned_operations.get(op_name, {})
                 undeclared_inputs = set()
 
                 # Inputs come from four different sources:
