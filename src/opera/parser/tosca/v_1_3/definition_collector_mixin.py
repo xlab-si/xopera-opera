@@ -42,33 +42,11 @@ class DefinitionCollectorMixin:
                 defs[name]["inputs"].update(definition["inputs"])
                 defs[name]["operations"].update(definition["operations"])
 
-        standard_interface_names = [StandardInterfaceOperation.shorthand_name(),
-                                    StandardInterfaceOperation.type_uri()]
-        configure_interface_names = [ConfigureInterfaceOperation.shorthand_name(),
-                                     ConfigureInterfaceOperation.type_uri()]
-
         for name, definition in self.get("interfaces", {}).items():
-            if name in standard_interface_names:
-                valid_standard_interface_operation_names = [i.value for i in StandardInterfaceOperation]
-                for operation in definition.get("operations", {}):
-                    if operation not in valid_standard_interface_operation_names:
-                        self.abort(
-                            f"Invalid operation for {name} interface: {operation}. Valid operation names are: "
-                            f"{valid_standard_interface_operation_names}.", self.loc
-                        )
-
-            if name in configure_interface_names:
-                valid_configure_interface_operation_names = [i.value for i in ConfigureInterfaceOperation]
-                for operation in definition.get("operations", {}):
-                    if operation not in valid_configure_interface_operation_names:
-                        self.abort(
-                            f"Invalid operation for {name} interface: {operation}. Valid operation names are: "
-                            f"{valid_configure_interface_operation_names}.", self.loc
-                        )
+            self.check_tosca_standard_and_configure_interfaces(name, definition.get("operations", {}))
 
             # collect operations and inputs from linked interface_types
-            # do this only when type is specified and interface name is not Standard or Configure
-            if definition.get("type", None) and name not in standard_interface_names + configure_interface_names:
+            if definition.get("type", None):
                 parent_interface_type = definition.type.resolve_reference(service_ast)
                 if parent_interface_type:
                     defs[name]["inputs"].update(parent_interface_type.get("inputs", {}))
@@ -78,6 +56,30 @@ class DefinitionCollectorMixin:
             defs[name]["operations"].update(definition.get("operations", {}))
 
         return dict(defs)
+
+    def check_tosca_standard_and_configure_interfaces(self, interface_name, operations):
+        standard_interface_names = [StandardInterfaceOperation.shorthand_name(),
+                                    StandardInterfaceOperation.type_uri()]
+        configure_interface_names = [ConfigureInterfaceOperation.shorthand_name(),
+                                     ConfigureInterfaceOperation.type_uri()]
+
+        if interface_name in standard_interface_names:
+            valid_standard_interface_operation_names = [i.value for i in StandardInterfaceOperation]
+            for operation in operations:
+                if operation not in valid_standard_interface_operation_names:
+                    self.abort(
+                        f"Invalid operation for {interface_name} interface: {operation}. Valid operation names are: "
+                        f"{valid_standard_interface_operation_names}.", self.loc
+                    )
+
+        if interface_name in configure_interface_names:
+            valid_configure_interface_operation_names = [i.value for i in ConfigureInterfaceOperation]
+            for operation in operations:
+                if operation not in valid_configure_interface_operation_names:
+                    self.abort(
+                        f"Invalid operation for {interface_name} interface: {operation}. Valid operation names are: "
+                        f"{valid_configure_interface_operation_names}.", self.loc
+                    )
 
     def collect_artifact_definitions(self, service_ast):
         return self._collect_definitions("artifacts", service_ast)
