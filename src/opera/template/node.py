@@ -59,7 +59,7 @@ class Node:
         return typ in self.types
 
     def instantiate(self):
-        # NOTE(@tadeboro): This is where we should handle multiple instances.
+        # NOTE: This is where we should handle multiple instances.
         # At the moment, we simply create one instance per node template. But
         # the algorithm is fully prepared for multiple instances.
         node_id = self.name + "_0"
@@ -67,7 +67,7 @@ class Node:
         return self.instances.values()
 
     def get_host(self):
-        # TODO(@tadeboro): Properly handle situations where multiple hosts are
+        # TODO: Properly handle situations where multiple hosts are
         # available.
 
         # 1. Scan requirements for direct compute host and return one.

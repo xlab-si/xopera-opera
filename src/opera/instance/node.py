@@ -148,7 +148,7 @@ class Node(Base):  # pylint: disable=too-many-public-methods
                            StandardInterfaceOperation.START, verbose, workdir)
         self.set_state(NodeState.STARTED)
 
-        # TODO(@tadeboro): Execute various add hooks
+        # TODO: Execute various add hooks
         thread_utils.print_thread(f"  Deployment of {self.tosca_id} complete")
 
     def undeploy(self, verbose, workdir):
@@ -164,7 +164,7 @@ class Node(Base):  # pylint: disable=too-many-public-methods
                            StandardInterfaceOperation.DELETE, verbose, workdir)
         self.set_state(NodeState.INITIAL)
 
-        # TODO(@tadeboro): Execute various remove hooks
+        # TODO: Execute various remove hooks
 
         self.reset_attributes()
         self.write()

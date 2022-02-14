@@ -11,7 +11,7 @@ from ..string import String
 from ..void import Void
 
 
-# TODO(@tadeboro): Unify ParameterDefinition and PropertyDefinition and add
+# TODO: Unify ParameterDefinition and PropertyDefinition and add
 # runtime checks. Refinement will be a PITA ...
 
 
@@ -38,5 +38,5 @@ class ParameterDefinition(Entity):
         return Value(typ, False)
 
     def get_value_type(self, service_ast):  # pylint: disable=no-self-use
-        # TODO(@tadeboro): Implement type checks.
+        # TODO: Implement type checks.
         return None

@@ -82,7 +82,7 @@ class ServiceTemplate(Entity):
                 f"{other.tosca_definitions_version}", other.loc
             )
 
-        # TODO(@tadeboro): Should we merge the topology templates or should we
+        # TODO: Should we merge the topology templates or should we
         # be doing substitution mapping instead?
         for key in (
                 "repositories",
