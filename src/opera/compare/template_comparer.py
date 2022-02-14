@@ -116,11 +116,15 @@ class TemplateComparer:
 
     @staticmethod
     def _compare_file(filepath1, filepath2, context):
-        equal = filecmp.cmp(
-            path.join(context.workdir1, filepath1),
-            path.join(context.workdir2, filepath2),
-            shallow=False
-        )
+        equal = False
+        if filepath1 and filepath2:
+            equal = filecmp.cmp(
+                path.join(context.workdir1, filepath1),
+                path.join(context.workdir2, filepath2),
+                shallow=False
+            )
+        elif not filepath1 and not filepath2:
+            equal = True
         return equal, f"file {filepath1}"
 
     @staticmethod
