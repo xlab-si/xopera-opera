@@ -68,11 +68,6 @@ commands:
       - run: git push origin stable
 
 executors:
-  python37:
-    docker:
-      - image: circleci/python:3.7.4
-    environment:
-      PIPENV_VENV_IN_PROJECT: true
   python38:
     docker:
       - image: circleci/python:3.8.2
@@ -90,10 +85,6 @@ executors:
       PIPENV_VENV_IN_PROJECT: true
 
 jobs:
-  test37:
-    executor: python37
-    steps:
-      - run_tests
   test38:
     executor: python38
     steps:
@@ -131,7 +122,6 @@ workflows:
   version: 2
   test:
     jobs:
-      - test37
       - test38
       - test39
       - test310
@@ -142,7 +132,6 @@ workflows:
               only: master
       - pypi_test_deploy:
           requires:
-            - test37
             - test38
             - test39
             - test310
