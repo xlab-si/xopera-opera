@@ -16,9 +16,9 @@ class Operation:
         self.host = host
 
     def run(self, host: OperationHost, instance, verbose, workdir, validate):
-        # TODO(@tadeboro): Respect the timeout option.
-        # TODO(@tadeboro): Add host validation.
-        # TODO(@tadeboro): Properly handle SELF - not even sure what this proper way would be at this time.
+        # TODO: Respect the timeout option.
+        # TODO: Add host validation.
+        # TODO: Properly handle SELF - not even sure what this proper way would be at this time.
         host = self.host or host
         if host in (OperationHost.SELF, OperationHost.HOST):
             actual_host = instance.get_host()
@@ -38,7 +38,7 @@ class Operation:
         # TODO: We print output only when primary is defined so we can run something. Fix this if needed.
         thread_utils.print_thread(f"    Executing {self.name} on {instance.tosca_id}")
 
-        # TODO(@tadeboro): Generalize executors.
+        # TODO: Generalize executors.
         success, ansible_outputs = ansible.run(
             actual_host, str(self.primary),
             tuple(str(i) for i in self.dependencies),

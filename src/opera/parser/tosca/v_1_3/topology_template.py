@@ -20,7 +20,7 @@ class TopologyTemplate(Entity):
         groups=Map(GroupDefinition),
         policies=List(Map(PolicyDefinition)),
         outputs=Map(ParameterDefinition),
-        # TODO(@tadeboro): substitution_mappings and workflows
+        # TODO: substitution_mappings and workflows
     )
 
     def get_template(self, inputs, service_ast):

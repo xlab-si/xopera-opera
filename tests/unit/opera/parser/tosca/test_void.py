@@ -1,13 +1,13 @@
 class TestBuild:
-    # TODO(@tadeboro): Add tests.
+    # TODO: Add tests.
     pass
 
 
 class TestInit:
-    # TODO(@tadeboro): Add tests.
+    # TODO: Add tests.
     pass
 
 
 class TestGetValue:
-    # TODO(@tadeboro): Add tests.
+    # TODO: Add tests.
     pass

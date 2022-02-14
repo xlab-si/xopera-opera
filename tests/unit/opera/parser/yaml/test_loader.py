@@ -46,7 +46,7 @@ VALID_TEST_CASES = [
              """),
         {"d": ["with", "strs", {"dct": 1, "of": 2, "nums": 3}, "list"]},
     ),
-    # FIXME(@tadeboro): This fails for some reasone. Need to dig through
+    # FIXME: This fails for some reasone. Need to dig through
     # pyyaml sources and find out why null constructor is not called in this
     # case.
     #  (

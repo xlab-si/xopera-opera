@@ -88,7 +88,7 @@ class Topology:
     # TOSCA functions
     #
     def get_input(self, params):
-        # TODO(@tadeboro): Allow nested data access.
+        # TODO: Allow nested data access.
         if not isinstance(params, list):
             params = [params]
 

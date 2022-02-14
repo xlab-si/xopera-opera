@@ -34,5 +34,5 @@ class PropertyDefinition(Entity):
         return Value(typ, False)
 
     def get_value_type(self, service_ast):  # pylint: disable=no-self-use
-        # TODO(@tadeboro): Implement types later.
+        # TODO: Implement types later.
         return None

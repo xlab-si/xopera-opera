@@ -94,7 +94,7 @@ class Base:
             self.set_attribute(name, value)
 
     def set_attribute(self, name, value):
-        # TODO(@tadeboro): Add type validation.
+        # TODO: Add type validation.
         if name not in self.attributes:
             raise DataError(
                 f"Instance has no '{name}' attribute. Available attributes: {', '.join(self.attributes.keys())}"
