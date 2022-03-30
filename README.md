@@ -3,13 +3,8 @@ xOpera orchestration tool compliant with TOSCA YAML v1.3 in the making.
 
 [![PyPI](https://img.shields.io/pypi/v/opera)](https://pypi.org/project/opera/)
 [![Test PyPI](https://img.shields.io/badge/test%20pypi-dev%20version-blueviolet)](https://test.pypi.org/project/opera/)
-[![CircleCI](https://img.shields.io/circleci/build/github/xlab-si/xopera-opera?label=circleci)](https://app.circleci.com/pipelines/github/xlab-si/xopera-opera)
-[![Code Climate coverage](https://img.shields.io/codeclimate/coverage/xlab-si/xopera-opera)](https://codeclimate.com/github/xlab-si/xopera-opera)
-[![GitHub contributors](https://img.shields.io/github/contributors/xlab-si/xopera-opera)](https://github.com/xlab-si/xopera-opera/graphs/contributors)
-[![GitHub top language](https://img.shields.io/github/languages/top/xlab-si/xopera-opera)](https://github.com/xlab-si/xopera-opera)
-[![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/xlab-si/xopera-opera)](https://github.com/xlab-si/xopera-opera)
-[![PyPI - License](https://img.shields.io/pypi/l/opera)](https://github.com/xlab-si/xopera-opera/blob/master/LICENSE)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/opera)](https://pypi.org/project/opera/)
+[![cicd](https://github.com/xlab-si/xopera-opera/actions/workflows/ci_cd.yaml/badge.svg)](https://github.com/xlab-si/xopera-opera/actions/workflows/ci_cd.yaml)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/4e287640ae2ea2b04163/test_coverage)](https://codeclimate.com/github/xlab-si/xopera-opera/test_coverage)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/opera)](https://pypi.org/project/opera/)
 
 <p align="center">
