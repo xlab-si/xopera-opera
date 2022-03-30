@@ -170,21 +170,35 @@ run_unit() {
     pytest tests/unit/
 }
 
-build_local_ci_container() {
-    docker build -t xopera-opera-test --file - . <<EOF
-FROM circleci/python:3.8
-USER root
-WORKDIR /test/
-RUN sudo apt-get install -y \
-    shellcheck
-COPY Pipfile /test/Pipfile-complete
-RUN head -n -3 Pipfile-complete > Pipfile \
-    && pipenv install --dev
+run_coverage() {
+    pytest --cov=opera --cov-report=xml tests/unit/
+}
 
-COPY . /test/
-RUN pipenv install
+run_integration() {
+    for dir in tests/integration/*/; do (cd "$dir" && ./runme.sh opera); done
+}
+
+run_help() {
+    cat <<EOF
+usage:
+    ./dev.sh <command>
+
+commands:
+    sanity              runs sanity tests
+    unit                runs unit tests
+    integration         runs integration tests
+    coverage            calculates code coverage
+    help                shows this help
 EOF
 }
+
+
+if [ $# -ne 1 ]
+  then
+    echo -e "No arguments were supplied\n"
+    run_help
+    exit 1
+fi
 
 command="$1"
 shift
@@ -196,10 +210,17 @@ case "$command" in
     unit)
         run_unit
         ;;
+    coverage)
+        run_integration
+        ;;
     integration)
-        build_local_ci_container
+        run_coverage
+        ;;
+    help)
+        run_help
         ;;
     *)
-        echo "Help."
+        echo -e "Invalid command: $command\n"
+        run_help
         ;;
 esac
