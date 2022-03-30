@@ -1,0 +1,102 @@
+name: cicd
+
+on: push
+
+jobs:
+  tests:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: [ '3.8', '3.9', '3.10' ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup python
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install local opera package (along with requiremements for tests)
+        run: |
+          pip install --upgrade pip
+          pip install wheel
+          pip install .[tests]
+
+      - name: Run sanity tests
+        run: ./tests/sanity/sanity.sh
+
+      - name: Run unit tests
+        run: pytest tests/unit
+
+      - name: Run integration tests
+        run: for d in tests/integration/*/; do (cd "$d" && ./runme.sh opera); done
+
+      - name: Calculate code coverage and push results to CodeClimate
+        if: github.ref == 'refs/heads/main'
+        run: |
+          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+          chmod +x ./cc-test-reporter
+          ./cc-test-reporter before-build
+          pytest --cov=opera --cov-report=xml tests/unit/
+          ./cc-test-reporter after-build
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+
+      - name: Store coverage XML artifact
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage.xml
+          path: coverage.xml
+
+  release:
+    runs-on: ubuntu-20.04
+    needs: tests
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.10.4
+
+      - name: Install pypa/build
+        run: python -m pip install build --user
+
+      - name: Build a binary wheel and a source tarball
+        run: python -m build --sdist --wheel --outdir dist/ .
+
+      - name: Publish package to TestPyPI (for main branch)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: ${{ secrets.TEST_PYPI_USERNAME }}
+          password: ${{ secrets.TEST_PYPI_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
+          skip_existing: true
+
+      - name: Publish CLI package to PyPI (for tags)
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: ${{ secrets.PYPI_USERNAME }}
+          password: ${{ secrets.PYPI_TOKEN }}
+
+      - name: Create and push GitHub stable branch which points to the latest released tag/commit
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        run: |
+          git branch -f stable HEAD
+          git push origin stable
+
+      - name: Draft a new Release (for tags)
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
