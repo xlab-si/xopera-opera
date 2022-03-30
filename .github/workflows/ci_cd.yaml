@@ -26,13 +26,13 @@ jobs:
           pip install .[tests]
 
       - name: Run sanity tests
-        run: ./tests/sanity/sanity.sh
+        run: ./dev.sh sanity
 
       - name: Run unit tests
-        run: pytest tests/unit
+        run: ./dev.sh unit
 
       - name: Run integration tests
-        run: for d in tests/integration/*/; do (cd "$d" && ./runme.sh opera); done
+        run: ./dev.sh integration
 
       - name: Calculate code coverage and push results to CodeClimate
         if: github.ref == 'refs/heads/main'
@@ -40,7 +40,7 @@ jobs:
           curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
           chmod +x ./cc-test-reporter
           ./cc-test-reporter before-build
-          pytest --cov=opera --cov-report=xml tests/unit/
+          ./dev.sh coverage
           ./cc-test-reporter after-build
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
