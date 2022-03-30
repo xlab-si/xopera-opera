@@ -17,7 +17,7 @@ class Entity(MapWrapper):
 
     @classmethod
     def validate(cls, yaml_node):
-        if cls.ATTRS == {}:
+        if not cls.ATTRS:
             raise AssertionError()
         if not isinstance(cls.REQUIRED, set):
             raise AssertionError()
