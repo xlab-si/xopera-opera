@@ -56,12 +56,8 @@ def _parser_callback(args):
         csar_or_st_path = PurePath(args.csar_or_service_template)
 
     try:
-        if is_zipfile(csar_or_st_path) or Path(csar_or_st_path).is_dir():
-            print("Validating CSAR...")
-            validate_csar(csar_or_st_path, inputs, storage, args.verbose, args.executors)
-        else:
-            print("Validating service template...")
-            validate_service_template(csar_or_st_path, inputs, storage, args.verbose, args.executors)
+        print("Validating TOSCA CSAR or service template...")
+        validate(csar_or_st_path, inputs, storage, args.verbose, args.executors)
         print("Done.")
     except ParseError as e:
         print(f"{e.loc}: {e}")
@@ -71,6 +67,14 @@ def _parser_callback(args):
         return 1
 
     return 0
+
+
+def validate(csar_or_st_path: PurePath, inputs: typing.Optional[dict], storage: Storage, verbose: bool,
+             executors: bool):
+    if is_zipfile(csar_or_st_path) or Path(csar_or_st_path).is_dir():
+        validate_csar(csar_or_st_path, inputs, storage, verbose, executors)
+    else:
+        validate_service_template(csar_or_st_path, inputs, storage, verbose, executors)
 
 
 def validate_csar(csar_path: PurePath, inputs: typing.Optional[dict], storage: Storage, verbose: bool,
