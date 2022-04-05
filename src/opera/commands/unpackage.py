@@ -11,7 +11,7 @@ from opera.utils import generate_random_pathname
 def add_parser(subparsers):
     parser = subparsers.add_parser(
         "unpackage",
-        help="Unpackage TOSCA CSAR to a specified location"
+        help="Unpackage TOSCA CSAR (zip file) to a specified location"
     )
     parser.add_argument(
         "--destination", "-d",
@@ -24,7 +24,7 @@ def add_parser(subparsers):
     )
     parser.add_argument(
         "csar",
-        help="Path to the compressed TOSCA CSAR"
+        help="Path to the TOSCA CSAR (zip file)"
     ).complete = shtab.FILE
     parser.set_defaults(func=_parser_callback)
 

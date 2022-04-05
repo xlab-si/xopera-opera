@@ -40,10 +40,10 @@ def prompt_yes_no_question(
 
 
 def determine_archive_format(filepath):
-    if is_tarfile(filepath):
-        return "tar"
-    elif is_zipfile(filepath):
+    if is_zipfile(filepath):
         return "zip"
+    elif is_tarfile(filepath):
+        return "tar"
     else:
         raise Exception(
             f"Unsupported archive format: '{filepath}'. The packaging format should be one of: zip, tar."
