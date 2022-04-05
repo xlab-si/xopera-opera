@@ -35,7 +35,7 @@ xOpera orchestration tool compliant with TOSCA YAML v1.3 in the making.
 ## Introduction
 `opera` aims to be a lightweight orchestrator compliant with [OASIS TOSCA]. 
 The current compliance is with the [OASIS TOSCA Simple Profile in YAML v1.3]. 
-The [xOpera documentation] for is available on GitHub pages. 
+The [xOpera documentation] is available on GitHub pages. 
 `opera` implements the TOSCA standard with [Ansible] automation tool where Ansible playbooks can be used as 
 orchestration actuators within the TOSCA interface operations.
 
@@ -92,6 +92,7 @@ To delete the created directory, we can undeploy our stuff by running:
 And that is it. 
 For more startup examples please visit [examples folder], or go to [xopera-examples] repository if you wish to explore 
 deeper with more complex xOpera examples. 
+If you want to use just xOpera TOSCA parser go to [xopera-tosca-parser] repository. 
 If you want to use opera commands from an API take a look at [xopera-api] repository. 
 You can also take a look at the [xOpera SaaS] component, which is designed for business partners and enterprise users.
 To find more about xOpera project visit our [xOpera documentation].
@@ -109,7 +110,7 @@ Agreements No. 825040 ([RADON]), No. 825480 ([SODALITE]) and No. 101000162 ([PIA
 [opera]: https://pypi.org/project/opera/
 [OASIS TOSCA Simple Profile in YAML v1.3]: https://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.3/TOSCA-Simple-Profile-YAML-v1.3.html
 [xOpera documentation]: https://xlab-si.github.io/xopera-docs/
-[CLI documentation]: https://xlab-si.github.io/xopera-docs/cli.html
+[CLI documentation]: https://xlab-si.github.io/xopera-docs/02-cli.html
 [Ansible]: https://www.ansible.com/
 [xopera@xlab.si]: mailto:xopera@xlab.si
 [OASIS TOSCA]: https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=tosca
@@ -117,6 +118,7 @@ Agreements No. 825040 ([RADON]), No. 825480 ([SODALITE]) and No. 101000162 ([PIA
 [PyPI development]: https://test.pypi.org/project/opera/#history
 [examples folder]: examples
 [xopera-examples]: https://github.com/xlab-si/xopera-examples
+[xopera-tosca-parser]: https://github.com/xlab-si/xopera-tosca-parser
 [xopera-api]: https://github.com/xlab-si/xopera-api
 [xOpera SaaS]: https://xlab-si.github.io/xopera-docs/saas.html
 [Apache License 2.0]: https://www.apache.org/licenses/LICENSE-2.0
