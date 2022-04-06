@@ -1,6 +1,6 @@
 from opera.constants import OperationHost
 from opera.error import DataError
-from opera.executor import ansible
+from opera.executors.ansible import ansible
 from opera.threading import utils as thread_utils
 
 
