@@ -7,6 +7,7 @@ import yaml
 
 from opera.threading import utils as thread_utils
 from . import utils
+from .stdout_callbacks import json_ansible_callback
 
 
 def _get_inventory(host):
@@ -45,17 +46,14 @@ def run(host, primary, dependencies, artifacts, variables, verbose, workdir, val
             fd.write("[defaults]\n")
             fd.write("retry_files_enabled = False\n")
 
-            opera_ssh_host_key_checking = os.environ.get(
-                "OPERA_SSH_HOST_KEY_CHECKING")
+            opera_ssh_host_key_checking = os.environ.get("OPERA_SSH_HOST_KEY_CHECKING")
             if opera_ssh_host_key_checking is not None:
                 check = str(opera_ssh_host_key_checking).lower().strip()
                 if check[:1] == "f" or check[:1] == "false":
                     fd.write("host_key_checking = False\n")
 
         if verbose:
-            print("***inputs***")
-            print([f"{key}: {variables[key]}" for key in variables])
-            print("***inputs***")
+            print(json.dumps({"inputs": {key: variables[key] for key in variables}}, indent=2, sort_keys=True))
 
         cmd = [
             "ansible-playbook",
@@ -69,7 +67,9 @@ def run(host, primary, dependencies, artifacts, variables, verbose, workdir, val
 
         env = dict(
             ANSIBLE_SHOW_CUSTOM_STATS="1",
-            ANSIBLE_STDOUT_CALLBACK="json",
+            ANSIBLE_CALLBACK_PLUGINS=f"~/.ansible/plugins/callback:/usr/share/ansible/plugins/callback:"
+                                     f"{os.path.dirname(json_ansible_callback.__file__)}",
+            ANSIBLE_STDOUT_CALLBACK="json_ansible_callback"
         )
         code, out, err = utils.run_in_directory(dir_path, cmd, env)
         if code != 0 or verbose:
