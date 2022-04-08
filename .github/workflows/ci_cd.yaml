@@ -14,7 +14,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup python
+      - name: Setup python ${{ matrix.python-version }}
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
@@ -34,10 +34,10 @@ jobs:
       - name: Run integration tests
         run: ./dev.sh integration
 
-      - name: Calculate code coverage and push results to CodeClimate
-        if: github.ref == 'refs/heads/main'
+      - name: Calculate code coverage and push results to CodeClimate (for main branch and only once)
+        if: github.ref == 'refs/heads/main' && matrix.python-version == '3.10'
         run: |
-          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+          curl -sL https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
           chmod +x ./cc-test-reporter
           ./cc-test-reporter before-build
           ./dev.sh coverage
@@ -45,8 +45,8 @@ jobs:
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
 
-      - name: Store coverage XML artifact
-        if: github.ref == 'refs/heads/main'
+      - name: Store coverage XML artifact (for main branch and only once)
+        if: github.ref == 'refs/heads/main' && matrix.python-version == '3.10'
         uses: actions/upload-artifact@v2
         with:
           name: coverage.xml
@@ -73,7 +73,7 @@ jobs:
       - name: Build a binary wheel and a source tarball
         run: python -m build --sdist --wheel --outdir dist/ .
 
-      - name: Publish package to TestPyPI (for main branch)
+      - name: Publish dev package to TestPyPI (for main branch)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
@@ -82,14 +82,22 @@ jobs:
           repository_url: https://test.pypi.org/legacy/
           skip_existing: true
 
-      - name: Publish CLI package to PyPI (for tags)
+      - name: Publish production package to TestPyPI (for tags)
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: ${{ secrets.TEST_PYPI_USERNAME }}
+          password: ${{ secrets.TEST_PYPI_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
+
+      - name: Publish production package to PyPI (for tags)
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: ${{ secrets.PYPI_USERNAME }}
           password: ${{ secrets.PYPI_TOKEN }}
 
-      - name: Create and push GitHub stable branch which points to the latest released tag/commit
+      - name: Create and push GitHub stable branch which points to the latest released tag/commit (for tags)
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         run: |
           git branch -f stable HEAD

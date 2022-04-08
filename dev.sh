@@ -211,10 +211,10 @@ case "$command" in
         run_unit
         ;;
     coverage)
-        run_integration
+        run_coverage
         ;;
     integration)
-        run_coverage
+        run_integration
         ;;
     help)
         run_help
