@@ -6,13 +6,14 @@ from pathlib import Path, PurePath
 
 import shtab
 import yaml
+from opera_tosca_parser.commands.parse import parse_service_template
 
 from opera.compare.instance_comparer import InstanceComparer
 from opera.compare.template_comparer import TemplateComparer, TemplateContext
 from opera.error import DataError, ParseError
-from opera.parser import tosca
 from opera.storage import Storage
 from opera.utils import format_outputs, save_outputs, get_template, get_workdir
+from opera.instance.topology import Topology
 
 
 def add_parser(subparsers):
@@ -143,11 +144,11 @@ def diff_templates(
     if inputs_old is None:
         inputs_old = {}
 
-    ast_old = tosca.load(workdir_old, PurePath(service_template_old.name))
-    ast_new = tosca.load(workdir_new, PurePath(service_template_new.name))
+    template_old, _ = parse_service_template(service_template_old, inputs_old)
+    template_new, _ = parse_service_template(service_template_new, inputs_new)
+    Topology.instantiate(template_old)
+    Topology.instantiate(template_new)
 
-    template_old = ast_old.get_template(inputs_old)
-    template_new = ast_new.get_template(inputs_new)
     context = TemplateContext(template_old, template_new, workdir_old, workdir_new)
 
     _, diff = template_comparer.compare_service_template(template_old, template_new, context)
@@ -165,8 +166,8 @@ def diff_instances(
 ):
     template_old = get_template(storage_old, workdir_old)
     template_new = get_template(storage_new, workdir_new)
-    topology_old = template_old.instantiate(storage_old)
-    topology_new = template_new.instantiate(storage_new)
+    topology_old = Topology.instantiate(template_old, storage_old)
+    topology_new = Topology.instantiate(template_new, storage_new)
 
     context = TemplateContext(template_old, template_new, workdir_old, workdir_new)
     _, diff = template_comparer.compare_service_template(template_old, template_new, context)

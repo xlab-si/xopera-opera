@@ -1,16 +1,15 @@
 import argparse
 import typing
 from pathlib import Path, PurePath
-from tempfile import TemporaryDirectory
 from zipfile import is_zipfile
 
 import shtab
 import yaml
+from opera_tosca_parser.commands.parse import parse_service_template, parse_csar
 
 from opera.error import OperaError, ParseError
-from opera.parser import tosca
-from opera.parser.tosca.csar import CloudServiceArchive, DirCloudServiceArchive
 from opera.storage import Storage
+from opera.instance.topology import Topology
 
 
 def add_parser(subparsers):
@@ -82,36 +81,18 @@ def validate_csar(csar_path: PurePath, inputs: typing.Optional[dict], storage: S
     if inputs is None:
         inputs = {}
 
-    csar = CloudServiceArchive.create(csar_path)
-    csar.validate_csar()
-    entrypoint = csar.get_entrypoint()
-
-    if entrypoint is not None:
-        if isinstance(csar, DirCloudServiceArchive):
-            workdir = Path(csar_path)
-            ast = tosca.load(workdir, entrypoint)
-            template = ast.get_template(inputs)
-            if executors:
-                topology = template.instantiate(storage)
-                topology.validate(verbose, workdir, 1)
-        else:
-            with TemporaryDirectory() as csar_validation_dir:
-                csar.unpackage_csar(csar_validation_dir)
-                workdir = Path(csar_validation_dir)
-                ast = tosca.load(workdir, entrypoint)
-                template = ast.get_template(inputs)
-                if executors:
-                    topology = template.instantiate(storage)
-                    topology.validate(verbose, csar_validation_dir, 1)
+    template, workdir = parse_csar(csar_path, inputs)
+    if executors:
+        topology = Topology.instantiate(template, storage)
+        topology.validate(verbose, workdir, 1)
 
 
 def validate_service_template(service_template_path: PurePath, inputs: typing.Optional[dict], storage: Storage,
                               verbose: bool, executors: bool):
     if inputs is None:
         inputs = {}
-    workdir = Path(service_template_path.parent)
-    ast = tosca.load(workdir, PurePath(service_template_path.name))
-    template = ast.get_template(inputs)
+
+    template, workdir = parse_service_template(service_template_path, inputs)
     if executors:
-        topology = template.instantiate(storage)
+        topology = Topology.instantiate(template, storage)
         topology.validate(verbose, workdir, 1)

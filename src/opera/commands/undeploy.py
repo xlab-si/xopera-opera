@@ -1,14 +1,15 @@
 import argparse
 from os import path
-from pathlib import Path, PurePath
+from pathlib import PurePath
 
 import shtab
+from opera_tosca_parser.commands.parse import parse_service_template
 
 from opera.commands.info import info
 from opera.error import DataError, ParseError
-from opera.parser import tosca
 from opera.storage import Storage
 from opera.utils import prompt_yes_no_question
+from opera.instance.topology import Topology
 
 
 def add_parser(subparsers):
@@ -98,16 +99,8 @@ def undeploy(storage: Storage, verbose_mode: bool, num_workers: int):
     if storage.exists("root_file"):
         service_template_path = PurePath(storage.read("root_file"))
 
-        workdir = Path(service_template_path.parent)
-        if storage.exists("csars"):
-            csar_dir = Path(storage.path) / "csars" / "csar"
-            workdir = csar_dir
-            ast = tosca.load(workdir, service_template_path.relative_to(csar_dir))
-        else:
-            ast = tosca.load(workdir, PurePath(service_template_path.name))
-
-        template = ast.get_template(inputs)
-        topology = template.instantiate(storage)
+        template, workdir = parse_service_template(service_template_path, inputs)
+        topology = Topology.instantiate(template, storage)
         topology.undeploy(verbose_mode, workdir, num_workers)
     else:
         print("There is no root_file in storage.")

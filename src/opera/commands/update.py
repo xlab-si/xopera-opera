@@ -13,6 +13,7 @@ from opera.compare.template_comparer import TemplateComparer
 from opera.error import DataError, ParseError
 from opera.storage import Storage
 from opera.utils import format_outputs, get_template, get_workdir
+from opera.instance.topology import Topology
 
 
 def add_parser(subparsers):
@@ -118,8 +119,8 @@ def update(
 ):
     template_old = get_template(storage_old, workdir_old)
     template_new = get_template(storage_new, workdir_new)
-    topology_old = template_old.instantiate(storage_old)
-    topology_new = template_new.instantiate(storage_new)
+    topology_old = Topology.instantiate(template_old, storage_old)
+    topology_new = Topology.instantiate(template_new, storage_new)
 
     if verbose_mode:
         print(format_outputs(instance_diff.outputs(), "json"))

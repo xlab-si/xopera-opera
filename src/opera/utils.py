@@ -6,8 +6,7 @@ from uuid import uuid4
 from zipfile import is_zipfile
 
 import yaml
-
-from opera.parser import tosca
+from opera_tosca_parser.commands.parse import parse_service_template
 
 
 def prompt_yes_no_question(
@@ -98,11 +97,10 @@ def get_template(storage, workdir):
 
         if storage.exists("csars"):
             csar_dir = Path(storage.path) / "csars" / "csar"
-            ast = tosca.load(Path(csar_dir), service_template_path.relative_to(csar_dir))
+            template, _ = parse_service_template((csar_dir / service_template_path), inputs)
         else:
-            ast = tosca.load(Path(workdir), PurePath(service_template_path.name))
+            template, _ = parse_service_template(Path(workdir) / PurePath(service_template_path.name), inputs)
 
-        template = ast.get_template(inputs)
         return template
     else:
         return None

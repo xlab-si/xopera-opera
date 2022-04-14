@@ -5,12 +5,13 @@ from pathlib import Path, PurePath
 
 import shtab
 import yaml
+from opera_tosca_parser.commands.parse import parse_service_template
 
 from opera.commands.info import info
 from opera.error import DataError, ParseError
-from opera.parser import tosca
 from opera.storage import Storage
 from opera.utils import prompt_yes_no_question
+from opera.instance.topology import Topology
 
 
 def add_parser(subparsers):
@@ -100,15 +101,7 @@ def notify(storage: Storage, verbose_mode: bool, trigger_name_or_event: str,
     if storage.exists("root_file"):
         service_template_path = PurePath(storage.read("root_file"))
 
-        workdir = Path(service_template_path.parent)
-        if storage.exists("csars"):
-            csar_dir = Path(storage.path) / "csars" / "csar"
-            workdir = csar_dir
-            ast = tosca.load(workdir, service_template_path.relative_to(csar_dir))
-        else:
-            ast = tosca.load(workdir, PurePath(service_template_path.name))
-
-        template = ast.get_template(inputs)
+        template, workdir = parse_service_template(service_template_path, inputs)
 
         # check if specified trigger or event name exists in template
         if trigger_name_or_event:
@@ -122,7 +115,7 @@ def notify(storage: Storage, verbose_mode: bool, trigger_name_or_event: str,
             if not trigger_name_or_event_exists:
                 raise DataError(f"The provided trigger or event name does not exist: {trigger_name_or_event}.")
 
-        topology = template.instantiate(storage)
+        topology = Topology.instantiate(template, storage)
         topology.notify(verbose_mode, workdir, trigger_name_or_event, notification_file_contents)
     else:
         print("There is no root_file in storage.")

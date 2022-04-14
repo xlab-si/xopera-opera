@@ -5,12 +5,14 @@ from typing import Dict, Optional, Union
 
 import shtab
 import yaml
+from opera_tosca_parser.parser import tosca
+from opera_tosca_parser.parser.tosca.csar import CloudServiceArchive
+from opera_tosca_parser.error import OperaToscaParserError
 
-from opera.error import DataError, ParseError, OperaError
-from opera.parser import tosca
-from opera.parser.tosca.csar import CloudServiceArchive
+from opera.error import DataError, ParseError
 from opera.storage import Storage
 from opera.utils import format_outputs, save_outputs
+from opera.instance.topology import Topology
 
 
 def add_parser(subparsers):
@@ -95,16 +97,16 @@ def info(csar_or_rootdir: Optional[PurePath], storage: Storage) -> dict:  # pyli
                     service_template_meta = csar.parse_service_template_meta(csar.get_entrypoint())
                     if service_template_meta:
                         info_dict["service_template_metadata"] = service_template_meta.to_dict()
-                except OperaError:
+                except OperaToscaParserError:
                     pass
 
             try:
                 csar_meta = csar.parse_csar_meta()
                 if csar_meta:
                     info_dict["csar_metadata"] = csar_meta.to_dict()
-            except OperaError:
+            except OperaToscaParserError:
                 pass
-        except OperaError:
+        except OperaToscaParserError:
             # anything that fails because of validation can be ignored, we can use state
             # we mark the CSAR as invalid because it's useful to know
             info_dict["csar_valid"] = False
@@ -134,17 +136,17 @@ def info(csar_or_rootdir: Optional[PurePath], storage: Storage) -> dict:  # pyli
                     service_template_meta = csar.parse_service_template_meta(csar.get_entrypoint())
                     if service_template_meta:
                         info_dict["service_template_metadata"] = service_template_meta.to_dict()
-                except OperaError:
+                except OperaToscaParserError:
                     pass
 
                 try:
                     csar_meta = csar.parse_csar_meta()
                     if csar_meta:
                         info_dict["csar_metadata"] = csar_meta.to_dict()
-                except OperaError:
+                except OperaToscaParserError:
                     pass
 
-            except OperaError:
+            except OperaToscaParserError:
                 info_dict["csar_valid"] = False
         else:
             ast = tosca.load(Path(service_template_path.parent), PurePath(service_template_path.name))
@@ -153,7 +155,7 @@ def info(csar_or_rootdir: Optional[PurePath], storage: Storage) -> dict:  # pyli
             template = ast.get_template(inputs)
             # We need to instantiate the template in order
             # to get access to the instance state.
-            topology = template.instantiate(storage)
+            topology = Topology.instantiate(template, storage)
             info_dict["status"] = topology.status()
         else:
             info_dict["status"] = "initialized"
