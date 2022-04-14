@@ -4,11 +4,17 @@ from opera.instance.base import Base
 
 
 class Relationship(Base):
-    def __init__(self, template, instance_id, source, target):
-        super().__init__(template, instance_id)
+    def __init__(self, template, topology, instance_id, source, target):
+        super().__init__(template, topology, instance_id)
 
         self.source = source
         self.target = target
+
+    @staticmethod
+    def instantiate(template, topology, source, target):
+        relationship_id = f"{source.tosca_id}--{target.tosca_id}"
+        template.instances = {relationship_id: Relationship(template, topology, relationship_id, source, target)}
+        return template.instances.values()
 
     #
     # TOSCA functions
@@ -57,7 +63,35 @@ class Relationship(Base):
             return self.source.get_property([OperationHost.SELF.value, prop] + rest)
         if host == OperationHost.TARGET.value:
             return self.target.get_property([OperationHost.SELF.value, prop] + rest)
-        return self.template.get_property(params)
+
+        if host == OperationHost.SELF.value:
+            # TODO: Add support for nested property values.
+            if prop not in self.template.properties:
+                raise DataError(f"Template has no '{prop}' attribute")
+            return self.template.properties[prop].eval(self, prop)
+        elif host == OperationHost.HOST.value:
+            raise DataError(f"{host} keyword can be only used within node template context.")
+        else:
+            # try to find the property within the TOSCA nodes
+            for node in self.topology.nodes.values():
+                if host == node.name or host in node.types:
+                    # TODO: Add support for nested property values.
+                    if prop in node.template.properties:
+                        return node.template.properties[prop].eval(self, prop)
+            # try to find the property within the TOSCA relationships
+            for rel in self.topology.relationships.values():
+                if host == rel.name or host in rel.types:
+                    # TODO: Add support for nested property values.
+                    if prop in rel.template.properties:
+                        return rel.template.properties[prop].eval(self, prop)
+
+            raise DataError(
+                f"We were unable to find the property: {prop} within the specified modelable entity or keyname: "
+                f"{host} for node: {self.template.name}. The valid entities to get properties from are currently TOSCA "
+                f"nodes, relationships and policies. But the best practice is that the property host is set to "
+                f"'{OperationHost.SELF.value}'. This indicates that the property is referenced locally from something "
+                f"in the relationship itself."
+            )
 
     def get_input(self, params):
         return self.template.get_input(params)
@@ -102,3 +136,13 @@ class Relationship(Base):
 
     def token(self, params):
         return self.template.token(params)
+
+    def get_host(self, host: OperationHost):
+        if host in (OperationHost.SELF, OperationHost.HOST):
+            raise DataError(f"Incorrect operation host '{host}' defined for relationship.")
+        if host == OperationHost.SOURCE:
+            return self.source.find_host()
+        elif host == OperationHost.TARGET:
+            return self.target.find_host()
+        else:  # ORCHESTRATOR
+            return "localhost"

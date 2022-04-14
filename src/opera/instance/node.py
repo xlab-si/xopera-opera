@@ -1,17 +1,21 @@
 from typing import Optional
+from pathlib import Path
+
+from opera_tosca_parser.template.node import Node as Template
+from opera_tosca_parser.template.trigger import Trigger
 
 from opera.constants import StandardInterfaceOperation, ConfigureInterfaceOperation, NodeState, OperationHost
 from opera.error import DataError
 from opera.error import ToscaDeviationError
-from opera.template.trigger import Trigger
+from opera.instance.relationship import Relationship
 from opera.threading import utils as thread_utils
 from opera.value import Value
 from .base import Base
 
 
 class Node(Base):  # pylint: disable=too-many-public-methods
-    def __init__(self, template, instance_id):
-        super().__init__(template, instance_id)
+    def __init__(self, template, topology, instance_id):
+        super().__init__(template, topology, instance_id)
 
         self.in_edges = {}  # This gets filled by other instances for us.
         self.out_edges = {}  # This is what we fill during the linking phase.
@@ -26,16 +30,15 @@ class Node(Base):  # pylint: disable=too-many-public-methods
             rname = requirement.name
             self.out_edges[rname] = self.out_edges.get(rname, {})
 
-            for target in requirement.target.instances.values():
-                target.in_edges[rname] = target.in_edges.get(rname, {})
+            target = requirement.target.instance
+            target.in_edges[rname] = target.in_edges.get(rname, {})
 
-                rel_instances = requirement.relationship.instantiate(self, target)
-                for rel in rel_instances:
-                    rel.topology = self.topology
-                    self.out_edges[rname][target.tosca_id] = rel
-                    target.in_edges[rname][self.tosca_id] = rel
-                    target.in_edges[rname][self.tosca_id] = rel
-                    rel.read()
+            rel_instances = Relationship.instantiate(requirement.relationship, self.topology, self, target)
+            for rel in rel_instances:
+                self.out_edges[rname][target.tosca_id] = rel
+                target.in_edges[rname][self.tosca_id] = rel
+                target.in_edges[rname][self.tosca_id] = rel
+                rel.read()
 
     @property
     def deploying(self):
@@ -72,11 +75,6 @@ class Node(Base):  # pylint: disable=too-many-public-methods
             for requirement_relationships in self.in_edges.values()
             for relationship in requirement_relationships.values()
         )
-
-    def get_host(self):
-        # Try to transitively find a HostedOn requirement and resort to
-        # localhost if nothing suitable is found.
-        return self.template.get_host() or "localhost"
 
     def _configure_requirements(self,
                                 source_operation: ConfigureInterfaceOperation,
@@ -216,9 +214,129 @@ class Node(Base):  # pylint: disable=too-many-public-methods
         self.notified = True
         thread_utils.print_thread(f"  Notification on {self.tosca_id} complete")
 
+    @staticmethod
+    def instantiate(template: Template, topology):
+        # NOTE: This is where we should handle multiple instances.
+        # At the moment, we simply create one instance per node template. But
+        # the algorithm is fully prepared for multiple instances.
+        node_id = template.name + "_0"
+        template.instance = Node(template, topology, node_id)
+        return template.instance
+
+    def get_host(self, host: OperationHost):
+        # TODO: Properly handle situations where multiple hosts are
+        # available.
+
+        # 1. Scan requirements for direct compute host and return one.
+        # 2. Scan requirements for indirect compute host and return one.
+        # 3. Default to localhost.
+        if host in (OperationHost.SELF, OperationHost.HOST):
+            return self.find_host()
+        elif host in (OperationHost.SOURCE, OperationHost.TARGET):
+            raise DataError(f"Incorrect operation host '{host}' defined for node.")
+        else:  # ORCHESTRATOR
+            return "localhost"
+
+    def find_host(self):
+        # TODO: Properly handle situations where multiple hosts are
+        # available.
+
+        # 1. Scan requirements for direct compute host and return one.
+        # 2. Scan requirements for indirect compute host and return one.
+        # 3. Default to localhost.
+        host = next((
+            r.target
+            for r in self.template.requirements
+            if r.relationship.is_a("tosca.relationships.HostedOn") and r.target.is_a("tosca.nodes.Compute")
+        ), None)
+        if host:
+            instance = next(iter(host.instances.values()))
+            return instance.attributes["public_address"].eval(
+                self, "public_address"
+            )
+
+        host = next((
+            r.target.find_host()
+            for r in self.template.requirements
+            if r.relationship.is_a("tosca.relationships.HostedOn")
+        ), None)
+
+        return host or "localhost"
+
     #
     # TOSCA functions
     #
+    def get_property(self, params):
+        host, prop, *rest = params
+
+        if host == OperationHost.SELF.value:
+            # TODO: Add support for nested property values.
+            if prop in self.template.properties:
+                return self.template.properties[prop].eval(self, prop)
+
+            # Check if there are capability and requirement with the same name.
+            if (prop in [r.name for r in self.template.requirements]
+                    and prop in [c.name for c in self.template.capabilities]):
+                raise DataError(f"There are capability and requirement with the same name: '{prop}'.")
+
+            # If we have no property, try searching for capability.
+            capabilities = tuple(c for c in self.template.capabilities if c.name == prop)
+            if len(capabilities) > 1:
+                raise DataError(f"More than one capability is named '{prop}'.")
+
+            if len(capabilities) == 1 and capabilities[0].properties:
+                return capabilities[0].properties.get(rest[0]).data
+
+            # If we have no property, try searching for requirement.
+            requirements = tuple(r for r in self.template.requirements if r.name == prop)
+            if len(requirements) == 0:
+                raise DataError(f"Cannot find property '{prop}'.")
+            if len(requirements) > 1:
+                raise DataError(f"More than one requirement is named '{prop}'.")
+            return requirements[0].target.get_property([OperationHost.SELF.value] + rest)
+        elif host == OperationHost.HOST.value:
+            for req in self.template.requirements:
+                # get value from the node that hosts the node as identified by its HostedOn relationship
+                if "tosca.relationships.HostedOn" in req.relationship.types:
+                    # TODO: Add support for nested property values.
+                    if req.target and prop in req.target.properties:
+                        return req.target.properties[prop].eval(self, prop)
+
+            raise DataError(
+                f"We were unable to find the property: {prop} specified with keyname: {host} for node: "
+                f"{self.template.name}. Check if the node is connected to its host "
+                "with tosca.relationships.HostedOn relationship."
+            )
+        elif host in (OperationHost.SOURCE.value, OperationHost.TARGET.value):
+            raise DataError(f"{host} keyword can be only used within relationship template context.")
+        else:
+            # try to find the property within the TOSCA nodes
+            for node in self.topology.nodes.values():
+                if host == node.template.name or host in node.template.types:
+                    # TODO: Add support for nested property values.
+                    if prop in node.template.properties:
+                        return node.template.properties[prop].eval(self, prop)
+            # try to find the property within the TOSCA relationships
+            for rel in self.topology.template.relationships.values():
+                if host == rel.name or host in rel.types:
+                    # TODO: Add support for nested property values.
+                    if prop in rel.properties:
+                        return rel.properties[prop].eval(self, prop)
+            # try to find the property within the connected TOSCA polices
+            for policy in self.template.policies:
+                if host == policy.name or host in policy.types:
+                    # TODO: Add support for nested property values.
+                    if prop in policy.properties:
+                        return policy.properties[prop].eval(self, prop)
+
+            raise DataError(
+                f"We were unable to find the property: {prop} within the specified modelable entity or keyname: {host} "
+                f"for node: {self.template.name}. The valid entities to get properties from are currently TOSCA nodes, "
+                f"relationships and policies. But the best practice is that the property host is set to "
+                f"'{OperationHost.SELF.value}'. This indicates that the property is referenced locally from something "
+                f"in the node itself."
+            )
+
     def get_attribute(self, params):
         host, attr, *rest = params
 
@@ -284,12 +402,6 @@ class Node(Base):  # pylint: disable=too-many-public-methods
                 f"in the node itself."
             )
 
-    def get_property(self, params):
-        return self.template.get_property(params)
-
-    def get_input(self, params):
-        return self.template.get_input(params)
-
     def map_attribute(self, params, value):
         host, attr, *rest = params
 
@@ -320,14 +432,47 @@ class Node(Base):  # pylint: disable=too-many-public-methods
         if not attribute_mapped:
             raise DataError(f"Cannot find attribute '{attr}' among {', '.join(self.attributes.keys())}.")
 
+    def get_input(self, params):
+        return self.topology.get_input(params)
+
     def get_artifact(self, params):
-        return self.template.get_artifact(params)
+        host, prop, *rest = params
+
+        location = None
+        remove = None
+
+        if len(rest) == 1:
+            location = rest[0]
+
+        if len(rest) == 2:
+            location, remove = rest
+
+        if host == OperationHost.HOST.value:
+            raise DataError("HOST is not yet supported in opera.")
+        if host != OperationHost.SELF.value:
+            raise DataError(
+                f"Artifact host should be set to '{OperationHost.SELF.value}' which is the only valid value. This is "
+                f"needed to indicate that the artifact is referenced locally from something in the node itself. Was: "
+                f"{host}."
+            )
+
+        if location == "LOCAL_FILE":
+            raise DataError("Location get_artifact property is not yet supported in opera.")
+
+        if remove:
+            raise DataError("Remove get_artifact property artifacts is not yet supported in opera.")
+
+        if prop in self.template.artifacts:
+            self.template.artifacts[prop].eval(self, prop)
+            return Path(self.template.artifacts[prop].data).name
+        else:
+            raise DataError(f"Cannot find artifact '{prop}'.")
 
     def concat(self, params):
-        return self.template.concat(params)
+        return self.topology.concat(params, self)
 
     def join(self, params):
-        return self.template.join(params)
+        return self.topology.join(params, self)
 
     def token(self, params):
-        return self.template.token(params)
+        return self.topology.token(params)
