@@ -1,18 +1,18 @@
 import itertools
+import abc
 from typing import Union
 
 from opera.constants import NodeState, OperationHost, StandardInterfaceOperation, ConfigureInterfaceOperation
 from opera.error import DataError, OperationError
-from opera.instance.topology import Topology
 from opera.value import Value
+from opera.executors.ansible import ansible
+from opera.threading import utils as thread_utils
 
 
 class Base:
-    def __init__(self, template, instance_id):
+    def __init__(self, template, topology, instance_id):
         self.template = template
-
-        # Set once we are added to topology.
-        self.topology: Topology = None
+        self.topology = topology
 
         # Set attributes that all instances should have
         self.attributes = dict(
@@ -77,15 +77,21 @@ class Base:
                       verbose: bool,
                       workdir: str,
                       validate: bool = False):
-        success, outputs, attributes = self.template.run_operation(host, interface, operation_type, self, verbose,
-                                                                   workdir, validate)
+        if isinstance(operation_type, (StandardInterfaceOperation, ConfigureInterfaceOperation)):
+            operation = self.template.interfaces[interface].operations.get(operation_type.value)
+        else:
+            operation = self.template.interfaces[interface].operations.get(operation_type)
+        if operation:
+            success, outputs, attributes = self.run(operation, host, verbose, workdir, validate)
+        else:
+            success, outputs, attributes = True, {}, {}
 
         if not success:
             self.set_state(NodeState.ERROR)
             raise OperationError("Failed", self.tosca_name, interface, operation_type.value)
 
         for params, value in outputs:
-            self.template.map_attribute(params, value)
+            self.map_attribute(params, value)
         self.update_attributes(attributes)
         self.write()
 
@@ -100,3 +106,52 @@ class Base:
                 f"Instance has no '{name}' attribute. Available attributes: {', '.join(self.attributes.keys())}"
             )
         self.attributes[name].set(value)
+
+    @abc.abstractmethod
+    def get_host(self, host: OperationHost):
+        return None
+
+    @abc.abstractmethod
+    def map_attribute(self, params, value):
+        pass
+
+    def run(self, operation, host: OperationHost, verbose, workdir, validate):
+        # TODO: Respect the timeout option.
+        # TODO: Add host validation.
+        # TODO: Properly handle SELF - not even sure what this proper way would be at this time.
+        actual_host = self.get_host(operation.host or host)
+
+        operation_inputs = {k: v.eval(self, k) for k, v in operation.inputs.items()}
+
+        # TODO: Currently when primary is None we skip running the operation. Fix this if needed.
+        if not operation.primary:
+            return True, {}, {}
+
+        # TODO: We print output only when primary is defined so we can run something. Fix this if needed.
+        thread_utils.print_thread(f"    Executing {operation.name} on {self.tosca_id}")
+
+        # TODO: Generalize executors.
+        success, ansible_outputs = ansible.run(
+            actual_host, str(operation.primary),
+            tuple(str(i) for i in operation.dependencies),
+            tuple(str(i) for i in operation.artifacts), operation_inputs, verbose,
+            workdir, validate
+        )
+        if not success:
+            return False, {}, {}
+
+        outputs = []
+        unresolved_outputs = []
+
+        for output, attribute_mapping in operation.outputs.items():
+            if output in ansible_outputs:
+                outputs.append((attribute_mapping, ansible_outputs[output]))
+                ansible_outputs.pop(output)
+            else:
+                unresolved_outputs.append(output)
+
+        if len(unresolved_outputs) > 0:
+            raise DataError(
+                f"Operation did not return the following outputs: {', '.join(unresolved_outputs)}")
+
+        return success, outputs, ansible_outputs
