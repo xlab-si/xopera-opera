@@ -1,4 +1,3 @@
-import itertools
 from typing import Optional
 
 from opera_tosca_parser.template.topology import Topology as Template
@@ -9,17 +8,16 @@ from opera.error import DataError
 from .node import Node
 
 
-class Topology:
-    def __init__(self, storage, template):
+class Topology:  # pylint: disable=too-many-public-methods
+    def __init__(self, template, storage=None):
         self.storage = storage
-        self.nodes = {n.tosca_id: n for n in itertools.chain.from_iterable(
-            Node.instantiate(node) for node in template.nodes.values())}
+        self.nodes = {n.tosca_id: n for n in (Node.instantiate(node, self) for node in template.nodes.values())}
         self.template = template
 
         for node in self.nodes.values():
-            node.topology = self
             node.instantiate_relationships()
-            node.read()
+            if self.storage:
+                node.read()
 
     def status(self):
         if any(node.deploying for node in self.nodes.values()):
@@ -102,16 +100,8 @@ class Topology:
         self.storage = storage
 
     @staticmethod
-    def instantiate(storage, template: Template):
-        return Topology(storage, template)
-
-    def get_outputs(self) -> dict:
-        return {
-            k: dict(
-                description=v["description"],
-                value=v["value"].eval(self, "value"),
-            ) for k, v in self.outputs.items()
-        }
+    def instantiate(template: Template, storage=None):
+        return Topology(template, storage)
 
     def find_node_or_relationship(self, entity_name):
         node = self.find_node(entity_name)
@@ -133,16 +123,16 @@ class Topology:
         return None
 
     def find_node(self, node_name):
-        if node_name not in self.nodes:
+        if node_name not in self.template.nodes:
             return None
 
-        return self.nodes[node_name]
+        return self.template.nodes[node_name].instance
 
     def find_relationship(self, relationship_name):
-        if relationship_name not in self.relationships:
+        if relationship_name not in self.template.relationships:
             return None
 
-        return self.relationships[relationship_name]
+        return self.template.relationships[relationship_name].instance
 
     #
     # TOSCA functions
@@ -156,6 +146,14 @@ class Topology:
             raise DataError(f"Invalid input: '{params[0]}'")
 
         return self.template.inputs[params[0]].eval(self.template, params[0])
+
+    def get_outputs(self) -> dict:
+        return {
+            k: dict(
+                description=v["description"],
+                value=v["value"].eval(self, "value"),
+            ) for k, v in self.template.outputs.items()
+        }
 
     def get_property(self, params):
         entity_name, *rest = params

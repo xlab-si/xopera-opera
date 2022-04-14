@@ -2,9 +2,9 @@ import argparse
 from pathlib import Path, PurePath
 
 import shtab
+from opera_tosca_parser.parser.tosca.csar import CloudServiceArchive
 
 from opera.error import DataError, ParseError
-from opera.parser.tosca.csar import CloudServiceArchive
 from opera.utils import generate_random_pathname
 
 

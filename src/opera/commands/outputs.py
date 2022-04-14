@@ -1,14 +1,15 @@
 import argparse
 from os import path
-from pathlib import Path, PurePath
+from pathlib import PurePath
 from typing import Dict
 
 import shtab
+from opera_tosca_parser.commands.parse import parse_service_template
 
 from opera.error import DataError, ParseError
-from opera.parser import tosca
 from opera.storage import Storage
 from opera.utils import format_outputs, save_outputs
+from opera.instance.topology import Topology
 
 
 def add_parser(subparsers):
@@ -71,17 +72,11 @@ def outputs(storage: Storage) -> dict:
     if storage.exists("root_file"):
         service_template_path = PurePath(storage.read("root_file"))
 
-        if storage.exists("csars"):
-            csar_dir = Path(storage.path) / "csars" / "csar"
-            ast = tosca.load(Path(csar_dir), service_template_path.relative_to(csar_dir))
-        else:
-            ast = tosca.load(Path(service_template_path.parent), PurePath(service_template_path.name))
-
-        template = ast.get_template(inputs)
+        template, _ = parse_service_template(service_template_path, inputs)
         # We need to instantiate the template in order
         # to get access to the instance state.
-        template.instantiate(storage)
-        result: Dict = template.get_outputs()
+        topology = Topology.instantiate(template, storage)
+        result: Dict = topology.get_outputs()
         return result
     else:
         print("There is no root_file in storage.")

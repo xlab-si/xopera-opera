@@ -6,13 +6,14 @@ from zipfile import ZipFile, is_zipfile
 
 import shtab
 import yaml
+from opera_tosca_parser.commands.parse import parse_csar, parse_service_template
+from opera_tosca_parser.parser.tosca.csar import CloudServiceArchive
 
 from opera.commands.info import info
 from opera.error import DataError, ParseError
-from opera.parser import tosca
-from opera.parser.tosca.csar import CloudServiceArchive
 from opera.storage import Storage
 from opera.utils import prompt_yes_no_question
+from opera.instance.topology import Topology
 
 
 def add_parser(subparsers):
@@ -158,18 +159,9 @@ def deploy_service_template(
     storage.write_json(inputs, "inputs")
     storage.write(str(service_template_path), "root_file")
 
-    # set workdir and check if service template/CSAR has been initialized
-    workdir = Path(service_template_path.parent)
-    if storage.exists("csars"):
-        csar_dir = Path(storage.path) / "csars" / "csar"
-        workdir = csar_dir
-        ast = tosca.load(workdir, service_template_path.relative_to(csar_dir))
-    else:
-        ast = tosca.load(workdir, PurePath(service_template_path.name))
-
     # initialize service template and deploy
-    template = ast.get_template(inputs)
-    topology = template.instantiate(storage)
+    template, workdir = parse_service_template(service_template_path, inputs)
+    topology = Topology.instantiate(template, storage)
     topology.deploy(verbose_mode, workdir, num_workers)
 
 
@@ -192,7 +184,6 @@ def deploy_compressed_csar(
     csars_dir.mkdir(exist_ok=True)
 
     csar = CloudServiceArchive.create(csar_path)
-    csar.validate_csar()
     tosca_service_template = csar.get_entrypoint()
 
     # unzip csar, save the path to storage and set workdir
@@ -201,9 +192,6 @@ def deploy_compressed_csar(
     csar_tosca_service_template_path = csar_dir / tosca_service_template
     storage.write(str(csar_tosca_service_template_path), "root_file")
     workdir = str(csar_dir)
-
-    # initialize service template from CSAR and deploy
-    ast = tosca.load(Path(csar_dir), Path(tosca_service_template))
-    template = ast.get_template(inputs)
-    topology = template.instantiate(storage)
+    template, _ = parse_csar(csar_path, inputs)
+    topology = Topology.instantiate(template, storage)
     topology.deploy(verbose_mode, workdir, num_workers)
