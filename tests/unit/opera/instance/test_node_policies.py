@@ -1,9 +1,10 @@
 import pathlib
 
 import pytest
+from opera_tosca_parser.commands.parse import parse_service_template
 
-from opera.parser import tosca
 from opera.storage import Storage
+from opera.instance.topology import Topology
 
 
 class TestNodePolicies:
@@ -242,38 +243,37 @@ class TestNodePolicies:
 
         storage = Storage(tmp_path / pathlib.Path(".opera"))
         storage.write("service.yaml", "root_file")
-        ast = tosca.load(tmp_path, name)
-        template = ast.get_template({})
-        template.instantiate(storage)
-        yield template
+        template, _ = parse_service_template((tmp_path / name), {})
+        topology_template = Topology.instantiate(template, storage)
+        yield topology_template
 
     def test_count_policies_for_service_template(self, service_template):
-        assert len(service_template.policies) == 3
+        assert len(service_template.template.policies) == 3
 
     def test_count_policies_for_node(self, service_template):
         node_vm = service_template.find_node("VM")
-        assert len(node_vm.policies) == 3
+        assert len(node_vm.template.policies) == 3
 
         node_monitoring = service_template.find_node("ConfigureMonitoring")
-        assert len(node_monitoring.policies) == 2
+        assert len(node_monitoring.template.policies) == 2
 
     def test_find_policies_for_node(self, service_template):
         node_vm = service_template.find_node("VM")
-        node_vm_policies = [policy.name for policy in node_vm.policies]
+        node_vm_policies = [policy.name for policy in node_vm.template.policies]
 
         assert "scale_down" in node_vm_policies
         assert "scale_up" in node_vm_policies
         assert "autoscale" in node_vm_policies
 
         node_monitoring = service_template.find_node("ConfigureMonitoring")
-        node_monitoring_policies = [policy.name for policy in node_monitoring.policies]
+        node_monitoring_policies = [policy.name for policy in node_monitoring.template.policies]
 
         assert "scale_down" in node_monitoring_policies
         assert "scale_up" in node_monitoring_policies
 
     def test_find_policy_targets(self, service_template):
         node_vm = service_template.find_node("VM")
-        node_vm_policy_targets = [policy.targets for policy in node_vm.policies]
+        node_vm_policy_targets = [policy.targets for policy in node_vm.template.policies]
 
         assert "VM" in node_vm_policy_targets[0]
         assert "VM" in node_vm_policy_targets[1]
@@ -281,7 +281,7 @@ class TestNodePolicies:
 
     def test_find_policy_triggers(self, service_template):
         node_vm = service_template.find_node("VM")
-        node_vm_policy_triggers = [policy.triggers for policy in node_vm.policies]
+        node_vm_policy_triggers = [policy.triggers for policy in node_vm.template.policies]
 
         assert "steampunk.triggers.scaling.ScaleDown" in node_vm_policy_triggers[0]
         assert "steampunk.triggers.scaling.ScaleUp" in node_vm_policy_triggers[1]
@@ -289,7 +289,7 @@ class TestNodePolicies:
 
     def test_find_policy_trigger_events(self, service_template):
         node_vm = service_template.find_node("VM")
-        node_vm_policy_triggers = [policy.triggers for policy in node_vm.policies]
+        node_vm_policy_triggers = [policy.triggers for policy in node_vm.template.policies]
 
         assert node_vm_policy_triggers[0]["steampunk.triggers.scaling.ScaleDown"].event.data == "scale_down_trigger"
         assert node_vm_policy_triggers[1]["steampunk.triggers.scaling.ScaleUp"].event.data == "scale_up_trigger"
@@ -297,7 +297,7 @@ class TestNodePolicies:
 
     def test_find_policy_trigger_target_filter(self, service_template):
         node_vm = service_template.find_node("VM")
-        node_vm_policy_triggers = [policy.triggers for policy in node_vm.policies]
+        node_vm_policy_triggers = [policy.triggers for policy in node_vm.template.policies]
 
         assert node_vm_policy_triggers[0]["steampunk.triggers.scaling.ScaleDown"].target_filter[0] == "VM"
         assert node_vm_policy_triggers[1]["steampunk.triggers.scaling.ScaleUp"].target_filter[0] == "VM"
@@ -305,7 +305,7 @@ class TestNodePolicies:
 
     def test_find_policy_trigger_action(self, service_template):
         node_vm = service_template.find_node("VM")
-        node_vm_policy_triggers = [policy.triggers for policy in node_vm.policies]
+        node_vm_policy_triggers = [policy.triggers for policy in node_vm.template.policies]
 
         interface1, operation1, _ = node_vm_policy_triggers[0]["steampunk.triggers.scaling.ScaleDown"].action[0]
         assert ("scaling_down", "scale_down") == (interface1, operation1)
@@ -321,7 +321,7 @@ class TestNodePolicies:
 
     def test_find_policy_properties(self, service_template):
         node_vm = service_template.find_node("VM")
-        node_vm_policy_properties = [policy.properties for policy in node_vm.policies]
+        node_vm_policy_properties = [policy.properties for policy in node_vm.template.policies]
 
         assert "cpu_lower_bound" in node_vm_policy_properties[0]
         assert "adjustment" in node_vm_policy_properties[0]

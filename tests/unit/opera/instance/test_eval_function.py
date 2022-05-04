@@ -1,9 +1,10 @@
 import pathlib
 
 import pytest
+from opera_tosca_parser.commands.parse import parse_service_template
 
-from opera.parser import tosca
 from opera.storage import Storage
+from opera.instance.topology import Topology
 
 
 class TestEvalFunction:
@@ -47,9 +48,9 @@ class TestEvalFunction:
         ))
         storage = Storage(tmp_path / pathlib.Path(".opera"))
         storage.write("service.yaml", "root_file")
-        ast = tosca.load(tmp_path, name)
-        template = ast.get_template({"marker": "test_input"})
-        yield template
+        template, _ = parse_service_template((tmp_path / name), {"marker": "test_input"})
+        topology_template = Topology.instantiate(template, storage)
+        yield topology_template
 
     def test_string_eval(self, service_template):
         node = service_template.find_node("test_node")
