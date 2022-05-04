@@ -1,9 +1,10 @@
 import pathlib
 
 import pytest
+from opera_tosca_parser.commands.parse import parse_service_template
 
-from opera.parser import tosca
 from opera.storage import Storage
+from opera.instance.topology import Topology
 
 
 def setupdir(path, yaml_text):
@@ -103,9 +104,8 @@ def prepare_template(path, yaml_text, template):
     (path / name).write_text(yaml_text(template))
     storage = Storage(path / pathlib.Path(".opera"))
     storage.write("template.yaml", "root_file")
-    ast = tosca.load(path, name)
-    template = ast.get_template({})
-    topology = template.instantiate(storage)
+    template, _ = parse_service_template((path / name), {})
+    topology = Topology.instantiate(template, storage)
     return template, topology, path, storage
 
 

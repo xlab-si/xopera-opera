@@ -1,10 +1,11 @@
 import pathlib
 
 import pytest
+from opera_tosca_parser.commands.parse import parse_service_template
 
 from opera.error import DataError
-from opera.parser import tosca
 from opera.storage import Storage
+from opera.instance.topology import Topology
 
 
 class TestAttributeMapping:
@@ -48,10 +49,9 @@ class TestAttributeMapping:
         ))
         storage = Storage(tmp_path / pathlib.Path(".opera"))
         storage.write("template.yaml", "root_file")
-        ast = tosca.load(tmp_path, name)
-        template = ast.get_template({})
-        template.instantiate(storage)
-        yield template
+        template, _ = parse_service_template((tmp_path / name), {})
+        topology_template = Topology.instantiate(template, storage)
+        yield topology_template
 
     def test_map_attribute_node(self, service_template):
         node = service_template.find_node("my_node")
@@ -76,18 +76,16 @@ class TestAttributeMapping:
             node.map_attribute(["SELF", "volume"], "loud")
 
     def test_map_attribute_relationship_source(self, service_template):
-        node_source = service_template.find_node("my_collector")
-        node_source_instance = next(iter(node_source.instances.values()))
+        node_source_instance = service_template.find_node("my_collector")
         relationship_instance = next(iter(node_source_instance.out_edges["my_target"].values()))
 
         relationship_instance.map_attribute(["SOURCE", "colour"], "ochre")
 
-        assert node_source.get_attribute(["SELF", "colour"]) == "ochre"
+        assert node_source_instance.get_attribute(["SELF", "colour"]) == "ochre"
 
     def test_map_attribute_relationship_target(self, service_template):
         node_target = service_template.find_node("my_node")
-        node_source = service_template.find_node("my_collector")
-        node_source_instance = next(iter(node_source.instances.values()))
+        node_source_instance = service_template.find_node("my_collector")
         relationship_instance = next(iter(node_source_instance.out_edges["my_target"].values()))
 
         relationship_instance.map_attribute(["TARGET", "colour"], "magenta")
@@ -95,8 +93,7 @@ class TestAttributeMapping:
         assert node_target.get_attribute(["SELF", "colour"]) == "magenta"
 
     def test_map_attribute_relationship_self(self, service_template):
-        node_source = service_template.find_node("my_collector")
-        node_source_instance = next(iter(node_source.instances.values()))
+        node_source_instance = service_template.find_node("my_collector")
         relationship_instance = next(iter(node_source_instance.out_edges["my_target"].values()))
 
         relationship_instance.map_attribute(["SELF", "colour"], "steampunk")
@@ -110,8 +107,7 @@ class TestAttributeMapping:
         ("other", "The attribute's 'host' should be set to one of")
     ])
     def test_map_attribute_relationship_bad_host(self, service_template, host):
-        node_source = service_template.find_node("my_collector")
-        node_source_instance = next(iter(node_source.instances.values()))
+        node_source_instance = service_template.find_node("my_collector")
         relationship_instance = next(iter(node_source_instance.out_edges["my_target"].values()))
 
         with pytest.raises(DataError, match="Invalid attribute host for attribute mapping"):
@@ -119,8 +115,7 @@ class TestAttributeMapping:
 
     @pytest.mark.parametrize("host", ["SELF", "SOURCE", "TARGET"])
     def test_map_attr_rel_bad_attr(self, service_template, host):
-        node_source = service_template.find_node("my_collector")
-        node_source_instance = next(iter(node_source.instances.values()))
+        node_source_instance = service_template.find_node("my_collector")
         relationship_instance = next(iter(node_source_instance.out_edges["my_target"].values()))
 
         with pytest.raises(DataError, match="Cannot find attribute 'volume' among"):

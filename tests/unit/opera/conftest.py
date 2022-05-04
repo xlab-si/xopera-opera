@@ -1,8 +1,7 @@
 import textwrap
 
 import pytest
-
-from opera.parser import yaml
+from opera_tosca_parser.parser import yaml
 
 
 @pytest.fixture
