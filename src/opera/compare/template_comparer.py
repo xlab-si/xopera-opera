@@ -1,7 +1,8 @@
 import filecmp
 from os import path
 
-from opera.error import DataError
+from opera_tosca_parser.error import DataError
+
 from .comparisons import Comparison, ListComparison, MapComparison
 from .diff import Diff
 
@@ -86,11 +87,11 @@ class TemplateComparer:
     @staticmethod
     def _compare_value(val1, val2, context):
         try:
-            eval1 = val1.eval(context.template1, "")
+            eval1 = val1.eval(context.template1.instance, "")
         except DataError:
             eval1 = None
         try:
-            eval2 = val2.eval(context.template2, "")
+            eval2 = val2.eval(context.template2.instance, "")
         except DataError:
             eval2 = None
         return eval1 == eval2, [eval1, eval2]
