@@ -4,17 +4,20 @@ from opera.instance.base import Base
 
 
 class Relationship(Base):
-    def __init__(self, template, topology, instance_id, source, target):
+    def __init__(self, template, topology, instance_id, source=None, target=None):
         super().__init__(template, topology, instance_id)
 
         self.source = source
         self.target = target
 
     @staticmethod
-    def instantiate(template, topology, source, target):
-        relationship_id = f"{source.tosca_id}--{target.tosca_id}"
-        template.instances = {relationship_id: Relationship(template, topology, relationship_id, source, target)}
-        return template.instances.values()
+    def instantiate(template, topology, source=None, target=None):
+        if source and target:
+            relationship_id = f"{source.tosca_id}--{target.tosca_id}"
+        else:
+            relationship_id = template.name + "_0"
+        template.instance = Relationship(template, topology, relationship_id, source, target)
+        return template.instance
 
     #
     # TOSCA functions

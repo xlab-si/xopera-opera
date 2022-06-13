@@ -33,12 +33,11 @@ class Node(Base):  # pylint: disable=too-many-public-methods
             target = requirement.target.instance
             target.in_edges[rname] = target.in_edges.get(rname, {})
 
-            rel_instances = Relationship.instantiate(requirement.relationship, self.topology, self, target)
-            for rel in rel_instances:
-                self.out_edges[rname][target.tosca_id] = rel
-                target.in_edges[rname][self.tosca_id] = rel
-                target.in_edges[rname][self.tosca_id] = rel
-                rel.read()
+            rel_instance = Relationship.instantiate(requirement.relationship, self.topology, self, target)
+            self.out_edges[rname][target.tosca_id] = rel_instance
+            target.in_edges[rname][self.tosca_id] = rel_instance
+            target.in_edges[rname][self.tosca_id] = rel_instance
+            rel_instance.read()
 
     @property
     def deploying(self):
@@ -250,7 +249,7 @@ class Node(Base):  # pylint: disable=too-many-public-methods
             if r.relationship.is_a("tosca.relationships.HostedOn") and r.target.is_a("tosca.nodes.Compute")
         ), None)
         if host:
-            instance = next(iter(host.instances.values()))
+            instance = host.instance
             return instance.attributes["public_address"].eval(
                 self, "public_address"
             )
