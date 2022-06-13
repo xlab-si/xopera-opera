@@ -6,12 +6,15 @@ from opera.threading import NodeExecutor
 from opera.constants import OperationHost
 from opera.error import DataError
 from .node import Node
+from .relationship import Relationship
 
 
 class Topology:  # pylint: disable=too-many-public-methods
     def __init__(self, template, storage=None):
         self.storage = storage
         self.nodes = {n.tosca_id: n for n in (Node.instantiate(node, self) for node in template.nodes.values())}
+        self.relationships = {r.tosca_id: r for r in (Relationship.instantiate(relationship, self)
+                              for relationship in template.relationships.values())}
         self.template = template
 
         for node in self.nodes.values():
