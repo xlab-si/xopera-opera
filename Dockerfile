@@ -8,7 +8,6 @@ WORKDIR /opera
 RUN apt-get update \
     && apt-get install -y git-all \
     && pip install --upgrade pip wheel \
-    && pip install -r requirements.txt \
     && pip install .
 
 ENTRYPOINT ["opera", "--version", "/dev/null"]
