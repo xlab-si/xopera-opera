@@ -1,4 +1,4 @@
-ansible-core>=2.12.4 # GPLv3
+ansible-core>=2.13.1 # GPLv3
 pyyaml<=5.4.1 # MIT
-shtab>=1.5.3 # Apache 2.0
-opera-tosca-parser>=0.1.2
+shtab>=1.5.5 # Apache 2.0
+opera-tosca-parser>=0.1.2 # Apache 2.0
