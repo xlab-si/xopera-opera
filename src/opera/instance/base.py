@@ -81,6 +81,7 @@ class Base:
             operation = self.template.interfaces[interface].operations.get(operation_type.value)
         else:
             operation = self.template.interfaces[interface].operations.get(operation_type)
+
         if operation:
             success, outputs, attributes = self.run(operation, host, verbose, workdir, validate)
         else:
@@ -88,7 +89,7 @@ class Base:
 
         if not success:
             self.set_state(NodeState.ERROR)
-            raise OperationError("Failed", self.tosca_name, interface, operation_type.value)
+            raise OperationError("Failed", self.tosca_name, interface, operation)
 
         for params, value in outputs:
             self.map_attribute(params, value)

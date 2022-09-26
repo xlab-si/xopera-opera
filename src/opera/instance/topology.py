@@ -1,6 +1,6 @@
 from typing import Optional
 
-from opera_tosca_parser.template.topology import Topology as Template
+from opera_tosca_parser.parser.tosca.v_1_3.template.topology import Topology as Template
 
 from opera.threading import NodeExecutor
 from opera.constants import OperationHost

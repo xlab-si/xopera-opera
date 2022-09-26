@@ -28,8 +28,8 @@ def setupdir(path, yaml_text):
                     type: string
                     value: { get_property: [ SELF, marker ] }
                 operations:
-                  create: files/create.yaml
-                  delete: files/delete.yaml
+                  create: create.yaml
+                  delete: delete.yaml
               hello:
                 type: hello_interface
 
@@ -39,7 +39,7 @@ def setupdir(path, yaml_text):
             operations:
               hello_operation:
                 description: Operation for saying hello
-                implementation: files/hello.yaml
+                implementation: hello.yaml
 
         policy_types:
           hello_policy:
@@ -86,7 +86,7 @@ def setupdir(path, yaml_text):
                 msg: "Hello!"
         """
 
-    (path / "types.yaml").write_text(yaml_text(imports))
+    (path / "files" / "types.yaml").write_text(yaml_text(imports))
     (path / "files" / "create.yaml").write_text(yaml_text(playbook1))
     (path / "files" / "delete.yaml").write_text(yaml_text(playbook2))
     (path / "files" / "hello.yaml").write_text(yaml_text(playbook3))
@@ -127,7 +127,7 @@ def service_template(tmp_path, yaml_text):
         tosca_definitions_version: tosca_simple_yaml_1_3
 
         imports:
-          - types.yaml
+          - files/types.yaml
 
         topology_template:
           inputs:
@@ -162,7 +162,7 @@ def service_template_updated(tmp_path, yaml_text):
         tosca_definitions_version: tosca_simple_yaml_1_3
 
         imports:
-          - types.yaml
+          - files/types.yaml
 
         topology_template:
           inputs:
@@ -206,7 +206,7 @@ def csar(tmp_path, yaml_text):
         tosca_definitions_version: tosca_simple_yaml_1_3
 
         imports:
-          - types.yaml
+          - files/types.yaml
 
         topology_template:
           inputs:

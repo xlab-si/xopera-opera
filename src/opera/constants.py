@@ -14,8 +14,12 @@ class StandardInterfaceOperation(Enum):
         return "Standard"
 
     @classmethod
-    def type_uri(cls):
+    def type_uri_1_3(cls):
         return "tosca.interfaces.node.lifecycle.Standard"
+
+    @classmethod
+    def type_uri_2_0(cls):
+        return "Lifecycle.Standard"
 
 
 # enum for tosca.interfaces.relationship.Configure operations
@@ -34,8 +38,12 @@ class ConfigureInterfaceOperation(Enum):
         return "Configure"
 
     @classmethod
-    def type_uri(cls):
+    def type_uri_1_3(cls):
         return "tosca.interfaces.relationship.Configure"
+
+    @classmethod
+    def type_uri_2_0(cls):
+        return "Relationship.Configure"
 
 
 # enum for TOSCA node orchestration states
@@ -63,4 +71,3 @@ class OperationHost(Enum):
     SOURCE = "SOURCE"
     TARGET = "TARGET"
     HOST = "HOST"
-    ORCHESTRATOR = "ORCHESTRATOR"

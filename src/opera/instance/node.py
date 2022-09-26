@@ -1,8 +1,8 @@
 from typing import Optional
 from pathlib import Path
 
-from opera_tosca_parser.template.node import Node as Template
-from opera_tosca_parser.template.trigger import Trigger
+from opera_tosca_parser.parser.tosca.v_1_3.template.node import Node as Template
+from opera_tosca_parser.parser.tosca.v_1_3.template.trigger import Trigger
 
 from opera.constants import StandardInterfaceOperation, ConfigureInterfaceOperation, NodeState, OperationHost
 from opera.error import DataError
