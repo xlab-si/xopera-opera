@@ -2,7 +2,7 @@ import argparse
 from pathlib import Path, PurePath
 
 import shtab
-from opera_tosca_parser.parser.tosca.csar import CloudServiceArchive
+from opera_tosca_parser.parser import tosca
 
 from opera.error import DataError, ParseError
 from opera.utils import generate_random_pathname
@@ -58,8 +58,6 @@ def _parser_callback(args):
 
 
 def unpackage(csar_input: PurePath, output_dir: PurePath):
-    csar = CloudServiceArchive.create(csar_input)
-    # validate CSAR before unpacking it
-    csar.validate_csar()
+    csar = tosca.load_csar(csar_input)
     # unpack the CSAR to the specified location
     csar.unpackage_csar(output_dir)

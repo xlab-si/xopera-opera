@@ -5,14 +5,13 @@ from typing import Dict, Optional, Union
 
 import shtab
 import yaml
+from opera_tosca_parser.error import ParseError as ToscaParserParseError
 from opera_tosca_parser.parser import tosca
-from opera_tosca_parser.parser.tosca.csar import CloudServiceArchive
-from opera_tosca_parser.error import OperaToscaParserError
 
 from opera.error import DataError, ParseError
+from opera.instance.topology import Topology
 from opera.storage import Storage
 from opera.utils import format_outputs, save_outputs
-from opera.instance.topology import Topology
 
 
 def add_parser(subparsers):
@@ -82,7 +81,7 @@ def info(csar_or_rootdir: Optional[PurePath], storage: Storage) -> dict:  # pyli
     # stateless autodetect first if possible,
     # which can then be overwritten via state
     if csar_or_rootdir is not None:
-        csar = CloudServiceArchive.create(csar_or_rootdir)
+        csar = tosca.load_csar(csar_or_rootdir, False)
         try:
             # this validates CSAR and the entrypoint's (if it exists) metadata
             # failure to validate here means no static information will be available at all
@@ -97,16 +96,16 @@ def info(csar_or_rootdir: Optional[PurePath], storage: Storage) -> dict:  # pyli
                     service_template_meta = csar.parse_service_template_meta(csar.get_entrypoint())
                     if service_template_meta:
                         info_dict["service_template_metadata"] = service_template_meta.to_dict()
-                except OperaToscaParserError:
+                except ToscaParserParseError:
                     pass
 
             try:
                 csar_meta = csar.parse_csar_meta()
                 if csar_meta:
                     info_dict["csar_metadata"] = csar_meta.to_dict()
-            except OperaToscaParserError:
+            except ToscaParserParseError:
                 pass
-        except OperaToscaParserError:
+        except ToscaParserParseError:
             # anything that fails because of validation can be ignored, we can use state
             # we mark the CSAR as invalid because it's useful to know
             info_dict["csar_valid"] = False
@@ -125,31 +124,30 @@ def info(csar_or_rootdir: Optional[PurePath], storage: Storage) -> dict:  # pyli
         if storage.exists("csars/csar"):
             csar_dir = Path(storage.path) / "csars" / "csar"
             info_dict["content_root"] = str(csar_dir)
-            ast = tosca.load(Path(csar_dir), service_template_path.relative_to(csar_dir))
+            ast = tosca.load_service_template(Path(csar_dir), service_template_path.relative_to(csar_dir))
 
             try:
-                csar = CloudServiceArchive.create(csar_dir)
-                csar.validate_csar()
+                csar = tosca.load_csar(csar_dir)
                 info_dict["csar_valid"] = True
 
                 try:
                     service_template_meta = csar.parse_service_template_meta(csar.get_entrypoint())
                     if service_template_meta:
                         info_dict["service_template_metadata"] = service_template_meta.to_dict()
-                except OperaToscaParserError:
+                except ToscaParserParseError:
                     pass
 
                 try:
                     csar_meta = csar.parse_csar_meta()
                     if csar_meta:
                         info_dict["csar_metadata"] = csar_meta.to_dict()
-                except OperaToscaParserError:
+                except ToscaParserParseError:
                     pass
 
-            except OperaToscaParserError:
+            except ToscaParserParseError:
                 info_dict["csar_valid"] = False
         else:
-            ast = tosca.load(Path(service_template_path.parent), PurePath(service_template_path.name))
+            ast = tosca.load_service_template(Path(service_template_path.parent), PurePath(service_template_path.name))
 
         if storage.exists("instances"):
             template = ast.get_template(inputs)

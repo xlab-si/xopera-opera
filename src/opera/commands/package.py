@@ -3,7 +3,7 @@ from pathlib import Path, PurePath
 from typing import Optional
 
 import shtab
-from opera_tosca_parser.parser.tosca.csar import CloudServiceArchive
+from opera_tosca_parser.parser import tosca
 
 from opera.error import DataError, ParseError
 from opera.utils import generate_random_pathname
@@ -74,6 +74,6 @@ def _parser_callback(args):
 
 def package(input_dir: PurePath, csar_output: str, service_template_path: Optional[PurePath],
             csar_format: str = "zip") -> str:
-    csar = CloudServiceArchive.create(input_dir)
+    csar = tosca.load_csar(input_dir, False)
     result: str = csar.package_csar(csar_output, service_template_path, csar_format)
     return result

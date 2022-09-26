@@ -7,13 +7,13 @@ from zipfile import ZipFile, is_zipfile
 import shtab
 import yaml
 from opera_tosca_parser.commands.parse import parse_csar, parse_service_template
-from opera_tosca_parser.parser.tosca.csar import CloudServiceArchive
+from opera_tosca_parser.parser import tosca
 
 from opera.commands.info import info
 from opera.error import DataError, ParseError
+from opera.instance.topology import Topology
 from opera.storage import Storage
 from opera.utils import prompt_yes_no_question
-from opera.instance.topology import Topology
 
 
 def add_parser(subparsers):
@@ -183,7 +183,7 @@ def deploy_compressed_csar(
     csars_dir = Path(storage.path) / "csars"
     csars_dir.mkdir(exist_ok=True)
 
-    csar = CloudServiceArchive.create(csar_path)
+    csar = tosca.load_csar(csar_path)
     tosca_service_template = csar.get_entrypoint()
 
     # unzip csar, save the path to storage and set workdir
