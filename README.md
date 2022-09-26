@@ -34,6 +34,9 @@ The [xOpera documentation] is available on GitHub pages.
 `opera` implements the TOSCA standard with [Ansible] automation tool where Ansible playbooks can be used as 
 orchestration actuators within the TOSCA interface operations.
 
+*We are currently testing experimental support for [TOSCA Version 2.0], which will become the main version after 
+TOSCA 2.0 is released.*
+
 ## Prerequisites
 `opera` requires Python 3 and a virtual environment. 
 In a typical modern Linux environment, we should already be set. 
