@@ -14,8 +14,8 @@ xOpera orchestration tool compliant with TOSCA YAML v1.3 in the making.
 | Aspect                         | Information                               |
 | ------------------------------ |:-----------------------------------------:|
 | Tool name                      | [opera]                                   |
-| Documentation                  | [CLI documentation]                       |
-| Orchestration standard         | [OASIS TOSCA Simple Profile in YAML v1.3] |
+| Documentation                  | [xOpera documentation]                    |
+| Orchestration standard         | [OASIS TOSCA]                             |
 | Implementation tools           | [Ansible]                                 |
 | Contact us                     | [xopera@xlab.si]                          |
 
@@ -29,8 +29,7 @@ xOpera orchestration tool compliant with TOSCA YAML v1.3 in the making.
 
 ## Introduction
 `opera` aims to be a lightweight orchestrator compliant with [OASIS TOSCA]. 
-The current compliance is with the [OASIS TOSCA Simple Profile in YAML v1.3]. 
-The [xOpera documentation] is available on GitHub pages. 
+The current compliance is with the [OASIS TOSCA Simple Profile in YAML Version 1.3]. 
 `opera` implements the TOSCA standard with [Ansible] automation tool where Ansible playbooks can be used as 
 orchestration actuators within the TOSCA interface operations.
 
@@ -106,12 +105,12 @@ This project has received funding from the European Union’s Horizon 2020 resea
 Agreements No. 825040 ([RADON]), No. 825480 ([SODALITE]) and No. 101000162 ([PIACERE]).
 
 [opera]: https://pypi.org/project/opera/
-[OASIS TOSCA Simple Profile in YAML v1.3]: https://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.3/TOSCA-Simple-Profile-YAML-v1.3.html
+[OASIS TOSCA]: https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=tosca
 [xOpera documentation]: https://xlab-si.github.io/xopera-docs/
-[CLI documentation]: https://xlab-si.github.io/xopera-docs/02-cli.html
 [Ansible]: https://www.ansible.com/
 [xopera@xlab.si]: mailto:xopera@xlab.si
-[OASIS TOSCA]: https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=tosca
+[OASIS TOSCA Simple Profile in YAML Version 1.3]: https://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.3/TOSCA-Simple-Profile-YAML-v1.3.html
+[TOSCA Version 2.0]: https://docs.oasis-open.org/tosca/TOSCA/v2.0/TOSCA-v2.0.html
 [PyPI production]: https://pypi.org/project/opera/#history
 [PyPI development]: https://test.pypi.org/project/opera/#history
 [examples folder]: examples
